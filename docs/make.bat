@@ -75,7 +75,9 @@ if "%1" == "gh-pages" (
 	rmdir /s /q %GH_PAGES_SOURCES% build REM delete source and make.bat
 	call git add -A :/
 	call git reset . REM un-stage docs directory
-	call git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
+	call git commit -m "Generated gh-pages from master`"
+    call git push origin gh-pages
+    call git checkout master
 	echo.Build finished. The GitHub Pages Documentation site is updated.
 	goto end
 )
