@@ -75,7 +75,7 @@ if "%1" == "gh-pages" (
     @echo.3
     move .\build\html\_static ..
     @echo.4
-	rmdir /s /q %GH_PAGES_SOURCES% build
+	rem rmdir /s /q %GH_PAGES_SOURCES% build
     @echo.5
 	rem call git add -A :/
     rem call git reset .
