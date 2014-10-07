@@ -69,11 +69,11 @@ if "%1" == "gh-pages" (
 	call git reset HEAD
 	call make html
     @echo.1
-	move .\build\html\*.* ..
-    @echo.2
     move .\build\html\_sources ..
-    @echo.3
+    @echo.2
     move .\build\html\_static ..
+    @echo.3
+	move .\build\html\*.* ..
     @echo.4
 	rem rmdir /s /q %GH_PAGES_SOURCES% build
     @echo.5
