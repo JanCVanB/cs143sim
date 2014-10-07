@@ -69,9 +69,9 @@ if "%1" == "gh-pages" (
 	call git reset HEAD
 	call make html
     pause
-	move .\build\html\*.* ..
 	move .\build\html\_sources ..
 	move .\build\html\_static ..
+	move .\build\html\*.* ..
 	rmdir /s /q %GH_PAGES_SOURCES% build
 	call git add -A :/
 	call git reset .
