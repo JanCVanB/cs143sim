@@ -5,7 +5,7 @@ REM Command file for Sphinx documentation
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
-set GH_PAGES_SOURCES=source make.bat
+set GH_PAGES_SOURCES=source _themes make.bat
 set BUILDDIR=_build
 set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% .
 set I18NSPHINXOPTS=%SPHINXOPTS% .
@@ -66,7 +66,7 @@ if "%1" == "gh-pages" (
     echo.1
 	call git checkout gh-pages
     echo.2
-	rmdir -rf build _sources _static _modules
+	rmdir _build _static _themes source
     echo.3
 	call git checkout master %GH_PAGES_SOURCES%
     echo.4
