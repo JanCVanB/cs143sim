@@ -68,7 +68,7 @@ if "%1" == "gh-pages" (
 	call git checkout master %GH_PAGES_SOURCES%
 	call git reset HEAD
 	call make html
-	move build/html/* ./
+	move ./build/html/*.html ..
 	rmdir /s /q %GH_PAGES_SOURCES% build
 	call git add -A
 	call git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
