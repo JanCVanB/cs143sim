@@ -66,10 +66,6 @@ if errorlevel 9009 (
 if "%1" == "gh-pages" (
 	echo.0
 	call git checkout gh-pages
-	echo.1
-	del make.bat
-	echo.2
-	rmdir \f build source
 	echo.3
 	call git checkout master %GH_PAGES_SOURCES%
 	echo.4
@@ -77,9 +73,9 @@ if "%1" == "gh-pages" (
 	echo.5
 	call make html
 	echo.6
-	move -fv build/html/* ./
+	move build/html/* ./
 	echo.7
-	rmdir -rf %GH_PAGES_SOURCES% build
+	rmdir /s /f %GH_PAGES_SOURCES% build
 	echo.8
 	call git add -A
 	echo.9
