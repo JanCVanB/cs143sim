@@ -72,10 +72,11 @@ if "%1" == "gh-pages" (
 	move .\build\html\_sources ..
 	move .\build\html\_static ..
 	move .\build\html\*.* ..
-	rmdir /s /q %GH_PAGES_SOURCES% build REM delete source and make.bat
+    del /q %GH_PAGES_SOURCES% REM delete make.bat
+	rmdir /s /q %GH_PAGES_SOURCES% build REM delete source and build
 	call git add -A :/
 	call git reset . REM un-stage docs directory
-	call git commit -m "Generated gh-pages from master`"
+	call git commit -m "Generated gh-pages from master"
     call git push origin gh-pages
     call git checkout master
 	echo.Build finished. The GitHub Pages Documentation site is updated.
