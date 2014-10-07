@@ -5,7 +5,7 @@ REM Command file for Sphinx documentation
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
-set GH_PAGES_SOURCES=docs/index.rst docs/CourseMaterials docs/Makefile
+set GH_PAGES_SOURCES=Makefile
 set BUILDDIR=_build
 set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% .
 set I18NSPHINXOPTS=%SPHINXOPTS% .
@@ -65,7 +65,7 @@ if errorlevel 9009 (
 if "%1" == "gh-pages" (
 	call git checkout gh-pages
 	rmdir -rf build _sources _static _modules
-	call git checkout master -- %GH_PAGES_SOURCES%
+	call git checkout master %GH_PAGES_SOURCES%
 	call git reset HEAD
 	call make html
 	move -fv build/html/* ./
