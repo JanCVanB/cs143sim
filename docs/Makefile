@@ -2,7 +2,7 @@
 #
 
 # GitHub Pages sync process variable
-GH_PAGES_SOURCES = docs/source cs143sim docs/Makefile
+GH_PAGES_SOURCES = docs cs143sim docs/Makefile
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
@@ -24,8 +24,21 @@ I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 .PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
 
+# GitHub Pages sync process
+gh-pages:
+	git checkout gh-pages
+	rm -rf build _sources _static _modules
+	git checkout master $(GH_PAGES_SOURCES)
+	git reset HEAD
+	make -f docs/Makefile html
+	mv -fv build/html/* ./
+	rm -rf $(GH_PAGES_SOURCES) build
+	git add -A
+	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
+
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
+	@echo "  gh-pages   to update GitHub Pages documentation site"
 	@echo "  html       to make standalone HTML files"
 	@echo "  dirhtml    to make HTML files named index.html in directories"
 	@echo "  singlehtml to make a single large HTML file"

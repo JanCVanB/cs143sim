@@ -5,6 +5,7 @@ REM Command file for Sphinx documentation
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
+set GH_PAGES_SOURCES=docs cs143sim docs/Makefile
 set BUILDDIR=_build
 set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% .
 set I18NSPHINXOPTS=%SPHINXOPTS% .
@@ -18,6 +19,7 @@ if "%1" == "" goto help
 if "%1" == "help" (
 	:help
 	echo.Please use `make ^<target^>` where ^<target^> is one of
+	echo.  gh-pages   to update GitHub Pages documentation site
 	echo.  html       to make standalone HTML files
 	echo.  dirhtml    to make HTML files named index.html in directories
 	echo.  singlehtml to make a single large HTML file
@@ -58,6 +60,20 @@ if errorlevel 9009 (
 	echo.If you don't have Sphinx installed, grab it from
 	echo.http://sphinx-doc.org/
 	exit /b 1
+)
+
+if "%1" == "gh-pages" (
+	call git checkout gh-pages
+	rmdir -rf build _sources _static _modules
+	call git checkout master %GH_PAGES_SOURCES%
+	call git reset HEAD
+	call make html
+	move -fv build/html/* ./
+	rmdir -rf %GH_PAGES_SOURCES% build
+	call git add -A
+	call git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
+	echo.Build finished. The GitHub Pages Documentation site is updated.
+	goto end
 )
 
 if "%1" == "html" (
