@@ -68,6 +68,7 @@ if "%1" == "gh-pages" (
 	call git checkout master %GH_PAGES_SOURCES%
 	call git reset HEAD
 	call make html
+    pause
 	move .\build\html\*.* ..
 	move .\build\html\_sources ..
 	move .\build\html\_static ..
