@@ -1,0 +1,1 @@
+Search.setIndex({titleterms:{indic:1,cours:0,materi:0,document:1,welcom:1,tabl:1,cs143sim:1},objtypes:{},objnames:{},filenames:["CourseMaterials","index"],terms:{descript:0,test:0,content:1,page:1,search:1,tutori:0,"case":0,modul:1,project:0,index:1},envversion:43,objects:{},titles:["Course Materials","Welcome to cs143sim&#8217;s documentation!"]})

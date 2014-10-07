@@ -1,1 +1,0 @@
-Search.setIndex({envversion:43,objtypes:{},titleterms:{tabl:0,cs143sim:0,indic:0,materi:1,welcom:0,cours:1,document:0},terms:{page:0,search:0,test:1,tutori:1,content:0,"case":1,index:0,project:1,modul:0,descript:1},filenames:["index","CourseMaterials"],objects:{},titles:["Welcome to cs143sim&#8217;s documentation!","Course Materials"],objnames:{}})

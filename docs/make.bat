@@ -5,10 +5,11 @@ REM Command file for Sphinx documentation
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
-set GH_PAGES_SOURCES=source _themes make.bat
-set BUILDDIR=_build
-set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% .
-set I18NSPHINXOPTS=%SPHINXOPTS% .
+
+set GH_PAGES_SOURCES=source make.bat
+set BUILDDIR=build
+set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% source
+set I18NSPHINXOPTS=%SPHINXOPTS% source
 if NOT "%PAPER%" == "" (
 	set ALLSPHINXOPTS=-D latex_paper_size=%PAPER% %ALLSPHINXOPTS%
 	set I18NSPHINXOPTS=-D latex_paper_size=%PAPER% %I18NSPHINXOPTS%
@@ -63,10 +64,12 @@ if errorlevel 9009 (
 )
 
 if "%1" == "gh-pages" (
-    echo.1
+    echo.0
 	call git checkout gh-pages
+    echo.1
+    del make.bat
     echo.2
-	rmdir _build _static _themes source
+	rmdir \f build source
     echo.3
 	call git checkout master %GH_PAGES_SOURCES%
     echo.4
@@ -140,9 +143,9 @@ if "%1" == "qthelp" (
 	echo.
 	echo.Build finished; now you can run "qcollectiongenerator" with the ^
 .qhcp project file in %BUILDDIR%/qthelp, like this:
-	echo.^> qcollectiongenerator %BUILDDIR%\qthelp\cs143sim.qhcp
+	echo.^> qcollectiongenerator %BUILDDIR%\qthelp\CS143Simulation.qhcp
 	echo.To view the help file:
-	echo.^> assistant -collectionFile %BUILDDIR%\qthelp\cs143sim.ghc
+	echo.^> assistant -collectionFile %BUILDDIR%\qthelp\CS143Simulation.ghc
 	goto end
 )
 
