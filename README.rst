@@ -1,7 +1,7 @@
 cs143sim
 ========
 
-Simulator for operation of an abstract communication network (Caltech CS/EE 143, Fall '14)
+Simulator for operation of an abstract communication network (Caltech CS/EE 143, Fall 2014)
 
 Project Specifications
 ----------------------
