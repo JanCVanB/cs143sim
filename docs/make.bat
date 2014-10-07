@@ -64,21 +64,13 @@ if errorlevel 9009 (
 )
 
 if "%1" == "gh-pages" (
-	echo.0
 	call git checkout gh-pages
-	echo.3
 	call git checkout master %GH_PAGES_SOURCES%
-	echo.4
 	call git reset HEAD
-	echo.5
 	call make html
-	echo.6
 	move build/html/* ./
-	echo.7
-	rmdir /s /f %GH_PAGES_SOURCES% build
-	echo.8
+	rmdir /s %GH_PAGES_SOURCES% build
 	call git add -A
-	echo.9
 	call git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
 	echo.Build finished. The GitHub Pages Documentation site is updated.
 	goto end
