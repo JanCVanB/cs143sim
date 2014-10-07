@@ -68,18 +68,13 @@ if "%1" == "gh-pages" (
 	call git checkout master %GH_PAGES_SOURCES%
 	call git reset HEAD
 	call make html
-	@echo.1
-	move .\build\html\_static ..
-	@echo.2
-	move .\build\html\_sources ..
-	@echo.3
 	move .\build\html\*.* ..
-	@echo.4
-	rem rmdir /s /q %GH_PAGES_SOURCES% build
-	@echo.5
-	rem call git add -A :/
-	rem call git reset .
-	rem call git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
+	move .\build\html\_sources ..
+	move .\build\html\_static ..
+	rmdir /s /q %GH_PAGES_SOURCES% build
+	call git add -A :/
+	call git reset .
+	call git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
 	echo.Build finished. The GitHub Pages Documentation site is updated.
 	goto end
 )
