@@ -68,13 +68,13 @@ if "%1" == "gh-pages" (
 	call git checkout master %GH_PAGES_SOURCES%
 	call git reset HEAD
 	call make html
-    pause
+    pause REM without pause, unfinished _static directory throws Access Denied
 	move .\build\html\_sources ..
 	move .\build\html\_static ..
 	move .\build\html\*.* ..
-	rmdir /s /q %GH_PAGES_SOURCES% build
+	rmdir /s /q %GH_PAGES_SOURCES% build REM delete source and make.bat
 	call git add -A :/
-	call git reset .
+	call git reset . REM un-stage docs directory
 	call git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
 	echo.Build finished. The GitHub Pages Documentation site is updated.
 	goto end
