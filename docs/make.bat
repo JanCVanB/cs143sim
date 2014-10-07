@@ -72,7 +72,7 @@ if "%1" == "gh-pages" (
     move .\build\html\_sources ..
     move .\build\html\_static ..
 	rmdir /s /q %GH_PAGES_SOURCES% build
-	call git add -A
+	call git add -A :/
     call git reset .
 	call git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
 	echo.Build finished. The GitHub Pages Documentation site is updated.
