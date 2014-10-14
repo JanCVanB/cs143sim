@@ -1,0 +1,277 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>reSTCodeReferenceModule &mdash; CS 143 Simulation 0.0.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/network.ico"/>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="CS 143 Simulation 0.0.1 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../index.html" class="fa fa-home"> CS 143 Simulation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../CourseMaterials.html">Course Materials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reSTHelp.html">reStructuredText Help</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reSTPrimer.html">Primer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reSTCodeReference.html">Code Reference Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reSTCheatSheet.html">Cheat Sheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reSTMarkupSpecification.html">Complete Markup Specification</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">CS 143 Simulation</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      
+    <li>reSTCodeReferenceModule</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for reSTCodeReferenceModule</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">.. module:: reSTCodeReferenceModule</span>
+<span class="sd">   :platform: Unix, Windows</span>
+<span class="sd">   :synopsis: Example for documenting python code with ReST</span>
+
+<span class="sd">.. moduleauthor:: Jan Van Bruggen &lt;jancvanbruggen@gmail.com&gt;</span>
+
+<span class="sd">This module does a lot of things. Well, not really, it honestly just shows you</span>
+<span class="sd">how to document your code with restructured text. I apologize for the</span>
+<span class="sd">verbosity, I&#39;m just trying to have big paragraphs for you guys to see. I&#39;m also</span>
+<span class="sd">keeping my lines under 80 characters so everyone&#39;s text editors can display</span>
+<span class="sd">them correctly.</span>
+
+<span class="sd">**This is bold because of how important it is.** *However, this is italicized</span>
+<span class="sd">because of how fancy that makes it look.*</span>
+
+<span class="sd">Link to a website:</span>
+
+<span class="sd">- `&lt;http://www.google.com&gt;`_</span>
+<span class="sd">- `Google &lt;http://www.google.com&gt;`_</span>
+<span class="sd">- `TheGoogle`_</span>
+
+<span class="sd">.. _TheGoogle: http://www.google.com</span>
+
+<span class="sd">Include images:</span>
+
+<span class="sd">.. image:: images/JanVanBruggen.jpg</span>
+<span class="sd">    :align: center</span>
+<span class="sd">    :width: 150</span>
+
+<span class="sd">Include raw html:</span>
+
+<span class="sd">.. raw:: html</span>
+
+<span class="sd">   &lt;div align=&quot;center&quot;</span>
+<span class="sd">        style=&quot;background-color:#0000FF; color:#FFFFFF&quot;&gt;</span>
+<span class="sd">     blue div</span>
+<span class="sd">   &lt;/div&gt;</span>
+
+
+<span class="sd">Include a code snippet::</span>
+
+<span class="sd">   for i in range(3):</span>
+<span class="sd">       print(i)</span>
+
+<span class="sd">   print(&#39;added colon&#39;)</span>
+
+<span class="sd">With good colon formatting ::</span>
+
+<span class="sd">   print(&#39;no colon&#39;)</span>
+
+<span class="sd">Like so</span>
+
+<span class="sd">::</span>
+
+<span class="sd">   print(&#39;also no colon&#39;)</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+<div class="viewcode-block" id="my_function"><a class="viewcode-back" href="../reSTCodeReference.html#reSTCodeReferenceModule.my_function">[docs]</a><span class="k">def</span> <span class="nf">my_function</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Sample function for showing doumentation syntax</span>
+
+<span class="sd">    :param int var: some value</span>
+<span class="sd">    :return: the input parameter</span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">var</span>
+
+</div>
+<div class="viewcode-block" id="MyClass"><a class="viewcode-back" href="../reSTCodeReference.html#reSTCodeReferenceModule.MyClass">[docs]</a><span class="k">class</span> <span class="nc">MyClass</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Sample for showing documentation syntax and the Pythagorean Theorem</span>
+
+<span class="sd">    :param var1: a variable that does stuff</span>
+<span class="sd">    :type var1: float</span>
+<span class="sd">    :param str var2: you can combine parameter type and description, if the</span>
+<span class="sd">       type is a single word</span>
+<span class="sd">    :param var3: you can&#39;t combine this parameter type with the description, as</span>
+<span class="sd">       it can be multiple types</span>
+<span class="sd">    :type var3: bool or None</span>
+<span class="sd">    :ivar output: the intended output</span>
+<span class="sd">    :raises AssertionError: if var3 is not a bool or None</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var1</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">var2</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">var3</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">var1</span> <span class="o">=</span> <span class="n">var1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">var2</span> <span class="o">=</span> <span class="n">var2</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">var3</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">var3</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">var3</span> <span class="o">=</span> <span class="n">var3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="MyClass.calcPythagorean"><a class="viewcode-back" href="../reSTCodeReference.html#reSTCodeReferenceModule.MyClass.calcPythagorean">[docs]</a>    <span class="k">def</span> <span class="nf">calcPythagorean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;The first method of my class</span>
+
+<span class="sd">        :param int arg1: the first argument</span>
+<span class="sd">        :param int arg2: the second argument</span>
+<span class="sd">        :return: the square root of the sum of arg1 and arg2</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">arg1</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">arg2</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">z</span>
+</div>
+    <span class="k">def</span> <span class="nf">setOutput</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;The second method of my class, which sets :attr:`output`&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">var2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">var3</span>
+
+<div class="viewcode-block" id="MyClass.run"><a class="viewcode-back" href="../reSTCodeReference.html#reSTCodeReferenceModule.MyClass.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;The run method of my class&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calcPythagorean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setOutput</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">uselessFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

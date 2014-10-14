@@ -7,6 +7,7 @@ Contents:
    :maxdepth: 2
    
    CourseMaterials
+   reSTHelp
 
 
 Indices and tables
