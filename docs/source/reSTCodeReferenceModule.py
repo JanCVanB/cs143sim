@@ -24,7 +24,7 @@ Link to a website:
 
 Include images:
 
-.. image:: images/JanVanBruggen.jpg
+.. image:: _static/network.png
     :align: center
     :width: 150
 

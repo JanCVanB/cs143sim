@@ -1,4 +1,3 @@
-***************************************************
 The reStructuredText_ Cheat Sheet: Syntax Reminders
 ***************************************************
 
@@ -58,7 +57,7 @@ Hyperlink Target  .. _reStructuredText: http://docutils.sf.net/rst.html
                   .. _indirect target: reStructuredText_
                   .. _internal target:
 Anonymous Target  __ http://docutils.sf.net/docs/ref/rst/restructuredtext.html
-Directive ("::")  .. image:: images/JanVanBruggen.jpg
+Directive ("::")  .. image:: _static/network.png
 Substitution Def  .. |substitution| replace:: like an inline directive
 Comment           .. is anything else
 Empty Comment     (".." on a line by itself, with blank lines before & after,

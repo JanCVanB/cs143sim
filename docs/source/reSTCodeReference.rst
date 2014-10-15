@@ -1,6 +1,5 @@
-***************************************
 reStructuredText Code Reference Example
-***************************************
+=======================================
 
    Auto-documentation example for :download:`reSTCodeReferenceModule.py`
 
