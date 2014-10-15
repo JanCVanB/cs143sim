@@ -118,7 +118,44 @@
             
   <div class="section" id="simpy">
 <h1>SimPy<a class="headerlink" href="#simpy" title="Permalink to this headline">¶</a></h1>
-<p>This is a summary of the responsibilities of SimPy.</p>
+<p>The simulation relies on SimPy for event scheduling and process management. It is possible we will use SimPy Stores as part of the Link model.</p>
+<div class="section" id="events">
+<h2>Events<a class="headerlink" href="#events" title="Permalink to this headline">¶</a></h2>
+<p>Events are scheduled to occur at a specific time in the future.</p>
+<ul class="simple">
+<li>Send a packet</li>
+<li>Receive a packet</li>
+<li>Record simulation variables</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">What other events do we have?</p>
+</div>
+</div>
+<div class="section" id="processes">
+<h2>Processes<a class="headerlink" href="#processes" title="Permalink to this headline">¶</a></h2>
+<p>Processes schedule events of various types and wait until the next event should be scheduled (whether a waiting for a time or an acknowledgement).</p>
+<ul class="simple">
+<li>Send data</li>
+<li>Update routing tables</li>
+<li>Monitor simulation</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">What other processes do we have?</p>
+</div>
+</div>
+<div class="section" id="callbacks">
+<h2>Callbacks<a class="headerlink" href="#callbacks" title="Permalink to this headline">¶</a></h2>
+<p>Callbacks are actions to perform in response to an event. Any event can have callbacks for any object. Callbacks are specified when the event is scheduled.</p>
+<ul class="simple">
+<li>???</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">What callbacks do we have?</p>
+</div>
+</div>
 </div>
 
 
