@@ -15,14 +15,14 @@ They are all features of TCP protocol. Different versions of TCP protocol employ
 
 Error Control: How to retransmit
 -----
-Three basic strategies
+	Three basic strategies
 - Stop-and-wait
 - Go Back N
 - Selective Acknowledgments
 
 Congestion Control: What's window size; Avoid saturating routers
 ------
-Basic strategies
+	Basic strategies
 - AIMD: additive increase, multiple decrease	
 - Fast Retransmit and Fast Recovery
 - Adjust Rate
