@@ -3,7 +3,7 @@ cs143sim
 
 Simulator for operation of an abstract communication network (Caltech CS/EE 143, Fall 2014)
 
-Documentation Site: jvanbrug.github.io/cs143sim
+Visit the documentation site `here <jvanbrug.github.io/cs143sim>`_!
 
 Project Specifications
 ----------------------
