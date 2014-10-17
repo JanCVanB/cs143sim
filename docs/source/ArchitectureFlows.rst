@@ -23,8 +23,7 @@ Three basic strategies
 Congestion Control: What's window size; Avoid saturating routers
 ------
 Basic strategies
-- AIMD
-	additive increase, multiple decrease
+- AIMD: additive increase, multiple decrease	
 - Fast Retransmit and Fast Recovery
 - Adjust Rate
 

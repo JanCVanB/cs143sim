@@ -17,7 +17,7 @@ All TCP packets obey these rules
 Layer 3
 ------
 When TCP packet going down to layer 3 (IP layer), some extra information will be added before TCP header.
-(http://en.wikipedia.org/wiki/IPv4)->Header
+( http://en.wikipedia.org/wiki/IPv4 )->Header
 
 Layer 2 and Layer 1
 ------
