@@ -13,11 +13,26 @@ There are three main part of transport layer:
 - Flow Control
 They are all features of TCP protocol. Different versions of TCP protocol employ different strategies.
 
-Error Control
+Error Control: How to retransmit
 -----
+Three basic strategies
+- Stop-and-wait
+- Go Back N
+- Selective Acknowledgments
 
-Congestion Control
+Congestion Control: What's window size; Avoid saturating routers
 ------
+Basic strategies
+- AIMD
+	additive increase, multiple decrease
+- Fast Retransmit and Fast Recovery
+- Adjust Rate
 
-Flow Control
+Flow Control: Avoid saturating destination
 ------
+- When sending ack packet, the destination inform how many buffers left.
+
+What we need to do
+------
+- Realize all the features
+- Combine different features so we have different versions of TCP
