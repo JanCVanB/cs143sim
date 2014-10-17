@@ -118,7 +118,30 @@
             
   <div class="section" id="packets">
 <h1>Packets<a class="headerlink" href="#packets" title="Permalink to this headline">¶</a></h1>
-<p>This is a summary of the roles, attributes, and design of packets.</p>
+<div class="section" id="basic-structure">
+<h2>Basic Structure<a class="headerlink" href="#basic-structure" title="Permalink to this headline">¶</a></h2>
+<p>As the header structure varies as using different version of TCP, we shall let it be some Bytes and let the protocol itself to decode.</p>
+</div>
+<div class="section" id="tcp-header">
+<h2>TCP Header<a class="headerlink" href="#tcp-header" title="Permalink to this headline">¶</a></h2>
+<p>All TCP packets obey these rules</p>
+<ul class="simple">
+<li>Source Port</li>
+<li>Destination Port</li>
+<li>Sequence Number</li>
+<li>Acknowledgment</li>
+<li>...(page 89)</li>
+</ul>
+</div>
+<div class="section" id="layer-3">
+<h2>Layer 3<a class="headerlink" href="#layer-3" title="Permalink to this headline">¶</a></h2>
+<p>When TCP packet going down to layer 3 (IP layer), some extra information will be added before TCP header.</p>
+<p>( <a class="reference external" href="http://en.wikipedia.org/wiki/IPv4">http://en.wikipedia.org/wiki/IPv4</a> )-&gt;Header</p>
+</div>
+<div class="section" id="layer-2-and-layer-1">
+<h2>Layer 2 and Layer 1<a class="headerlink" href="#layer-2-and-layer-1" title="Permalink to this headline">¶</a></h2>
+<p>We don&#8217;t need to worry about them.</p>
+</div>
 </div>
 
 

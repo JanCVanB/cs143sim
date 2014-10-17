@@ -15,6 +15,7 @@ How to manage router tables:
 
 Forwarding
 ----------
+
 - The router forwards data packets between incoming and outgoing interface connections by reading header in packets.
 - How to deal with the situation when packets arrive at a rate higher than the router can process.
 

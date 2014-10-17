@@ -119,6 +119,48 @@
   <div class="section" id="flows">
 <h1>Flows<a class="headerlink" href="#flows" title="Permalink to this headline">¶</a></h1>
 <p>This is a summary of the roles, attributes, and design of flows.</p>
+<div class="section" id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h2>
+<p>In this case, flows are in charge of transport layer.
+There are three main part of transport layer:</p>
+<ul class="simple">
+<li>Error Control</li>
+<li>Congestion Control</li>
+<li>Flow Control</li>
+</ul>
+<p>They are all features of TCP protocol. Different versions of TCP protocol employ different strategies.</p>
+</div>
+<div class="section" id="error-control-how-to-retransmit">
+<h2>Error Control: How to retransmit<a class="headerlink" href="#error-control-how-to-retransmit" title="Permalink to this headline">¶</a></h2>
+<p>Three basic strategies</p>
+<ul class="simple">
+<li>Stop-and-wait</li>
+<li>Go Back N</li>
+<li>Selective Acknowledgments</li>
+</ul>
+</div>
+<div class="section" id="congestion-control-what-s-window-size-avoid-saturating-routers">
+<h2>Congestion Control: What&#8217;s window size; Avoid saturating routers<a class="headerlink" href="#congestion-control-what-s-window-size-avoid-saturating-routers" title="Permalink to this headline">¶</a></h2>
+<p>Basic strategies</p>
+<ul class="simple">
+<li>AIMD: additive increase, multiple decrease</li>
+<li>Fast Retransmit and Fast Recovery</li>
+<li>Adjust Rate</li>
+</ul>
+</div>
+<div class="section" id="flow-control-avoid-saturating-destination">
+<h2>Flow Control: Avoid saturating destination<a class="headerlink" href="#flow-control-avoid-saturating-destination" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>When sending ack packet, the destination inform how many buffers left.</li>
+</ul>
+</div>
+<div class="section" id="what-we-need-to-do">
+<h2>What we need to do<a class="headerlink" href="#what-we-need-to-do" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Realize all the features</li>
+<li>Combine different features so we have different versions of TCP</li>
+</ul>
+</div>
 </div>
 
 

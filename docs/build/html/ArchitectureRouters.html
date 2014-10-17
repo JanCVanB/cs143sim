@@ -118,7 +118,24 @@
             
   <div class="section" id="routers">
 <h1>Routers<a class="headerlink" href="#routers" title="Permalink to this headline">¶</a></h1>
-<p>This is a summary of the roles, attributes, and design of routers.</p>
+<p>Routers mainly forwards data packages between computer networks. The router tables decide which paths to forward current packages. Typically routers do not involved in CCA.</p>
+<div class="section" id="control">
+<h2>Control<a class="headerlink" href="#control" title="Permalink to this headline">¶</a></h2>
+<p>How to manage router tables:</p>
+<ul class="simple">
+<li>Static and dynamic routes are stored in Routing Information Base</li>
+<li>Build a router table</li>
+<li>Update a router table</li>
+<li>Classical algorithms: Bellmen-ford, Dijkstra, etc</li>
+</ul>
+</div>
+<div class="section" id="forwarding">
+<h2>Forwarding<a class="headerlink" href="#forwarding" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>The router forwards data packets between incoming and outgoing interface connections by reading header in packets.</li>
+<li>How to deal with the situation when packets arrive at a rate higher than the router can process.</li>
+</ul>
+</div>
 </div>
 
 
