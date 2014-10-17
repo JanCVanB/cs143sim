@@ -8,6 +8,7 @@ The "cost" is the quantity to minimize for each path, as a sum of edge costs.
 .. author:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 '''
 
+from __future__ import print_function
 from heapq import heappush, heappop
 
 def bellman_ford(Edges, Source):
@@ -155,10 +156,9 @@ Edges = [(1,2,2),
          (6,7,4)]
 Source = 3
 
-print('BellmanFord:')
+print('\nBellmanFord:')
 Brokers, Costs = bellman_ford(Edges, Source)
 print_bellman_chains(Brokers, Costs, Edges, Source)
-print()
-print('Dijkstra:')
+print('\nDijkstra:')
 Paths, Costs = dijkstra(Edges, Source)
 print_dijkstra_chains(Paths, Costs, Edges, Source)
