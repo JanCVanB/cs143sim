@@ -2,6 +2,7 @@
 '''
 import codecs
 import os
+
 import setuptools
 
 import cs143sim
@@ -12,8 +13,8 @@ with codecs.open(os.path.join(HERE, 'README.rst'), encoding='utf-8') as f:
     README = f.read()
 
 setuptools.setup(
-    author="Lan Hongjian, Yamei Ou, Samuel Richerd, Jan Van Bruggen, Junlin Zhang",
-    author_email='jancvanbruggen@gmail.com',
+    author="H. Lan, Y. Ou, S. Richerd, J. Van Bruggen, J. Zhang",
+    author_email='cs143-project@googlegroups.com',
     description='Simulator for operation of an abstract communication network (Caltech CS/EE 143, Fall 2014)',
     name=cs143sim.__name__,
     url='https://github.com/jvanbrug/cs143sim',

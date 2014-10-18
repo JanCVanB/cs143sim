@@ -11,6 +11,7 @@ The "cost" is the quantity to minimize for each path, as a sum of edge costs.
 from __future__ import print_function
 from heapq import heappush, heappop
 
+
 def bellman_ford(Edges, Source):
     '''Return two dictionaries of node IDs keying to broker node IDs and costs
        for the shortest paths to each node, using the Bellman-Ford algorithm'''
@@ -37,6 +38,7 @@ def bellman_ford(Edges, Source):
                 Costs[Receiver] = Costs[Sender] + Cost
         print_bellman_state(Brokers, Costs)
     return Brokers, Costs
+
 
 def dijkstra(Edges, Source):
     '''Return two dictionaries of node IDs keying to broker node IDs and costs
@@ -70,6 +72,7 @@ def dijkstra(Edges, Source):
         print_dijkstra_state(All, Paths, Costs)
     return Paths, Costs
 
+
 def print_destinations(Destinations):
     '''Print all destinations'''
     print('_' * 64)
@@ -78,6 +81,7 @@ def print_destinations(Destinations):
         print('  ' + str(Destination) + '   ', end=' | ')
     print()
     print('|' + '-' * 62 + '|')
+
 
 def print_bellman_chains(Brokers, Costs, Edges, Source):
     '''Print the routing chain from Source to each destination, with Costs'''
@@ -98,6 +102,7 @@ def print_bellman_chains(Brokers, Costs, Edges, Source):
             Last = Broker
         print()
 
+
 def print_bellman_state(Brokers, Costs):
     '''Print the current set of Brokers and Costs for each destination'''
     print('| ', end='')
@@ -108,6 +113,7 @@ def print_bellman_state(Brokers, Costs):
               ' ' * (3 - len(Cost)) + Cost, end=' | ')
     print()
     print('|' + '-' * 62 + '|')
+
 
 def print_dijkstra_chains(Paths, Costs, Edges, Source):
     '''Print the routing chain from Source to each destination, with Costs'''
@@ -128,6 +134,7 @@ def print_dijkstra_chains(Paths, Costs, Edges, Source):
             Last = Broker
         print()
 
+
 def print_dijkstra_state(Destinations, Paths, Costs):
     '''Print the current set of brokers and Costs for each destination'''
     print('| ', end='')
@@ -144,21 +151,22 @@ def print_dijkstra_state(Destinations, Paths, Costs):
     print()
     print('|' + '-' * 62 + '|')
 
-# Edge: (Node1, Node2, Cost)
-Edges = [(1,2,2),
-         (1,7,3),
-         (2,3,1),
-         (3,4,8),
-         (4,5,1),
-         (5,1,4),
-         (5,6,2),
-         (5,7,1),
-         (6,7,4)]
-Source = 3
 
-print('\nBellmanFord:')
-Brokers, Costs = bellman_ford(Edges, Source)
-print_bellman_chains(Brokers, Costs, Edges, Source)
-print('\nDijkstra:')
-Paths, Costs = dijkstra(Edges, Source)
-print_dijkstra_chains(Paths, Costs, Edges, Source)
+if __name__ == '__main__':
+    Edges = [(1, 2, 2),  # (Node1, Node2, Cost)
+             (1, 7, 3),
+             (2, 3, 1),
+             (3, 4, 8),
+             (4, 5, 1),
+             (5, 1, 4),
+             (5, 6, 2),
+             (5, 7, 1),
+             (6, 7, 4)]
+    Source = 3
+    print('\nBellmanFord:')
+    Brokers, Costs = bellman_ford(Edges, Source)
+    print_bellman_chains(Brokers, Costs, Edges, Source)
+    print('\nDijkstra:')
+    Paths, Costs = dijkstra(Edges, Source)
+    print_dijkstra_chains(Paths, Costs, Edges, Source)
+

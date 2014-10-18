@@ -8,7 +8,7 @@ The reStructuredText_ Cheat Sheet: Syntax Reminders
 :Description: This is a "docinfo block", or bibliographic field list
 
 .. NOTE:: If you are reading this as HTML, please read
-   the `text source <../../ReSTCheatSheet.rst>`_ instead to see the input
+   the `text source <../../reSTCheatSheet.rst>`_ instead to see the input
    syntax examples!
 
 Section Structure

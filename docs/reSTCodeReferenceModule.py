@@ -1,7 +1,7 @@
 '''
 .. module:: reSTCodeReferenceModule
    :platform: Unix, Windows
-   :synopsis: Example for documenting python code with ReST
+   :synopsis: Example for documenting python code with reST
 
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 
