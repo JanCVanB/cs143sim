@@ -32,7 +32,7 @@ Grid table:
 Simple tables:
 
 ================  ============================================================
-List Type         Examples (syntax in the `text source`_)
+List Type         Examples
 ================  ============================================================
 Bullet list       * items begin with "-", "+", or "*"
 Enumerated list   1. items use any variation of "1.", "A)", and "(i)"
@@ -44,7 +44,7 @@ Option list       -o  at least 2 spaces between option & description
 ================  ============================================================
 
 ================  ============================================================
-Explicit Markup   Examples (visible in the `text source`_)
+Explicit Markup   Examples
 ================  ============================================================
 Footnote          .. [1] Manually numbered or [#] auto-numbered
                      (even [#labelled]) or [*] auto-symbol
