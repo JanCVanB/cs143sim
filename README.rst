@@ -26,6 +26,7 @@ For each of these, you should be able to produce both a time trace and an overal
 Project Links
 -------------
 
+- 'Documentation Site <http://jvanbrug.github.io/cs143sim>'_
 - `Course Website <http://courses.cms.caltech.edu/cs143/>`_
 - `Project Description <http://courses.cms.caltech.edu/cs143/Project/NetworkSimGuidelines-2013-Rev2.pdf>`_
 - `Test Cases <http://courses.cms.caltech.edu/cs143/Project/NetworkSimTestCases-2013-Rev4.pdf>`_

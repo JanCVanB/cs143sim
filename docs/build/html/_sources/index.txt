@@ -7,6 +7,7 @@ Contents:
    :maxdepth: 2
    
    Architecture
+   Code
    CourseMaterials
    reSTHelp
 
