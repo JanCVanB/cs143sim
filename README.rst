@@ -3,7 +3,7 @@ cs143sim
 
 Simulator for operation of an abstract communication network (Caltech CS/EE 143, Fall 2014)
 
-Visit the documentation site `here <http://jvanbrug.github.io/cs143sim>`_!
+Visit the documentation site `here <http://cs143sim.readthedocs.org/>`_!
 
 Project Specifications
 ----------------------
@@ -26,7 +26,7 @@ For each of these, you should be able to produce both a time trace and an overal
 Project Links
 -------------
 
-- 'Documentation Site <http://jvanbrug.github.io/cs143sim>'_
+- 'Documentation Site <http://cs143sim.readthedocs.org/>'_
 - `Course Website <http://courses.cms.caltech.edu/cs143/>`_
 - `Project Description <http://courses.cms.caltech.edu/cs143/Project/NetworkSimGuidelines-2013-Rev2.pdf>`_
 - `Test Cases <http://courses.cms.caltech.edu/cs143/Project/NetworkSimTestCases-2013-Rev4.pdf>`_

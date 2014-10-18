@@ -53,9 +53,9 @@ Explicit Markup   Examples (visible in the `text source`_)
 Footnote          .. [1] Manually numbered or [#] auto-numbered
                      (even [#labelled]) or [*] auto-symbol
 Citation          .. [CIT2002] A citation.
-Hyperlink Target  .. _reStructuredText: http://docutils.sf.net/rst.html
-                  .. _indirect target: reStructuredText_
-                  .. _internal target:
+Hyperlink Target  .. _reStructuredText:: http://docutils.sf.net/rst.html
+                  .. _indirect target:: reStructuredText_
+                  .. _internal target:: `reStructured Text <http://docutils.sf.net/rst.html>`_
 Anonymous Target  __ http://docutils.sf.net/docs/ref/rst/restructuredtext.html
 Directive ("::")  .. image:: _static/network.png
 Substitution Def  .. |substitution| replace:: like an inline directive
