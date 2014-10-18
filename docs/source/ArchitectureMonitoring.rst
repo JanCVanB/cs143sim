@@ -14,5 +14,3 @@ These are the variables to monitor:
 - Flow Rate for each Flow
 - Window Size for each Flow
 - Packet Delay for each Flow
-
-.. note:: Should we monitor any other simulation variables

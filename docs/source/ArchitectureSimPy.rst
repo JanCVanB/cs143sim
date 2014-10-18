@@ -8,11 +8,11 @@ Events
 
 Events are scheduled to occur at a specific time in the future.
 
-- Send a packet
-- Receive a packet
-- Record simulation variables
-
-.. note:: What other events do we have?
+- Link available
+- Packet received
+- Packet added to buffer
+- Send routing table update packet
+- Flow starts
 
 Processes
 ---------
@@ -21,15 +21,10 @@ Processes schedule events of various types and wait until the next event should 
 
 - Send data
 - Update routing tables
-- Monitor simulation
-
-.. note:: What other processes do we have?
 
 Callbacks
 ---------
 
 Callbacks are actions to perform in response to an event. Any event can have callbacks for any object. Callbacks are specified when the event is scheduled.
 
-- ???
-
-.. note:: What callbacks do we have?
+- Update simulation monitors

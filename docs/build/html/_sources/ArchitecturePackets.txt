@@ -23,6 +23,8 @@ When TCP packet going down to layer 3 (IP layer), some extra information will be
 
 ( http://en.wikipedia.org/wiki/IPv4 )->Header
 
+.. note:: Research router packet manipulation between Layers 2 and 3
+
 Layer 2 and Layer 1
 -------------------
 

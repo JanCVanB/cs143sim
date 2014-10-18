@@ -118,7 +118,43 @@
             
   <div class="section" id="hosts">
 <h1>Hosts<a class="headerlink" href="#hosts" title="Permalink to this headline">¶</a></h1>
-<p>This is a summary of the roles, attributes, and design of hosts.</p>
+<p>This is a summary of variables and functions of host.</p>
+<div class="section" id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h2>
+<p>In the general cases, hosts are in charge of flow control. congestion control, and transmission protocols. But in our architecture, there is an individual flow class, so the main mission of hosts is to link flows(packets) to the outer world, which are links and routers.</p>
+</div>
+<div class="section" id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>IP address</li>
+<li>Flows on this host</li>
+<li>Sending Buffer?</li>
+<li>Receiving Buffer?</li>
+<li>Links connected to this host</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Sending buffer? Ask Flows each time link available?</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Receiving buffer?</p>
+</div>
+</div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Detect the buffer of the links it connects</li>
+<li>Transmit packets: Take the order of the flow, transmit the packet if the link is robust.</li>
+<li>Receive packets: Receive packets from links. It should be able to distinguish acknowledge packets from normal packets.</li>
+<li>Send feedbacks to flows: When the host receives an acknowledgement, it should let the flow know that the packet has been sent successfully.</li>
+<li>Check the destination IP address of incoming packets</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Ignore bad destination IPs?</p>
+</div>
+</div>
 </div>
 
 

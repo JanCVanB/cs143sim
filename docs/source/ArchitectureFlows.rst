@@ -33,6 +33,8 @@ Basic strategies
 - Fast Retransmit and Fast Recovery
 - Adjust Rate
 
+.. note:: What's "Adjust Rate"?
+
 Flow Control: Avoid saturating destination
 ------------------------------------------
 
