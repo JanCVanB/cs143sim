@@ -5,7 +5,7 @@ import os
 import setuptools
 
 import cs143sim
-ou ar
+
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 with codecs.open(os.path.join(HERE, 'README.rst'), encoding='utf-8') as f:
@@ -40,7 +40,5 @@ setuptools.setup(
     package_data={
     },
     entry_points={
-        'console_scripts': [
-        ],
     },
 )
