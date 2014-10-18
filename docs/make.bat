@@ -5,11 +5,9 @@ REM Command file for Sphinx documentation
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
-
-set GH_PAGES_SOURCES=source make.bat
-set BUILDDIR=build
-set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% source
-set I18NSPHINXOPTS=%SPHINXOPTS% source
+set BUILDDIR=_build
+set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% .
+set I18NSPHINXOPTS=%SPHINXOPTS% .
 if NOT "%PAPER%" == "" (
 	set ALLSPHINXOPTS=-D latex_paper_size=%PAPER% %ALLSPHINXOPTS%
 	set I18NSPHINXOPTS=-D latex_paper_size=%PAPER% %I18NSPHINXOPTS%
@@ -20,7 +18,6 @@ if "%1" == "" goto help
 if "%1" == "help" (
 	:help
 	echo.Please use `make ^<target^>` where ^<target^> is one of
-	echo.  gh-pages   to update GitHub Pages documentation site
 	echo.  html       to make standalone HTML files
 	echo.  dirhtml    to make HTML files named index.html in directories
 	echo.  singlehtml to make a single large HTML file
@@ -61,26 +58,6 @@ if errorlevel 9009 (
 	echo.If you don't have Sphinx installed, grab it from
 	echo.http://sphinx-doc.org/
 	exit /b 1
-)
-
-if "%1" == "gh-pages" (
-	call git checkout gh-pages
-	call git checkout master %GH_PAGES_SOURCES%
-	call git reset HEAD
-	call make html
-    pause REM without pause, unfinished _static directory throws Access Denied
-	move .\build\html\_sources ..
-	move .\build\html\_static ..
-	move .\build\html\*.* ..
-    del /q %GH_PAGES_SOURCES% REM delete make.bat
-	rmdir /s /q %GH_PAGES_SOURCES% build REM delete source and build
-	call git add -A :/
-	call git reset . REM un-stage docs directory
-	call git commit -m "Generated gh-pages from master"
-    call git push origin gh-pages
-    call git checkout master
-	echo.Build finished. The GitHub Pages Documentation site is updated.
-	goto end
 )
 
 if "%1" == "html" (
