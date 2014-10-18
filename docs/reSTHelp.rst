@@ -7,4 +7,3 @@ reStructuredText Help
    Primer <reSTPrimer>
    Code Reference Example <reSTCodeReference>
    Cheat Sheet <reSTCheatSheet>
-   Complete Markup Specification <reSTMarkupSpecification>
