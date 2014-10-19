@@ -1,5 +1,6 @@
-'''The cs143sim Package
-'''
+"""
+The cs143sim Package
+"""
 
 __all__ = []
 __name__ = 'cs143sim'
