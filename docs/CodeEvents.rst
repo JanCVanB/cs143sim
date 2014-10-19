@@ -1,6 +1,8 @@
 Events
 ======
 
+.. automodule:: cs143sim.events
+
 .. currentmodule:: cs143sim.events
 
 Flow Start
