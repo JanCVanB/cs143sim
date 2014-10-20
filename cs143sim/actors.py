@@ -3,6 +3,7 @@ This module contains all actor definitions.
 
 .. autosummary::
 
+    Buffer
     Flow
     Host
     Link
@@ -15,6 +16,20 @@ This module contains all actor definitions.
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
 """
+
+
+class Buffer:
+    """Representation of a data storage container
+
+    Flows try to transmit data from Host to Host.
+
+    :param int capacity: maximum number of packets that can be stored
+    :ivar int capacity: maximum number of packets that can be stored
+    :ivar list packets: packets currently in storage
+    """
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.packets = []
 
 
 class Flow:
