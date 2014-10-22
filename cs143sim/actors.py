@@ -180,9 +180,27 @@ class Router:
     Routers route packets through the network to their destination Hosts.
 
     :param list links: all connected Links
+    :param Link default_gateway: default route
     :ivar list links: all connected Links
     :ivar dict table: routing table
     """
-    def __init__(self, links):
+    def __init__(self, links, address, default_gateway):
+        self.address = address
         self.links = links
         self.table = {}
+        self.default_gateway = default_gateway
+        
+    def update_router_table(self):
+        
+    
+    def map_route(self,packet):
+        
+        return output_link
+        
+    def read_packet_head(packet):
+        
+        return destination_address
+        
+    def get_neighbor_router(self):
+        
+        return neighbor_routers
