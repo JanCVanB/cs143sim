@@ -147,19 +147,19 @@ class Router:
         self.address = address
         self.links = links
         self.table = {}
-        self.default_gateway = default_gateway;
+        self.default_gateway = default_gateway
         
     def update_router_table(self):
         
     
     def map_route(self,packet):
         
-        return output_link;
+        return output_link
         
     def read_packet_head(packet):
         
-        return destination_address;
+        return destination_address
         
     def get_neighbor_router(self):
         
-        return neighbor_routers;
+        return neighbor_routers
