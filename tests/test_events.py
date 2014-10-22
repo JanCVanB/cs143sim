@@ -13,16 +13,20 @@ from test_actors import basic_router
 def basic_environment():
     return Environment()
 
+
 def basic_flow_start():
     FlowStart(env=basic_environment(), delay=1.0, flow=basic_flow())
+
 
 def basic_link_available():
     LinkAvailable(env=basic_environment(), delay=1.0, router=basic_router(),
                   link=basic_link())
 
+
 def basic_packet_receipt():
     PacketReceipt(env=basic_environment(), delay=1.0, router=basic_router(),
                   link=basic_link(), packet=basic_packet())
+
 
 def basic_update_routing_table():
     UpdateRoutingTable(env=basic_environment(), delay=1.0,

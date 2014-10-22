@@ -21,15 +21,20 @@ This module contains all actor definitions.
 class Buffer:
     """Representation of a data storage container
 
-    Flows try to transmit data from Host to Host.
+    Buffers store data to be linked while Link is busy sending data.
 
-    :param int capacity: maximum number of packets that can be stored
-    :ivar int capacity: maximum number of packets that can be stored
+    :param int capacity: maximum number of bits that can be stored
+    :ivar int capacity: maximum number of bits that can be stored
     :ivar list packets: packets currently in storage
     """
     def __init__(self, capacity):
         self.capacity = capacity
         self.packets = []
+
+    def add(self, packet):
+        current_level = sum(packet.size for packet in self.packets)
+        if current_level + packet.size <= self.capacity:
+            self.packets.append(packet)
 
 
 class Flow:
@@ -37,11 +42,11 @@ class Flow:
 
     Flows try to transmit data from Host to Host.
 
-    :param actors.Host source: source Host
-    :param actors.Host destination: destination Host
+    :param cs143sim.actors.Host source: source Host
+    :param cs143sim.actors.Host destination: destination Host
     :param float amount: amount of data to transmit
-    :ivar actors.Host source: source Host
-    :ivar actors.Host destination: destination Host
+    :ivar cs143sim.actors.Host source: source Host
+    :ivar cs143sim.actors.Host destination: destination Host
     :ivar float amount: amount of data to transmit
     """
     def __init__(self, source, destination, amount):
@@ -73,18 +78,33 @@ class Link:
     :param source: source Host or Router
     :param destination: destination Host or Router
     :param float delay: amount of time required to transmit a packet
+    :param float rate: speed of removing data from source
+    :param int buffer_capacity: Buffer capacity in bits
     :ivar source: source Host
     :ivar destination: destination Host
     :ivar float delay: amount of time required to transmit a packet
     :ivar list buffer: packets currently in transmission
+    :ivar bool busy: whether currently removing data from source
     :ivar float utilization: fraction of capacity in use
     """
-    def __init__(self, source, destination, delay):
+    def __init__(self, source, destination, delay, rate, buffer_capacity):
         self.source = source
         self.destination = destination
         self.delay = delay
-        self.buffer = []
+        self.rate = rate
+        self.buffer = Buffer(capacity=buffer_capacity)
+        self.busy = False
         self.utilization = 0
+
+    def add(self, packet):
+        if self.busy:
+            self.buffer.add(packet)
+        else:
+            self.send(packet)
+
+    def send(self, packet):
+        # TODO: implement sending
+        pass
 
 
 class Packet:
@@ -96,20 +116,25 @@ class Packet:
     :param destination: destination port
     :param int number: sequence number
     :param acknowledgement: acknowledgement... something
+    :cvar int PACKET_SIZE: size of every packet, in bits
     :ivar source: source port
     :ivar destination: destination port
     :ivar int number: sequence number
     :ivar acknowledgement: acknowledgement... something
+    :ivar int size: size of packet, in bits
     """
+    PACKET_SIZE = 8192  # bits
+
     def __init__(self, source, destination, number, acknowledgement):
         self.source = source
         self.destination = destination
         self.number = number
         self.acknowledgement = acknowledgement
+        self.size = Packet.PACKET_SIZE
 
 
 class Router:
-    """Representation of a... router
+    """Representation of a router...
 
     Routers route packets through the network to their destination Hosts.
 
