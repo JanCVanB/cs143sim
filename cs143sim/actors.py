@@ -53,8 +53,49 @@ class Flow:
         self.source = source
         self.destination = destination
         self.amount = amount
-
-
+        
+        
+        
+        
+    def make_packet(packet_num):
+        """
+        Make a packet based on the packet number 
+        """
+    
+    def send_packet():
+        """
+        When possible, TLA use this method to send a pcket
+        """
+        
+    def receive_packet():
+        """
+        When receive a packet, check if the packet is an ack packet. If so, run TLA
+        """
+    
+    def time_out():
+        """
+        When time out happens, run TLA
+        Time_out timers should be reset if a the ack arrive
+        """
+    
+    def TLA():
+        """
+        Transport Layer Algorithm main body 
+        Including transmission control, congestion control algorithm (window size adjust)
+        Flow control might not be needed, as the receiving buffer size is unlimited.
+        
+        For example (stop and wait):
+            TLA send a packet
+            while(! all packet have been transmitted):
+                yield(time_out|receive_ack)
+                if(time_out) : 
+                    retransmit
+                    reset timer
+                if(receive_ack) :
+                    transmit new packet
+                    reset timer
+        """
+        
 class Host:
     """Representation of an access point
 
