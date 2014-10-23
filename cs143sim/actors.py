@@ -138,10 +138,13 @@ class Router:
 
     Routers route packets through the network to their destination Hosts.
 
+    :param address:IP address for router
     :param list links: all connected Links
     :param Link default_gateway: default route
+    :param default_gateway: default out port if can not decide route
     :ivar list links: all connected Links
     :ivar dict table: routing table
+    :ivar default_gateway: default out port if can not decide route
     """
     def __init__(self, links, address, default_gateway):
         self.address = address
@@ -150,10 +153,13 @@ class Router:
         self.default_gateway = default_gateway
         
     def update_router_table(self):
+        neighbors = get_neighbor_router()
+        pass
         
     
     def map_route(self,packet):
-        
+        dest = read_packet_head(packet)
+        output_link = table[dest]
         return output_link
         
     def read_packet_head(packet):
