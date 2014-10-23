@@ -102,11 +102,9 @@ class Host:
     Hosts send Packets through Links to Routers or other Hosts.
 
     :param str address: IP address
-    :param int buffer: Sending buffer
     :param list flows: Flows on this host
     :param link link: Link connected to this host
     :ivar str address: IP address
-    :ivar int buffer: Sending buffer
     :ivar list link: Link connected to this host
     :ivar list flows: Flows on this host
     """
@@ -114,17 +112,12 @@ class Host:
         self.address = address
         self.flows = flows
         self.link = link
-        self.buffer = buffer
-
-    def detect_buffer(self)
-        return self.link.buffer
 
     def send(self, packet)
-        if self.detect_buffer() >= packet.PACKET_SIZE:
-           pass to the link
+        self.link.add(packet)
 
     def receive(self, packet)
-        pass to flows[packet.destination]
+        # TODO: pass to flows[packet.destination]
 
 class Link:
     """Representation of a physical link between access points or routers
