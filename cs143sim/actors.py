@@ -108,16 +108,17 @@ class Host:
     :ivar list link: Link connected to this host
     :ivar list flows: Flows on this host
     """
-    def __init__(self, address, flows, link, buffer):
+    def __init__(self, address, flows, link):
         self.address = address
         self.flows = flows
         self.link = link
 
-    def send(self, packet)
+    def send(self, packet):
         self.link.add(packet)
 
-    def receive(self, packet)
+    def receive(self, packet):
         # TODO: pass to flows[packet.destination]
+        pass
 
 class Link:
     """Representation of a physical link between access points or routers
