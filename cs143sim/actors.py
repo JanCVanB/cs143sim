@@ -97,8 +97,8 @@ class Flow:
 class Host:
     """Representation of an access point
 
-    Hosts send :class:`Packets <.Packet> through :class:`Links <.Link>` to
-    :class:`Routers <.Router>` or other :class:`Hosts <.Host>`.
+    Hosts send :class:`Packets <.Packet>` through a :class:`.Link` to a
+    :class:`.Router` or to another :class:`.Host`.
 
     :param str address: IP address
     :param list flows: :class:`Flows <.Flow>` on this :class:`.Host`
