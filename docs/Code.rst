@@ -6,3 +6,4 @@ Source Code
    
    CodeActors
    CodeEvents
+   CodeSimulation
