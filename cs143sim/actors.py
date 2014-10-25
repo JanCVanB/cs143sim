@@ -54,6 +54,10 @@ class Flow:
         self.destination = destination
         self.amount = amount
 
+    def __str__(self):
+        return ('Flow from ' + self.source.address +
+                ' to ' + self.destination.address)
+
     def make_packet(self, packet_num):
         """
         Make a packet based on the packet number
@@ -101,16 +105,17 @@ class Host:
     :class:`.Router` or to another :class:`.Host`.
 
     :param str address: IP address
-    :param list flows: :class:`Flows <.Flow>` on this :class:`.Host`
-    :param link: :class:`Link` connected to this :class:`.Host`
     :ivar str address: IP address
     :ivar list flows: :class:`Flows <.Flow>` on this :class:`.Host`
     :ivar link: :class:`Link` connected to this :class:`.Host`
     """
-    def __init__(self, address, flows, link):
+    def __init__(self, address):
         self.address = address
-        self.flows = flows
-        self.link = link
+        self.flows = []
+        self.link = None
+
+    def __str__(self):
+        return 'Host at ' + self.address
 
     def send(self, packet):
         self.link.add(packet)
@@ -145,6 +150,10 @@ class Link:
         self.buffer = Buffer(capacity=buffer_capacity)
         self.busy = False
         self.utilization = 0
+
+    def __str__(self):
+        return ('Link from ' + self.source.address +
+                ' to ' + self.destination.address)
 
     def add(self, packet):
         if self.busy:
@@ -183,6 +192,11 @@ class Packet:
         self.acknowledgement = acknowledgement
         self.size = Packet.PACKET_SIZE
 
+    def __str__(self):
+        return ('Packet ' + str(self.number) +
+                ' from ' + self.source.address +
+                ' to ' + self.destination.address)
+
 
 class Router:
     """Representation of a data router
@@ -200,6 +214,9 @@ class Router:
         self.links = links
         self.table = {}
         self.default_gateway = default_gateway
+
+    def __str__(self):
+        return 'Router at ' + self.address
 
     def update_router_table(self):
         # TODO: update router table

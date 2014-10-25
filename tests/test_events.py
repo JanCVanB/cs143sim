@@ -24,7 +24,7 @@ def basic_link_available():
 
 
 def basic_packet_receipt():
-    PacketReceipt(env=basic_environment(), delay=1.0, router=basic_router(),
+    PacketReceipt(env=basic_environment(), delay=1.0, receiver=basic_router(),
                   link=basic_link(), packet=basic_packet())
 
 

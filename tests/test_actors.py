@@ -15,7 +15,7 @@ def basic_flow():
 
 
 def basic_host():
-    return Host(address='', flows=[], link=None)
+    return Host(address='')
 
 
 def basic_link():
