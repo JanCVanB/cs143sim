@@ -42,11 +42,11 @@ class Flow:
 
     Flows try to transmit data from :class:`.Host` to :class:`.Host`.
 
-    :param cs143sim.actors.Host source: source :class:`.Host`
-    :param cs143sim.actors.Host destination: destination :class:`.Host`
+    :param source: source :class:`.Host`
+    :param destination: destination :class:`.Host`
     :param float amount: amount of data to transmit
-    :ivar cs143sim.actors.Host source: source :class:`.Host`
-    :ivar cs143sim.actors.Host destination: destination :class:`.Host`
+    :ivar source: source :class:`.Host`
+    :ivar destination: destination :class:`.Host`
     :ivar float amount: amount of data to transmit
     """
     def __init__(self, source, destination, amount):
@@ -102,12 +102,10 @@ class Host:
 
     :param str address: IP address
     :param list flows: :class:`Flows <.Flow>` on this :class:`.Host`
-    :param cs143sim.actors.Link link: :class:`Link` connected to this
-    :class:`.Host`
+    :param link: :class:`Link` connected to this :class:`.Host`
     :ivar str address: IP address
     :ivar list flows: :class:`Flows <.Flow>` on this :class:`.Host`
-    :ivar cs143sim.actors.Link link: :class:`Link` connected to this
-    :class:`.Host`
+    :ivar link: :class:`Link` connected to this :class:`.Host`
     """
     def __init__(self, address, flows, link):
         self.address = address
@@ -174,7 +172,7 @@ class Packet:
     :ivar destination: destination :class:`.Host` or :class:`.Router`
     :ivar int number: sequence number
     :ivar acknowledgement: acknowledgement... something
-    :ivar int size: size of :class:`.Packet`, in bits
+    :ivar int size: size, in bits
     """
     PACKET_SIZE = 8192  # bits
 
@@ -193,7 +191,7 @@ class Router:
     respective destination :class:`Hosts <.Host>`.
 
     :param list links: all connected :class:`Links <.Link>`
-    :param cs143sim.actors.Link default_gateway: default :class:`.Link`
+    :param default_gateway: default :class:`.Link`
     :ivar list links: all connected :class:`Links <.Link>`
     :ivar dict table: routing table
     """
