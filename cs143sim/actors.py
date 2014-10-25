@@ -53,49 +53,47 @@ class Flow:
         self.source = source
         self.destination = destination
         self.amount = amount
-        
-        
-        
-        
-    def make_packet(packet_num):
+
+    def make_packet(self, packet_num):
         """
-        Make a packet based on the packet number 
+        Make a packet based on the packet number
         """
-    
-    def send_packet():
+
+    def send_packet(self):
         """
-        When possible, TLA use this method to send a pcket
+        When possible, TLA use this method to send a packet
         """
-        
-    def receive_packet():
+
+    def receive_packet(self):
         """
         When receive a packet, check if the packet is an ack packet. If so, run TLA
         """
-    
-    def time_out():
+
+    def time_out(self):
         """
         When time out happens, run TLA
         Time_out timers should be reset if a the ack arrive
         """
-    
-    def TLA():
+
+    def tla(self):
         """
-        Transport Layer Algorithm main body 
+        Transport Layer Algorithm main body
         Including transmission control, congestion control algorithm (window size adjust)
         Flow control might not be needed, as the receiving buffer size is unlimited.
-        
+
         For example (stop and wait):
             TLA send a packet
             while(! all packet have been transmitted):
                 yield(time_out|receive_ack)
-                if(time_out) : 
+                if(time_out) :
                     retransmit
                     reset timer
                 if(receive_ack) :
                     transmit new packet
                     reset timer
         """
-        
+
+
 class Host:
     """Representation of an access point
 
@@ -120,6 +118,7 @@ class Host:
         # TODO: pass to flows[packet.destination]
         pass
 
+
 class Link:
     """Representation of a physical link between access points or routers
 
@@ -130,8 +129,8 @@ class Link:
     :param float delay: amount of time required to transmit a packet
     :param float rate: speed of removing data from source
     :param int buffer_capacity: Buffer capacity in bits
-    :ivar source: source Host
-    :ivar destination: destination Host
+    :ivar source: source Host or Router
+    :ivar destination: destination Host or Router
     :ivar float delay: amount of time required to transmit a packet
     :ivar list buffer: packets currently in transmission
     :ivar bool busy: whether currently removing data from source
@@ -198,18 +197,19 @@ class Router:
         self.links = links
         self.table = {}
         self.default_gateway = default_gateway
-        
+
     def update_router_table(self):
-        
-    
-    def map_route(self,packet):
-        
+        # TODO: update router table
+        pass
+
+    def map_route(self, packet):
+        # TODO: get output_link
         return output_link
-        
+
     def read_packet_head(packet):
-        
+        # TODO: get destination_address
         return destination_address
-        
+
     def get_neighbor_router(self):
-        
+        # TODO: get neighbor_routers
         return neighbor_routers

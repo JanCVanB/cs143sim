@@ -15,7 +15,7 @@ def basic_flow():
 
 
 def basic_host():
-    return Host(address='', flows=[])
+    return Host(address='', flows=[], link=None)
 
 
 def basic_link():
@@ -29,7 +29,8 @@ def basic_packet():
 
 
 def basic_router():
-    return Router(links=[basic_link()])
+    return Router(links=[basic_link()], address='',
+                  default_gateway=basic_link())
 
 
 def buffer_overflow():
