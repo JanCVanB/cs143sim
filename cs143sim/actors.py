@@ -42,11 +42,11 @@ class Flow:
 
     Flows try to transmit data from Host to Host.
 
-    :param cs143sim.actors.Host source: source Host
-    :param cs143sim.actors.Host destination: destination Host
+    :param .Host source: source Host
+    :param .Host destination: destination Host
     :param float amount: amount of data to transmit
-    :ivar cs143sim.actors.Host source: source Host
-    :ivar cs143sim.actors.Host destination: destination Host
+    :ivar .Host source: source Host
+    :ivar .Host destination: destination Host
     :ivar float amount: amount of data to transmit
     """
     def __init__(self, source, destination, amount):
@@ -101,9 +101,9 @@ class Host:
 
     :param str address: IP address
     :param list flows: Flows on this host
-    :param link link: Link connected to this host
+    :param .Link link: Link connected to this host
     :ivar str address: IP address
-    :ivar list link: Link connected to this host
+    :ivar .Link link: Link connected to this host
     :ivar list flows: Flows on this host
     """
     def __init__(self, address, flows, link):
@@ -124,7 +124,7 @@ class Link:
 
     Links carry packets from one end to the other.
 
-    :param source: source Host or Router
+    :param source: source :class:`.Host` or :class:`.Router`
     :param destination: destination Host or Router
     :param float delay: amount of time required to transmit a packet
     :param float rate: speed of removing data from source
@@ -161,13 +161,13 @@ class Packet:
 
     Packets carry information along the network, between Hosts or Routers.
 
-    :param source: source port
-    :param destination: destination port
+    :param source: source Host or Router
+    :param destination: destination Host or Router
     :param int number: sequence number
     :param acknowledgement: acknowledgement... something
     :cvar int PACKET_SIZE: size of every packet, in bits
-    :ivar source: source port
-    :ivar destination: destination port
+    :ivar source: source Host or Router
+    :ivar destination: destination Host or Router
     :ivar int number: sequence number
     :ivar acknowledgement: acknowledgement... something
     :ivar int size: size of packet, in bits
@@ -188,7 +188,7 @@ class Router:
     Routers route packets through the network to their destination Hosts.
 
     :param list links: all connected Links
-    :param Link default_gateway: default route
+    :param .Link default_gateway: default route
     :ivar list links: all connected Links
     :ivar dict table: routing table
     """
