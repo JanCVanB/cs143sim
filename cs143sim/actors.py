@@ -21,11 +21,11 @@ This module contains all actor definitions.
 class Buffer:
     """Representation of a data storage container
 
-    Buffers store data to be linked while Link is busy sending data.
+    Buffers store data to be linked while :class:`.Link` is busy sending data.
 
     :param int capacity: maximum number of bits that can be stored
     :ivar int capacity: maximum number of bits that can be stored
-    :ivar list packets: packets currently in storage
+    :ivar list packets: :class:`Packets <.Packet>` currently in storage
     """
     def __init__(self, capacity):
         self.capacity = capacity
@@ -40,13 +40,13 @@ class Buffer:
 class Flow:
     """Representation of a connection between access points
 
-    Flows try to transmit data from Host to Host.
+    Flows try to transmit data from :class:`.Host` to :class:`.Host`.
 
-    :param .Host source: source Host
-    :param .Host destination: destination Host
+    :param cs143sim.actors.Host source: source :class:`.Host`
+    :param cs143sim.actors.Host destination: destination :class:`.Host`
     :param float amount: amount of data to transmit
-    :ivar .Host source: source Host
-    :ivar .Host destination: destination Host
+    :ivar cs143sim.actors.Host source: source :class:`.Host`
+    :ivar cs143sim.actors.Host destination: destination :class:`.Host`
     :ivar float amount: amount of data to transmit
     """
     def __init__(self, source, destination, amount):
@@ -97,14 +97,17 @@ class Flow:
 class Host:
     """Representation of an access point
 
-    Hosts send Packets through Links to Routers or other Hosts.
+    Hosts send :class:`Packets <.Packet> through :class:`Links <.Link>` to
+    :class:`Routers <.Router>` or other :class:`Hosts <.Host>`.
 
     :param str address: IP address
-    :param list flows: Flows on this host
-    :param .Link link: Link connected to this host
+    :param list flows: :class:`Flows <.Flow>` on this :class:`.Host`
+    :param cs143sim.actors.Link link: :class:`Link` connected to this
+    :class:`.Host`
     :ivar str address: IP address
-    :ivar .Link link: Link connected to this host
-    :ivar list flows: Flows on this host
+    :ivar list flows: :class:`Flows <.Flow>` on this :class:`.Host`
+    :ivar cs143sim.actors.Link link: :class:`Link` connected to this
+    :class:`.Host`
     """
     def __init__(self, address, flows, link):
         self.address = address
@@ -125,14 +128,14 @@ class Link:
     Links carry packets from one end to the other.
 
     :param source: source :class:`.Host` or :class:`.Router`
-    :param destination: destination Host or Router
-    :param float delay: amount of time required to transmit a packet
+    :param destination: destination :class:`.Host` or :class:`.Router`
+    :param float delay: amount of time required to transmit a :class:`.Packet`
     :param float rate: speed of removing data from source
-    :param int buffer_capacity: Buffer capacity in bits
-    :ivar source: source Host or Router
-    :ivar destination: destination Host or Router
-    :ivar float delay: amount of time required to transmit a packet
-    :ivar list buffer: packets currently in transmission
+    :param int buffer_capacity: :class:`.Buffer` capacity in bits
+    :ivar source: source :class:`.Host` or :class:`.Router`
+    :ivar destination: destination :class:`.Host` or :class:`.Router`
+    :ivar float delay: amount of time required to transmit a :class:`.Packet`
+    :ivar list buffer: :class:`Packets <.Packet>` currently in transmission
     :ivar bool busy: whether currently removing data from source
     :ivar float utilization: fraction of capacity in use
     """
@@ -159,18 +162,19 @@ class Link:
 class Packet:
     """Representation of a quantum of information
 
-    Packets carry information along the network, between Hosts or Routers.
+    Packets carry information along the network, between :class:`Hosts <.Host>`
+    or :class:`Routers <.Router>`.
 
-    :param source: source Host or Router
-    :param destination: destination Host or Router
+    :param source: source :class:`.Host` or :class:`.Router`
+    :param destination: destination :class:`.Host` or :class:`.Router`
     :param int number: sequence number
     :param acknowledgement: acknowledgement... something
-    :cvar int PACKET_SIZE: size of every packet, in bits
-    :ivar source: source Host or Router
-    :ivar destination: destination Host or Router
+    :cvar int PACKET_SIZE: size of every :class:`.Packet`, in bits
+    :ivar source: source :class:`.Host` or :class:`.Router`
+    :ivar destination: destination :class:`.Host` or :class:`.Router`
     :ivar int number: sequence number
     :ivar acknowledgement: acknowledgement... something
-    :ivar int size: size of packet, in bits
+    :ivar int size: size of :class:`.Packet`, in bits
     """
     PACKET_SIZE = 8192  # bits
 
@@ -183,13 +187,14 @@ class Packet:
 
 
 class Router:
-    """Representation of a router...
+    """Representation of a data router
 
-    Routers route packets through the network to their destination Hosts.
+    Routers route :class:`Packets <.Packet>` through the network to their
+    respective destination :class:`Hosts <.Host>`.
 
-    :param list links: all connected Links
-    :param .Link default_gateway: default route
-    :ivar list links: all connected Links
+    :param list links: all connected :class:`Links <.Link>`
+    :param cs143sim.actors.Link default_gateway: default :class:`.Link`
+    :ivar list links: all connected :class:`Links <.Link>`
     :ivar dict table: routing table
     """
     def __init__(self, links, address, default_gateway):
