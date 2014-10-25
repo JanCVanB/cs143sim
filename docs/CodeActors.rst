@@ -5,6 +5,12 @@ Actors
 
 .. currentmodule:: cs143sim.actors
 
+Buffer
+------
+
+.. autoclass:: Buffer
+    :members:
+
 Flow
 ----
 
