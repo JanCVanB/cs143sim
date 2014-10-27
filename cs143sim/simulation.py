@@ -16,6 +16,7 @@ from simpy.core import Environment
 from cs143sim.actors import Flow
 from cs143sim.actors import Host
 from cs143sim.actors import Link
+from cs143sim.actors import Router
 from cs143sim.events import FlowStart
 
 
@@ -74,9 +75,21 @@ class Controller:
         """
         new_link = Link(source=source, destination=destination, delay=delay,
                         rate=rate, buffer_capacity=buffer_capacity)
-        source.link = new_link
-        destination.link = new_link
+        for actor in (source, destination):
+            if isinstance(actor, Host):
+                actor.link = new_link
+            elif isinstance(actor, Router):
+                actor.links.append(new_link)
         self.links[name] = new_link
+
+    def make_router(self, name):
+        """Make a new :class:`.Router` and add it to `self.routers`
+
+        :param str name: new :class:`.Router` name
+        """
+        address = name + ' address'  # TODO: implement IP addresses
+        new_router = Router(address=address)
+        self.routers[name] = new_router
 
     def read_case(self, case):
         """Read input file at path `case` and create actors and events
@@ -106,9 +119,13 @@ class Controller:
                     rate = float(case_line[3])
                     delay = float(case_line[4])
                     buffer_capacity = int(case_line[5])
-                    for host_name in (source_name, destination_name):
-                        if host_name not in self.hosts:
-                            self.make_host(name=host_name)
+                    for actor_name in (source_name, destination_name):
+                        if (actor_name not in self.hosts and
+                                actor_name not in self.routers):
+                            if 'H' in actor_name:
+                                self.make_host(name=actor_name)
+                            elif 'R' in actor_name:
+                                self.make_router(name=actor_name)
                     source = self.hosts[source_name]
                     destination = self.hosts[destination_name]
                     self.make_link(name=actor_name, source=source,

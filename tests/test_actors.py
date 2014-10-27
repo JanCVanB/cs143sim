@@ -29,8 +29,7 @@ def basic_packet():
 
 
 def basic_router():
-    return Router(links=[basic_link()], address='',
-                  default_gateway=basic_link())
+    return Router(address='')
 
 
 def buffer_overflow():

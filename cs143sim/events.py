@@ -43,7 +43,8 @@ class FlowStart(Timeout):
     :param flow: :class:`~cs143sim.actors.Flow` that starts
     """
     def __init__(self, env, delay, flow):
-        super(FlowStart, self).__init__(env, delay, value=flow)
+        super(FlowStart, self).__init__(env, delay)
+        self.callbacks.append(flow.react_to_flow_start)
         if DEBUG:
             self.callbacks.append(print_event)
 
@@ -58,8 +59,9 @@ class LinkAvailable(Timeout):
     :param link: :class:`~cs143sim.actors.Link` on which a
         :class:`~cs143sim.actors.Packet` was sent
     """
-    def __init__(self, env, delay, router, link):
-        super(LinkAvailable, self).__init__(env, delay, value=(router, link))
+    def __init__(self, env, delay, link):
+        super(LinkAvailable, self).__init__(env, delay)
+        self.callbacks.append(link.react_to_link_available)
         if DEBUG:
             self.callbacks.append(print_event)
 
@@ -76,14 +78,14 @@ class PacketReceipt(Timeout):
     :param link: :class:`~cs143sim.actors.Link` on which `packet` arrives
     :param packet: :class:`~cs143sim.actors.Packet` that arrives
     """
-    def __init__(self, env, delay, receiver, link, packet):
-        super(PacketReceipt, self).__init__(env, delay, value=(receiver, link,
-                                                               packet))
+    def __init__(self, env, delay, receiver, packet):
+        super(PacketReceipt, self).__init__(env, delay, value=packet)
+        # TODO: self.callbacks.append(receiver.receive_packet)
         if DEBUG:
             self.callbacks.append(print_event)
 
 
-class UpdateRoutingTable(Timeout):
+class RoutingTableOutdated(Timeout):
     """A :class:`~cs143sim.actors.Router` updates its routing table
 
     :param env: SimPy simulation :class:`~simpy.core.Environment`
@@ -91,6 +93,7 @@ class UpdateRoutingTable(Timeout):
     :param router: :class:`~cs143sim.actors.Router` that updates
     """
     def __init__(self, env, delay, router):
-        super(UpdateRoutingTable, self).__init__(env, delay, value=router)
+        super(RoutingTableOutdated, self).__init__(env, delay)
+        self.callbacks.append(router.react_to_routing_table_outdated)
         if DEBUG:
             self.callbacks.append(print_event)

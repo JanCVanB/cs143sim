@@ -35,6 +35,9 @@ class Buffer:
         current_level = sum(packet.size for packet in self.packets)
         if current_level + packet.size <= self.capacity:
             self.packets.append(packet)
+        else:
+            # The packet cannot be stored, so the packet is dropped
+            pass
 
 
 class Flow:
@@ -96,6 +99,10 @@ class Flow:
                     transmit new packet
                     reset timer
         """
+
+    def react_to_flow_start(self, event):
+        # TODO: react by sending packets to Host
+        pass
 
 
 class Host:
@@ -161,8 +168,16 @@ class Link:
         else:
             self.send(packet)
 
+    def react_to_link_available(self, event):
+        # TODO: implement the pseudo-code below
+        # self.busy = False
+        # if packets in buffer:
+        #     self.busy = True
+        #     self.send(self.buffer.get_first_packet())
+        pass
+
     def send(self, packet):
-        # TODO: implement sending
+        # TODO: implement sending by scheduling LinkAvailable and PacketReceipt
         pass
 
 
@@ -198,25 +213,38 @@ class Packet:
                 ' to ' + self.destination.address)
 
 
+class JunlinPacket(Packet):
+    """Packet used for sending flow data"""
+
+
+class YameiPacket(Packet):
+    """Packet used for updating routing tables"""
+
+
 class Router:
     """Representation of a data router
 
     Routers route :class:`Packets <.Packet>` through the network to their
     respective destination :class:`Hosts <.Host>`.
 
-    :param list links: all connected :class:`Links <.Link>`
-    :param default_gateway: default :class:`.Link`
+    :param str address: IP address
+    :ivar str address: IP address
     :ivar list links: all connected :class:`Links <.Link>`
     :ivar dict table: routing table
+    :ivar default_gateway: default :class:`.Link`
     """
-    def __init__(self, links, address, default_gateway):
+    def __init__(self, address):
         self.address = address
-        self.links = links
+        self.links = []
         self.table = {}
-        self.default_gateway = default_gateway
+        self.default_gateway = None
+
 
     def __str__(self):
         return 'Router at ' + self.address
+
+    def react_to_routing_table_outdated(self, event):
+        self.update_router_table()
 
     def update_router_table(self):
         # TODO: update router table
