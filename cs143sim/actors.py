@@ -146,26 +146,55 @@ class Router:
     :ivar dict table: routing table
     :ivar default_gateway: default out port if can not decide route
     """
-    def __init__(self, links, address, default_gateway):
+    def __init__(self, links, address):
         self.address = address
         self.links = links
         self.table = {}
-        self.default_gateway = default_gateway
+        self.default_gateway = table[0]
         
-    def update_router_table(self):
-        neighbors = get_neighbor_router()
+    def update_router_table(yamei_packet):
+        """
+        This function is more important to routers which are not directly connected to this router.
+        Implement Bellman Ford algorithm here
+        """
+        for item in yamei_packet.table:
+            if item.val + yamei_packet.router.distace < table[item.key]:
+                update table[item.key] = item.val + yamei_packet.router.distace
+                
         pass
-        
+    
+    def generate_communication_packet(self):
+        """
+        Design a sepcial packet that send the whole router table of this router to communicate with its neighbor
+        """
+        return communication_packet
     
     def map_route(self,packet):
         dest = read_packet_head(packet)
         output_link = table[dest]
         return output_link
         
-    def read_packet_head(packet):
-        
-        return destination_address
+    def receive(packet):
+        """
+        Read packet head to tell whether is a normal packet or a update_RT_communication packet
+        If it is normal packet, call map_route function
+        If it is update_RT_communication packet, call update_router_table function
+        """
+        destination_address = packet.destination
+        pass
         
     def get_neighbor_router(self):
-        
-        return neighbor_routers
+        """
+        Get the delay, rate, hop and destination information from links
+        Actually router table can update their neighbor_router's information without sending a communication packet.
+        Update the neighbor part of the router table here (maybe)
+        """
+        neighbor = self.links.destination
+        pass
+    
+    def send(packet):
+        """
+        send packet to certain link
+        the packet could be normal packet to forward or communication packet to send to all links.
+        """
+        pass
