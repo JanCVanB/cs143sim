@@ -32,11 +32,18 @@ class Buffer:
         self.packets = []
 
     def add(self, packet):
+        """
+        Adds packet to `packets` if `capacity` will not be exceeded,
+        drops packet if buffer if full.
+
+        :param packet: :class:`.Packet` added to buffer.
+        """
         current_level = sum(packet.size for packet in self.packets)
         if current_level + packet.size <= self.capacity:
             self.packets.append(packet)
         else:
             # The packet cannot be stored, so the packet is dropped
+            # TODO: Insert callback for simulation monitor (report that a packet was dropped)
             pass
 
 
@@ -197,6 +204,7 @@ class Packet:
     :ivar int number: sequence number
     :ivar acknowledgement: acknowledgement... something
     :ivar int size: size, in bits
+    :ivar str timestamp: time at which the packet was created
     """
     PACKET_SIZE = 8192  # bits
 
@@ -206,6 +214,7 @@ class Packet:
         self.number = number
         self.acknowledgement = acknowledgement
         self.size = Packet.PACKET_SIZE
+        self.timestamp = ''  # TODO: Insert timestamp
 
     def __str__(self):
         return ('Packet ' + str(self.number) +
