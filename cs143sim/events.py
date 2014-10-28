@@ -14,13 +14,12 @@ This module contains all event definitions.
 
 from simpy.events import Timeout
 
-
-DEBUG = True
+from cs143sim.constants import DEBUG
 
 
 def print_event(event):
     print 'At', event.env.now, event.__class__.__name__, 'for',
-    print full_string(event._value)
+    print full_string(event.actor)
 
 
 def full_string(thing):
@@ -46,6 +45,7 @@ class FlowStart(Timeout):
         super(FlowStart, self).__init__(env, delay)
         self.callbacks.append(flow.react_to_flow_start)
         if DEBUG:
+            self.actor = flow
             self.callbacks.append(print_event)
 
 
@@ -63,6 +63,7 @@ class LinkAvailable(Timeout):
         super(LinkAvailable, self).__init__(env, delay)
         self.callbacks.append(link.react_to_link_available)
         if DEBUG:
+            self.actor = link
             self.callbacks.append(print_event)
 
 
@@ -82,6 +83,7 @@ class PacketReceipt(Timeout):
         super(PacketReceipt, self).__init__(env, delay, value=packet)
         # TODO: self.callbacks.append(receiver.receive_packet)
         if DEBUG:
+            self.actor = receiver
             self.callbacks.append(print_event)
 
 
@@ -96,4 +98,5 @@ class RoutingTableOutdated(Timeout):
         super(RoutingTableOutdated, self).__init__(env, delay)
         self.callbacks.append(router.react_to_routing_table_outdated)
         if DEBUG:
+            self.actor = router
             self.callbacks.append(print_event)

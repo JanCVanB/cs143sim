@@ -17,6 +17,7 @@ from cs143sim.actors import Flow
 from cs143sim.actors import Host
 from cs143sim.actors import Link
 from cs143sim.actors import Router
+from cs143sim.constants import DEBUG
 from cs143sim.events import FlowStart
 
 
@@ -108,9 +109,13 @@ class Controller:
                     start_time = float(case_line[4])
                     for host_name in (source_name, destination_name):
                         if host_name not in self.hosts:
+                            if DEBUG:
+                                print 'Creating', host_name
                             self.make_host(name=host_name)
                     source = self.hosts[source_name]
                     destination = self.hosts[destination_name]
+                    if DEBUG:
+                        print 'Creating', actor_name
                     self.make_flow(name=actor_name, source=source,
                                    destination=destination, amount=amount,
                                    start_time=start_time)
@@ -119,15 +124,19 @@ class Controller:
                     rate = float(case_line[3])
                     delay = float(case_line[4])
                     buffer_capacity = int(case_line[5])
-                    for actor_name in (source_name, destination_name):
-                        if (actor_name not in self.hosts and
-                                actor_name not in self.routers):
-                            if 'H' in actor_name:
-                                self.make_host(name=actor_name)
-                            elif 'R' in actor_name:
-                                self.make_router(name=actor_name)
+                    for host_or_router_name in (source_name, destination_name):
+                        if (host_or_router_name not in self.hosts and
+                                host_or_router_name not in self.routers):
+                            if DEBUG:
+                                print 'Creating', host_or_router_name
+                            if 'H' in host_or_router_name:
+                                self.make_host(name=host_or_router_name)
+                            elif 'R' in host_or_router_name:
+                                self.make_router(name=host_or_router_name)
                     source = self.hosts[source_name]
                     destination = self.hosts[destination_name]
+                    if DEBUG:
+                        print 'Creating', actor_name
                     self.make_link(name=actor_name, source=source,
                                    destination=destination, rate=rate,
                                    delay=delay, buffer_capacity=buffer_capacity)
