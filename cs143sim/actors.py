@@ -146,15 +146,23 @@ class Router:
     :ivar dict table: routing table
     :ivar default_gateway: default out port if can not decide route
     """
-    def __init__(self, links, address):
+    def __init__(self, links, address, all_destination):
         self.address = address
         self.links = links
         self.table = {}
-        self.default_gateway = table[0]
+        self.default_gateway = links[0].destination
+        
+        for d in all_destination:
+            val = float("inf"), default_gateway
+            table[d] = val
+        
      
     def add_router_table(self, destination, distance, next_hoop):
-        value = [distance, next_hoop]
-        table[destination]= value
+        """
+        update & append new item
+        """
+        value = distance, next_hoop
+        table[destination] = value
     
     def update_router_table(self, RouterPacket):
         """
@@ -167,9 +175,15 @@ class Router:
                 update table[item.key] = item.val + yamei_packet.router.distance
         """ 
         
-        for item in RouterPacket.routertable:
-            if item.val + 1 < table[item.key]:
-                update table[item.key] = item.val + 1
+        for destination, val in RouterPacket.routertable:
+            if destination in self.table:
+                if val[0] + 1 < self.table[destination]:
+                    update_val = val[0] + 1, RouterPacket.source
+                    self.table[destination] = update_val
+            else:
+                update_val = val[0] + 1, RouterPacket.source
+                self.table[destination] = update_val
+                    
         pass
     
     def generate_communication_packet(self):
@@ -209,11 +223,11 @@ class Router:
     
     """   
     def get_neighbor_router(self):
-        """
-        Get the delay, rate, hop and destination information from links
-        Actually router table can update their neighbor_router's information without sending a communication packet.
-        Update the neighbor part of the router table here (maybe)
-        """
+        
+        #Get the delay, rate, hop and destination information from links
+        #Actually router table can update their neighbor_router's information without sending a communication packet.
+        #Update the neighbor part of the router table here (maybe)
+        
         neighbor = self.links.destination
         pass
     """
