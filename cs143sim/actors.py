@@ -151,28 +151,48 @@ class Router:
         self.links = links
         self.table = {}
         self.default_gateway = table[0]
-        
-    def update_router_table(yamei_packet):
+     
+    def add_router_table(self, destination, distance, next_hoop):
+        value = [distance, next_hoop]
+        table[destination]= value
+    
+    def update_router_table(self, RouterPacket):
         """
         This function is more important to routers which are not directly connected to this router.
         Implement Bellman Ford algorithm here
-        """
-        for item in yamei_packet.table:
-            if item.val + yamei_packet.router.distace < table[item.key]:
-                update table[item.key] = item.val + yamei_packet.router.distace
-                
+        
+        
+        for item in RouterPacket.routertable:
+            if item.val + yamei_packet.router.distance < table[item.key]:
+                update table[item.key] = item.val + yamei_packet.router.distance
+        """ 
+        
+        for item in RouterPacket.routertable:
+            if item.val + 1 < table[item.key]:
+                update table[item.key] = item.val + 1
         pass
     
     def generate_communication_packet(self):
         """
         Design a sepcial packet that send the whole router table of this router to communicate with its neighbor
         """
-        return communication_packet
+        time_interval = 1
+        for l in links:
+            router_packet = RouterPackect(routertable = self.table, source = self.address, destination = l.destination)
+            send(link = l, packet = router_packet)
+        #return communication_packet
+        pass
     
     def map_route(self,packet):
-        dest = read_packet_head(packet)
-        output_link = table[dest]
-        return output_link
+        if packet.destination in table:
+            route_link = table[packet.destination]
+            send(link = route_link, packet = packet)
+        else:
+            route_link = self.default_gateway
+            send(link = route_link, packet = packet)
+        pass
+        
+        
         
     def receive(packet):
         """
@@ -180,9 +200,14 @@ class Router:
         If it is normal packet, call map_route function
         If it is update_RT_communication packet, call update_router_table function
         """
-        destination_address = packet.destination
-        pass
+        if packet.typ == 1 || packet.typ == 2:
+            map_route(packet)
+        elif packet.typ == 3:
+            update_router_table(packet)
         
+        pass
+    
+    """   
     def get_neighbor_router(self):
         """
         Get the delay, rate, hop and destination information from links
@@ -191,10 +216,12 @@ class Router:
         """
         neighbor = self.links.destination
         pass
+    """
     
-    def send(packet):
+    def send(self, link, packet):
         """
         send packet to certain link
         the packet could be normal packet to forward or communication packet to send to all links.
         """
-        pass
+        link.add(packet)
+        
