@@ -243,26 +243,17 @@ class Router:
         :ivar dict table: routing table
         :ivar default_gateway: default out port if can not decide route
         """
-    def __init__(self, links, address, all_destination):
+    def __init__(self, address):
         self.address = address
-        self.links = links
+        self.links = []
         self.table = {}
-        if len(links):
-            self.default_gateway = links[0].destination
-        else:
-            self.default_gateway = address
         
-        for d in all_destination:
+    def initialize_routing_table(self, all_host_ip_addresses):
+        self.default_gateway = self.links[0].destination.address
+        for host_ip_address in all_host_ip_addresses:
             val = float("inf"), default_gateway
-            table[d] = val
+            table[host_ip_address] = val
     
-    
-    def add_router_table(self, destination, distance, next_hoop):
-        """
-            update & append new item
-            """
-        value = distance, next_hoop
-        table[destination] = value
     
     def update_router_table(self, RouterPacket):
         """
@@ -283,8 +274,7 @@ class Router:
             else:
                 update_val = val[0] + 1, RouterPacket.source
                 self.table[destination] = update_val
-        
-        pass
+
     
     def generate_communication_packet(self):
         """
@@ -292,10 +282,9 @@ class Router:
             """
         time_interval = 1
         for l in links:
-            router_packet = RouterPackect(routertable = self.table, source = self.address, destination = l.destination)
+            router_packet = RouterPackect(routertable = self.table, source = self.address)
             send(link = l, packet = router_packet)
         #return communication_packet
-        pass
     
     def map_route(self,packet):
         if packet.destination in table:
@@ -304,33 +293,21 @@ class Router:
         else:
             route_link = self.default_gateway
             send(link = route_link, packet = packet)
-        pass
     
     
     
-    def receive(packet):
+    def receive_packet(self, event):
         """
             Read packet head to tell whether is a normal packet or a update_RT_communication packet
             If it is normal packet, call map_route function
             If it is update_RT_communication packet, call update_router_table function
-            """
-        if packet.typ == 1 or packet.typ == 2:
+        """
+        packet = event.value
+        if isinstance(packet, DataPacket):
             map_route(packet)
-        elif packet.typ == 3:
+        elif isinstance(packet, RouterPacket):
             update_router_table(packet)
         
-        pass
-    
-    """
-        def get_neighbor_router(self):
-        
-        #Get the delay, rate, hop and destination information from links
-        #Actually router table can update their neighbor_router's information without sending a communication packet.
-        #Update the neighbor part of the router table here (maybe)
-        
-        neighbor = self.links.destination
-        pass
-        """
     
     def send(self, link, packet):
         """
@@ -340,6 +317,5 @@ class Router:
         link.add(packet)
 
     def react_to_routing_table_outdated(self, event):
-        # TODO: react by generating routing packets to neighbor routers
-        pass
+        self.generate_communication_packet()
 
