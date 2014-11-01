@@ -17,6 +17,7 @@ This module contains all actor definitions.
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
 """
 
+from tla_stop_and_wait import StopAndWait
 
 class Buffer:
     """Representation of a data storage container
@@ -63,6 +64,10 @@ class Flow:
         self.source = source
         self.destination = destination
         self.amount = amount
+        
+        self.W=1
+        self.tla=StopAndWait(self)
+        
 
     def __str__(self):
         return ('Flow from ' + self.source.address +
@@ -72,39 +77,31 @@ class Flow:
         """
         Make a packet based on the packet number
         """
+        
+    def make_ack_packet(self, packet):
+        """
+        Make a ack packet
+        """
 
-    def send_packet(self):
+    def send_packet(self, packet):
         """
         When possible, TLA use this method to send a packet
         """
 
     def receive_packet(self):
         """
-        When receive a packet, check if the packet is an ack packet. If so, run TLA
+        If the packet is a data packet, generate an ack packet
         """
+        
+        """
+        If the packet is a ack packet, call tla.rcv_ack()
+        """
+        
 
     def time_out(self):
         """
         When time out happens, run TLA
         Time_out timers should be reset if a the ack arrive
-        """
-
-    def tla(self):
-        """
-        Transport Layer Algorithm main body
-        Including transmission control, congestion control algorithm (window size adjust)
-        Flow control might not be needed, as the receiving buffer size is unlimited.
-
-        For example (stop and wait):
-            TLA send a packet
-            while(! all packet have been transmitted):
-                yield(time_out|receive_ack)
-                if(time_out) :
-                    retransmit
-                    reset timer
-                if(receive_ack) :
-                    transmit new packet
-                    reset timer
         """
 
     def react_to_flow_start(self, event):
