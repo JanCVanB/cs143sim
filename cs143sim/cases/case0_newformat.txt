@@ -1,0 +1,28 @@
+// Sam's format:
+// define hosts first:
+HOST
+    ID    H1
+    ID    H2
+
+LINK
+    ID       L1
+    RATE     10
+    DELAY    10
+    BUFFER   64
+    CONNECTS H1 H2
+    ID       L2
+    CONNECTS H2 H3
+
+FLOW
+    ID      F1
+    SRC     H1
+    DST     H2
+    DATA    20
+    START   1.0
+
+FLOW
+    ID      F2
+    SRC     H1
+    DST     H3
+    DATA    24
+    START   0.3
