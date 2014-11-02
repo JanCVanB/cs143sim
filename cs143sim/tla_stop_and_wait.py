@@ -25,9 +25,10 @@ class StopAndWait:
         self.last_acked_packet_number+=1
         n=self.last_acked_packet_number
         
-        packet=self.flow.make_packet(n)
-        self.flow.send_packet(packet)
-        pass
+        if n<self.packet_number:
+            packet=self.flow.make_packet(n)
+            self.flow.send_packet(packet)
+
     
     def response_to_time_out(self):
         n=self.last_acked_packet_number
