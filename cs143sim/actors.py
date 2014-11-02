@@ -17,11 +17,8 @@ This module contains all actor definitions.
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
 """
 
-<<<<<<< Updated upstream
 from tla_stop_and_wait import StopAndWait
-=======
 from cs143sim.constants import PACKET_SIZE
->>>>>>> Stashed changes
 
 class Buffer:
     """Representation of a data storage container
@@ -81,23 +78,28 @@ class Flow:
         """
         Make a packet based on the packet number
         """
-
+        packet=DataPacket(packet_num, False, 0, self.source, self.destination)
+        return packet
         
     def make_ack_packet(self, packet):
         """
         Make a ack packet
         """
-
+        ack_packet=DataPacket(packet.number, True, 0, packet.destination, packet.source)
+        return ack_packet
+    
+    
     def send_packet(self, packet):
         """
         When possible, TLA use this method to send a packet
         """
-
-    def receive_packet(self):
+        self.host.send(packet)
+        
+    def receive_packet(self, packet):
         """
         If the packet is a data packet, generate an ack packet
         """
-        
+        if packet.ack==True
         """
         If the packet is a ack packet, call tla.rcv_ack()
         """
