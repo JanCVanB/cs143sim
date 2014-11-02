@@ -2,7 +2,7 @@ from cs143sim.actors import Buffer
 from cs143sim.actors import Flow
 from cs143sim.actors import Host
 from cs143sim.actors import Link
-from cs143sim.actors import Packet
+from cs143sim.actors import DataPacket
 from cs143sim.actors import Router
 
 
@@ -24,8 +24,9 @@ def basic_link():
 
 
 def basic_packet():
-    return Packet(source=basic_host(), destination=basic_host(), number=1,
-                  acknowledgement=object())
+    #return Packet(source=basic_host(), destination=basic_host(), number=1,
+    #              acknowledgement=object())
+    return DataPacket(source=basic_host(), destination=basic_host(), number=1, acknowledgement=object(), timestamp=0)
 
 
 def basic_router():
