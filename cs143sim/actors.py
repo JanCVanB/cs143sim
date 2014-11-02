@@ -17,11 +17,11 @@ This module contains all actor definitions.
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
 """
 
-<<<<<<< Updated upstream
+
 from tla_stop_and_wait import StopAndWait
-=======
+
 from cs143sim.constants import PACKET_SIZE
->>>>>>> Stashed changes
+
 
 class Buffer:
     """Representation of a data storage container

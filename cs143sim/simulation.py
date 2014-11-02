@@ -9,8 +9,6 @@ This module contains the simulation setup and execution.
 """
 
 
-from csv import reader
-
 from simpy.core import Environment
 
 from cs143sim.actors import Flow
@@ -83,13 +81,13 @@ class Controller:
         self.flows[name] = new_flow
         FlowStart(env=self.env, delay=start_time, flow=new_flow)
 
-    def make_host(self, name):
+    def make_host(self, name, ip_address):
         """Make a new :class:`.Host` and add it to `self.hosts`
 
         :param str name: new :class:`.Host` name
+        :param str ip_address: new :class:`.Host`'s IP address
         """
-        address = name + ' address'  # TODO: implement IP addresses
-        new_host = Host(address=address)
+        new_host = Host(address=ip_address)
         self.hosts[name] = new_host
 
     def make_link(self, name, source, destination, rate, delay, buffer_capacity):
@@ -113,13 +111,13 @@ class Controller:
                 pass  # raise Exception('Unknown Source/Destination: ' + actor)
         self.links[name] = new_link
 
-    def make_router(self, name):
+    def make_router(self, name, ip_address):
         """Make a new :class:`.Router` and add it to `self.routers`
 
         :param str name: new :class:`.Router` name
+        :param str ip_address: new :class:`.Router`'s IP Address
         """
-        address = name + ' address'  # TODO: implement IP addresses
-        new_router = Router(address=address)
+        new_router = Router(address=ip_address)
         self.routers[name] = new_router
 
     def read_case(self, case):
@@ -131,7 +129,7 @@ class Controller:
             # Open the file for line-by-line consumption (NOM NOM NOM)
             obj_type = ''  # make an empty object, it will contain the pointer to the
             obj_id = ''
-            attributes = ('RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START')
+            attributes = ('RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START', 'IP')
             store_in = {attribute: '' for attribute in attributes}
             for case_line in case_file:
                 line_comp = case_line.split()
@@ -152,7 +150,7 @@ class Controller:
                     # if we have a valid obj type, listen for new object attributes
                     obj_type = keyword
                     obj_id = ''
-                elif keyword in ['RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START']:
+                elif keyword in attributes:
                     # store simple attributes in their corresponding place
                     store_in[keyword] = line_comp[1]
 
@@ -167,35 +165,41 @@ class Controller:
                         # call the create function for the old object
                         # but first, make sure all the variables have been declared!
                         for attribute in ['BUFFER', 'DELAY', 'RATE', 'SRC', 'DST']:
-                            if attribute == '' or attribute == []:
+                            if store_in[attribute] in ['', []]:
                                 # Make sure all the attributes are not empty
                                 raise MissingAttribute(obj_type, obj_id, attribute)
                         # If all the attributes are present, create the object
                         # TODO: Referential integrity for links!
-                        self.make_link(obj_id, store_in['SRC'], store_in['DST'], store_in['RATE'],
-                                       store_in['DELAY'], store_in['BUFFER'])
-                        print 'Making Link: ' + obj_id
-
+                        if DEBUG:
+                            print 'Making Link: ' + obj_id
+                        self.make_link(obj_id, store_in['SRC'], store_in['DST'], float(store_in['RATE']),
+                                       float(store_in['DELAY']), int(store_in['BUFFER']))
                     elif obj_type == 'HOST':
                         # hosts only need ID, so create a new host on each new ID
-                        print 'Making host: ' + obj_id
-                        self.make_host(obj_id)
+                        for attribute in ['IP']:
+                            if store_in[attribute] in ['', []]:
+                                # Make sure all the attributes are not empty
+                                raise MissingAttribute(obj_type, obj_id, attribute)
+                        if DEBUG:
+                            print 'Making host: ' + obj_id
+                        self.make_host(obj_id, store_in['IP'])
 
                     elif obj_type == 'ROUTER':
-                        #for attribute in ['']:
-                        #   if attribute == '' or attribute == []:
-                        #       raise MissingAttribute(obj_type, obj_id, attribute)
-                        print 'Making Router: ' + obj_id
-                        self.make_router(obj_id)
+                        for attribute in ['IP']:
+                           if store_in[attribute] in ['', []]:
+                               raise MissingAttribute(obj_type, obj_id, attribute)
+                        if DEBUG:
+                            print 'Making Router: ' + obj_id
+                        self.make_router(obj_id, store_in['IP'])
 
                     elif obj_type == 'FLOW':
                         for attribute in ['SRC', 'DST', 'START', 'DATA']:
-                            if attribute == '' or attribute == []:
+                            if store_in[attribute] in ['', []]:
                                 raise MissingAttribute(obj_type, obj_id, attribute)
                         # if all the attributes are there, lets go ahead and create the flow
                         try:
                             self.make_flow(obj_id, self.hosts[store_in['SRC']], self.hosts[store_in['DST']],
-                                       int(store_in['DATA']), float(store_in['START']))
+                                           int(store_in['DATA']), float(store_in['START']))
                         except KeyError as e:
                             # TODO: Add referential integrity (verify the hosts exist)
                             raise Exception('Input File Formatting Error: Reference to unknown object: ' + repr(e))
@@ -218,25 +222,6 @@ class Controller:
                                         '\nExpects: CONNECTS A B')
                 else:
                     raise Exception('Unrecognized keyword: ' + keyword)
-
-
-
-                # if 'F' in actor_name:
-                #     source_name, destination_name = case_line[1:3]
-                #     amount = int(case_line[3])
-                #     start_time = float(case_line[4])
-                #     for host_name in (source_name, destination_name):
-                #         if host_name not in self.hosts:
-                #             if DEBUG:
-                #                 print 'Creating', host_name
-                #             self.make_host(name=host_name)
-                #     source = self.hosts[source_name]
-                #     destination = self.hosts[destination_name]
-                #     if DEBUG:
-                #         print 'Creating', actor_name
-                #     self.make_flow(name=actor_name, source=source,
-                #                    destination=destination, amount=amount,
-                #                    start_time=start_time)
 
 
     def run(self, until=None):
