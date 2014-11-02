@@ -99,7 +99,8 @@ class Flow:
         """
         If the packet is a data packet, generate an ack packet
         """
-        if packet.ack==True
+        if packet.ack==True:
+            pass
         """
         If the packet is a ack packet, call tla.rcv_ack()
         """
