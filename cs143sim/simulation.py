@@ -195,7 +195,7 @@ class Controller:
                         # if all the attributes are there, lets go ahead and create the flow
                         try:
                             self.make_flow(obj_id, self.hosts[store_in['SRC']], self.hosts[store_in['DST']],
-                                       store_in['DATA'], float(store_in['START']))
+                                       int(store_in['DATA']), float(store_in['START']))
                         except KeyError as e:
                             # TODO: Add referential integrity (verify the hosts exist)
                             raise Exception('Input File Formatting Error: Reference to unknown object: ' + repr(e))
