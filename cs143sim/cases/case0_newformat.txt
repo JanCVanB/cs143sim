@@ -1,19 +1,30 @@
 // Sam's format:
-// define hosts first:
+// define hosts and routers first:
+// IMPORTANT NOTE:This is not actually case 0 in the Project Test Cases..
+// this is just a test case I threw together to make sure this input format works
 HOST
     ID      H1
     IP      192.168.1.1
     ID      H2
     IP      192.168.1.2
+    ID      H3
+    IP      192.168.1.3
+
+ROUTER
+    ID      R1
+    IP      192.168.1.4
 
 LINK
     ID       L1
     RATE     10
     DELAY    10
     BUFFER   64
-    CONNECTS H1 H2
+    CONNECTS H1 R1
     ID       L2
-    CONNECTS H2 H3
+    CONNECTS H2 R1
+    ID       L3
+    CONNECTS H3 R1
+
 
 FLOW
     ID      F1
@@ -27,4 +38,4 @@ FLOW
     SRC     H1
     DST     H3
     DATA    24
-    START   0.3
+    START   1.3

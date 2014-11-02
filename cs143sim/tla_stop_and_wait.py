@@ -37,14 +37,10 @@ class StopAndWait:
         PacketTimeOut(env=global_vars.env, delay=10, actor=self, packet_number=n)
     
     def react_to_ack(self, ack_packet):
-        
-
         self.last_acked_packet_number+=1
         n=self.last_acked_packet_number+1
-        
 
         if n<self.packet_number:
-
             packet=self.flow.make_packet(packet_number=n)
             self.flow.send_packet(packet)
             PacketTimeOut(env=global_vars.env, delay=10, actor=self, packet_number=n)
