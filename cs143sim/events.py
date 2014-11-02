@@ -42,7 +42,7 @@ class FlowStart(Timeout):
     :param flow: :class:`~cs143sim.actors.Flow` that starts
     """
     def __init__(self, env, delay, flow):
-        super(FlowStart, self).__init__(env, delay)
+        super(FlowStart, self).__init__(env=env, delay=delay)
         self.callbacks.append(flow.react_to_flow_start)
         if DEBUG:
             self.actor = flow
@@ -60,7 +60,7 @@ class LinkAvailable(Timeout):
         :class:`~cs143sim.actors.Packet` was sent
     """
     def __init__(self, env, delay, link):
-        super(LinkAvailable, self).__init__(env, delay)
+        super(LinkAvailable, self).__init__(env=env, delay=delay)
         self.callbacks.append(link.react_to_link_available)
         if DEBUG:
             self.actor = link
@@ -80,7 +80,7 @@ class PacketReceipt(Timeout):
     :param packet: :class:`~cs143sim.actors.Packet` that arrives
     """
     def __init__(self, env, delay, receiver, packet):
-        super(PacketReceipt, self).__init__(env, delay, value=packet)
+        super(PacketReceipt, self).__init__(env=env, delay=delay, value=packet)
         # TODO: self.callbacks.append(receiver.receive_packet)
         if DEBUG:
             self.actor = receiver
@@ -95,7 +95,7 @@ class RoutingTableOutdated(Timeout):
     :param router: :class:`~cs143sim.actors.Router` that updates
     """
     def __init__(self, env, delay, router):
-        super(RoutingTableOutdated, self).__init__(env, delay)
+        super(RoutingTableOutdated, self).__init__(env=env, delay=delay)
         self.callbacks.append(router.react_to_routing_table_outdated)
         if DEBUG:
             self.actor = router
