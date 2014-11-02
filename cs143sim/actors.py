@@ -19,11 +19,8 @@ This module contains all actor definitions.
 
 from tla_stop_and_wait import StopAndWait
 from cs143sim.constants import PACKET_SIZE
-<<<<<<< HEAD
-
-=======
 from cs143sim.events import PacketReceipt
->>>>>>> FETCH_HEAD
+
 
 class Buffer:
     """Representation of a data storage container
@@ -107,13 +104,13 @@ class Flow:
         """
         If the packet is a data packet, generate an ack packet
         """
-        if packet.acknowledgment==False:
+        if packet.acknowledgement==False:
             ack_packet=self.make_ack_packet(packet)
             self.send_packet(ack_packet)
         """
         If the packet is a ack packet, call tla.rcv_ack()
         """
-        if packet.acknowledgment==True:
+        if packet.acknowledgement==True:
             self.tla.react_to_ack(packet)
 
     def time_out(self, timeout_packet_number):
@@ -232,11 +229,9 @@ class DataPacket(Packet):
     def __init__(self, number, acknowledgement, timestamp, source, destination):
         Packet.__init__(self, timestamp, source, destination)
         self.number = number
-<<<<<<< HEAD
+
         self.acknowledgement = acknowledgement
-=======
-        self.acknowledgment = acknowledgement
->>>>>>> FETCH_HEAD
+
 
 class RouterPacket(Packet):
     def __init__(self, timestamp, routertable, source):
