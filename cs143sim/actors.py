@@ -198,12 +198,12 @@ class Packet:
     :param source: source :class:`.Host` or :class:`.Router`
     :param destination: destination :class:`.Host` or :class:`.Router`
     :param int number: sequence number
-    :param ack: acknowledgement... something
+    :param acknowledgement: acknowledgement... something
     :cvar int PACKET_SIZE: size of every :class:`.Packet`, in bits
     :ivar source: source :class:`.Host` or :class:`.Router`
     :ivar destination: destination :class:`.Host` or :class:`.Router`
     :ivar int number: sequence number
-    :ivar ack: acknowledgement... something
+    :ivar acknowledgement: acknowledgement... something
     :ivar int size: size, in bits
     :ivar str timestamp: time at which the packet was created
     """
@@ -214,10 +214,10 @@ class Packet:
         self.size = PACKET_SIZE
 
 class DataPacket(Packet):
-    def __init__(self, number, ack, timestamp, source, destination):
+    def __init__(self, number, acknowledgement, timestamp, source, destination):
         Packet.__init__(self, timestamp, source, destination)
         self.number = number
-        self.ack = ack
+        self.acknowledgment = acknowledgment
 
 class RouterPacket(Packet):
     def __init__(self, timestamp, routertable, source):
