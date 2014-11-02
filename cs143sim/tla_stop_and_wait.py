@@ -1,6 +1,10 @@
 """
 This module includes simple transport layer algorithm: stop and wait
 """
+from cs143sim.events import PacketTimeOut
+
+import global_vars
+
 packet_size=1024*8
 class StopAndWait:
     """
@@ -9,6 +13,7 @@ class StopAndWait:
     :ivar last_acked_packet_number
     :ivar last_sent_packet_number=
     """
+    global env
     def __init__(self,flow):
         self.flow=flow
         
@@ -20,24 +25,41 @@ class StopAndWait:
         
         self.last_acked_packet_number=-1 
         
-    def react_to_flow_start(self):
-        packet=self.flow.make_packet(0)
-        self.flow.send_packet(packet)
+    def __str__(self):
+        return self.flow.__str__()
     
-   
+    def react_to_flow_start(self, event):
+       
+        print "    Packet Amount: "+str(self.packet_number)             
+        n=0
+        packet=self.flow.make_packet(packet_number=n)
+        self.flow.send_packet(packet)
+        PacketTimeOut(env=global_vars.env, delay=10, actor=self, packet_number=n)
+    
     def react_to_ack(self, ack_packet):
-        self.last_acked_packet_number+=1
-        n=self.last_acked_packet_number
         
-        if n<self.packet_number:
-            packet=self.flow.make_packet(n)
-            self.flow.send_packet(packet)
 
-    
-    def react_to_time_out(self, timeout_packet_number):
+        self.last_acked_packet_number+=1
+        n=self.last_acked_packet_number+1
+        
+
+        if n<self.packet_number:
+
+            packet=self.flow.make_packet(packet_number=n)
+            self.flow.send_packet(packet)
+            PacketTimeOut(env=global_vars.env, delay=10, actor=self, packet_number=n)
+
+    def react_to_time_out(self, event):
+
         n=self.last_acked_packet_number
-        packet=self.flow.make_packet(n)
-        self.flow.send_packet(packet)
+        time_out_packet_number=event.value
+        
+        print "    Time Out "+str(time_out_packet_number)+" "+str(n)
+        if time_out_packet_number>n:
+            n=0
+            packet=self.flow.make_packet(packet_number=n)
+            self.flow.send_packet(packet)
+            PacketTimeOut(env=global_vars.env, delay=10, actor=self, packet_number=n)
         pass
     
     pass
