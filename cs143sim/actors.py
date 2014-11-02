@@ -21,7 +21,7 @@ from tla_stop_and_wait import StopAndWait
 from cs143sim.constants import PACKET_SIZE
 from cs143sim.events import PacketReceipt
 from random import randint
-import global_vars
+
 
 
 
@@ -86,7 +86,7 @@ class Flow(Actor):
         self.amount = amount
         
         self.W=1
-        self.tla=StopAndWait(self)
+        self.tla=StopAndWait(env=self.env, flow=self)
         
 
     def __str__(self):
@@ -121,12 +121,12 @@ class Flow(Actor):
             r=0
             
         if r==0:
-            PacketReceipt(env=global_vars.env, delay=5, receiver=self.destination.flows[0], packet=packet)
+            PacketReceipt(env=self.env, delay=5, receiver=self.destination.flows[0], packet=packet)
         else:
             pass
         
         
-    def receive_packet(self, event):
+    def react_to_packet_receipt(self, event):
         packet=event.value
         """
         If the packet is a data packet, generate an ack packet

@@ -2,18 +2,18 @@ from actors import *
 from simpy import *
 from events import *
 
-import global_vars
 
+env=Environment()
 
-H1=Host(env=global_vars.env, address="0")
-H2=Host(env=global_vars.env, address="1")
+H1=Host(env=env, address="0")
+H2=Host(env=env, address="1")
 
-F1=Flow(env=global_vars.env, source=H1, destination=H2, amount=5*1024*8)
+F1=Flow(env=env, source=H1, destination=H2, amount=5*1024*8)
 H1.flows.append(F1)
 H2.flows.append(F1)
 
 
 
-FlowStart(env=global_vars.env, delay=1, flow=F1)
-global_vars.env.run()
+FlowStart(env=env, delay=1, flow=F1)
+env.run()
 

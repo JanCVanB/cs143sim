@@ -96,7 +96,7 @@ class PacketReceipt(Timeout):
             self.actor = receiver
             self.callbacks.append(print_event)
         # TODO: 
-        self.callbacks.append(receiver.receive_packet)
+        self.callbacks.append(receiver.react_to_packet_receipt)
 
 class PacketTimeOut(Timeout):
     """
