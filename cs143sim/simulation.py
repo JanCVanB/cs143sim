@@ -46,6 +46,18 @@ class InputFileSyntaxError(Exception):
         return 'Input File Syntax Error: (Line ' + self.line_number + ') ' + self.message
 
 
+class InputFileUnknownReference(Exception):
+    """
+    InputFileUnknownReference is an `Exception` thrown when a link or host makes reference
+    to an unknown link or object
+    """
+    def __init__(self, line_number, message):
+        self.line_number = line_number
+        self.message = message
+
+    def __str__(self):
+        return 'InputFileUnknownReference (Line ' + self.line_number + '): ' + self.message
+
 
 class Controller:
     """Controller that prepares, starts, and cleans up a run of the simulation
@@ -131,7 +143,9 @@ class Controller:
             obj_id = ''
             attributes = ('RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START', 'IP')
             store_in = {attribute: '' for attribute in attributes}
+            line_number = 0
             for case_line in case_file:
+                line_number += 1
                 line_comp = case_line.split()
                 if line_comp == [] and obj_id == '':
                     obj_id = ''  # clear obj_ID on extra empty line
@@ -169,13 +183,30 @@ class Controller:
                                 # Make sure all the attributes are not empty
                                 raise MissingAttribute(obj_type, obj_id, attribute)
                         # If all the attributes are present, create the object
-                        # TODO: Referential integrity for links!
                         if DEBUG:
                             print 'Making Link: ' + obj_id
-                        self.make_link(obj_id, store_in['SRC'], store_in['DST'], float(store_in['RATE']),
+                        the_src = ''
+                        the_dst = ''
+                        # This next part verifies referential integrity (aka that the specified hosts/routers
+                        # actually exist in the simulation)
+                        for target in [store_in['SRC'], store_in['DST']]:
+                            print 'Checking: ' + target
+                            if target in self.hosts:
+                                if the_src == '':
+                                    the_src = self.hosts[target]
+                                else:
+                                    the_dst = self.hosts[target]
+                            elif target in self.routers:
+                                if the_src == '':
+                                    the_src = self.routers[target]
+                                else:
+                                    the_dst = self.routers[target]
+                            else:
+                                raise InputFileUnknownReference(line_number, target + ' is not a valid Host/Router.')
+                        self.make_link(obj_id, the_src, the_dst, float(store_in['RATE']),
                                        float(store_in['DELAY']), int(store_in['BUFFER']))
                     elif obj_type == 'HOST':
-                        # hosts only need ID, so create a new host on each new ID
+                        # check the attributes,
                         for attribute in ['IP']:
                             if store_in[attribute] in ['', []]:
                                 # Make sure all the attributes are not empty
@@ -186,8 +217,8 @@ class Controller:
 
                     elif obj_type == 'ROUTER':
                         for attribute in ['IP']:
-                           if store_in[attribute] in ['', []]:
-                               raise MissingAttribute(obj_type, obj_id, attribute)
+                            if store_in[attribute] in ['', []]:
+                                raise MissingAttribute(obj_type, obj_id, attribute)
                         if DEBUG:
                             print 'Making Router: ' + obj_id
                         self.make_router(obj_id, store_in['IP'])
@@ -197,12 +228,16 @@ class Controller:
                             if store_in[attribute] in ['', []]:
                                 raise MissingAttribute(obj_type, obj_id, attribute)
                         # if all the attributes are there, lets go ahead and create the flow
+                        # BUT FIRST, we need to make sure the SRC/DST hosts actually exist..
+                        # if they don't, warn the user that "No, i'm sorry, you have to specify
+                        # hosts that actually exist."
                         try:
                             self.make_flow(obj_id, self.hosts[store_in['SRC']], self.hosts[store_in['DST']],
                                            int(store_in['DATA']), float(store_in['START']))
                         except KeyError as e:
-                            # TODO: Add referential integrity (verify the hosts exist)
-                            raise Exception('Input File Formatting Error: Reference to unknown object: ' + repr(e))
+                            raise InputFileUnknownReference(line_number,
+                                                            'Input File Formatting Error: ' +
+                                                            'Reference to unknown object: ' + repr(e))
 
                         print 'Making Flow: ' + obj_id
                     else:
@@ -222,7 +257,6 @@ class Controller:
                                         '\nExpects: CONNECTS A B')
                 else:
                     raise Exception('Unrecognized keyword: ' + keyword)
-
 
     def run(self, until=None):
         """Run the simulation for a specified duration
