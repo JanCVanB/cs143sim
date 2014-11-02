@@ -1,8 +1,10 @@
 // Sam's format:
 // define hosts first:
 HOST
-    ID    H1
-    ID    H2
+    ID      H1
+    IP      192.168.1.1
+    ID      H2
+    IP      192.168.1.2
 
 LINK
     ID       L1
