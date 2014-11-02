@@ -131,7 +131,7 @@ class Controller:
             # Open the file for line-by-line consumption (NOM NOM NOM)
             obj_type = ''  # make an empty object, it will contain the pointer to the
             obj_id = ''
-            attributes = ('RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START', 'IP')
+            attributes = ('RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START')
             store_in = {attribute: '' for attribute in attributes}
             for case_line in case_file:
                 line_comp = case_line.split()
@@ -152,7 +152,7 @@ class Controller:
                     # if we have a valid obj type, listen for new object attributes
                     obj_type = keyword
                     obj_id = ''
-                elif keyword in attributes:
+                elif keyword in ['RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START']:
                     # store simple attributes in their corresponding place
                     store_in[keyword] = line_comp[1]
 
@@ -167,7 +167,7 @@ class Controller:
                         # call the create function for the old object
                         # but first, make sure all the variables have been declared!
                         for attribute in ['BUFFER', 'DELAY', 'RATE', 'SRC', 'DST']:
-                            if store_in[attribute] in ['', []]:
+                            if attribute == '' or attribute == []:
                                 # Make sure all the attributes are not empty
                                 raise MissingAttribute(obj_type, obj_id, attribute)
                         # If all the attributes are present, create the object
@@ -178,11 +178,8 @@ class Controller:
 
                     elif obj_type == 'HOST':
                         # hosts only need ID, so create a new host on each new ID
-                        for attribute in ['IP']:
-                            if store_in[attribute] in ['', []]:
-                                raise MissingAttribute(obj_type, obj_id, attribute)
                         print 'Making host: ' + obj_id
-                        self.make_host(obj_id, obj_ip)
+                        self.make_host(obj_id)
 
                     elif obj_type == 'ROUTER':
                         #for attribute in ['']:
@@ -193,12 +190,12 @@ class Controller:
 
                     elif obj_type == 'FLOW':
                         for attribute in ['SRC', 'DST', 'START', 'DATA']:
-                            if store_in[attribute] in ['', []]:
+                            if attribute == '' or attribute == []:
                                 raise MissingAttribute(obj_type, obj_id, attribute)
                         # if all the attributes are there, lets go ahead and create the flow
                         try:
                             self.make_flow(obj_id, self.hosts[store_in['SRC']], self.hosts[store_in['DST']],
-                                           store_in['DATA'], float(store_in['START']))
+                                       int(store_in['DATA']), float(store_in['START']))
                         except KeyError as e:
                             # TODO: Add referential integrity (verify the hosts exist)
                             raise Exception('Input File Formatting Error: Reference to unknown object: ' + repr(e))

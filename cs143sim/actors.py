@@ -17,7 +17,11 @@ This module contains all actor definitions.
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
 """
 
+<<<<<<< Updated upstream
 from tla_stop_and_wait import StopAndWait
+=======
+from cs143sim.constants import PACKET_SIZE
+>>>>>>> Stashed changes
 
 class Buffer:
     """Representation of a data storage container
@@ -77,6 +81,7 @@ class Flow:
         """
         Make a packet based on the packet number
         """
+
         
     def make_ack_packet(self, packet):
         """
@@ -184,7 +189,6 @@ class Link:
         # TODO: implement sending by scheduling LinkAvailable and PacketReceipt
         pass
 
-
 class Packet:
     """Representation of a quantum of information
 
@@ -194,38 +198,31 @@ class Packet:
     :param source: source :class:`.Host` or :class:`.Router`
     :param destination: destination :class:`.Host` or :class:`.Router`
     :param int number: sequence number
-    :param acknowledgement: acknowledgement... something
+    :param ack: acknowledgement... something
     :cvar int PACKET_SIZE: size of every :class:`.Packet`, in bits
     :ivar source: source :class:`.Host` or :class:`.Router`
     :ivar destination: destination :class:`.Host` or :class:`.Router`
     :ivar int number: sequence number
-    :ivar acknowledgement: acknowledgement... something
+    :ivar ack: acknowledgement... something
     :ivar int size: size, in bits
     :ivar str timestamp: time at which the packet was created
     """
-    PACKET_SIZE = 8192  # bits
-
-    def __init__(self, source, destination, number, acknowledgement):
+    def __init__(self, timestamp, source, destination):
+        self.timestamp = timestamp
         self.source = source
         self.destination = destination
+        self.size = PACKET_SIZE
+
+class DataPacket(Packet):
+    def __init__(self, number, ack, timestamp, source, destination):
+        Packet.__init__(self, timestamp, source, destination)
         self.number = number
-        self.acknowledgement = acknowledgement
-        self.size = Packet.PACKET_SIZE
-        self.timestamp = ''  # TODO: Insert timestamp
+        self.ack = ack
 
-    def __str__(self):
-        return ('Packet ' + str(self.number) +
-                ' from ' + self.source.address +
-                ' to ' + self.destination.address)
-
-
-class JunlinPacket(Packet):
-    """Packet used for sending flow data"""
-
-
-class YameiPacket(Packet):
-    """Packet used for updating routing tables"""
-
+class RouterPacket(Packet):
+    def __init__(self, timestamp, routertable, source):
+        Packet.__init__(self, timestamp, source, destination = 0)
+        self.routertable = routertable
 
 class Router:
     """Representation of a data router
