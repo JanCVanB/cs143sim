@@ -19,6 +19,7 @@ This module contains all actor definitions.
 
 from tla_stop_and_wait import StopAndWait
 from cs143sim.constants import PACKET_SIZE
+from cs143sim.events import PacketReceipt
 
 class Buffer:
     """Representation of a data storage container
@@ -93,18 +94,20 @@ class Flow:
         """
         When possible, TLA use this method to send a packet
         """
-        self.host.send(packet)
+        self.source.send(packet)
         
     def receive_packet(self, packet):
         """
         If the packet is a data packet, generate an ack packet
         """
-        if packet.ack==True:
-            pass
+        if packet.ack==False:
+            ack_packet=make_ack_packet(packet)
+            send_packet(ack_packet)
         """
         If the packet is a ack packet, call tla.rcv_ack()
         """
-        
+        if packet.ack==True:
+            self.tla.react_to_ack(packet)
 
     def time_out(self):
         """
@@ -113,8 +116,7 @@ class Flow:
         """
 
     def react_to_flow_start(self, event):
-        # TODO: react by sending packets to Host
-        pass
+        self.tla.react_to_flow_start()
 
 
 class Host:
@@ -137,7 +139,8 @@ class Host:
         return 'Host at ' + self.address
 
     def send(self, packet):
-        self.link.add(packet)
+        #self.link.add(packet)
+        pass
 
     def receive(self, packet):
         # TODO: pass to flows[packet.destination]
@@ -190,6 +193,7 @@ class Link:
 
     def send(self, packet):
         # TODO: implement sending by scheduling LinkAvailable and PacketReceipt
+        
         pass
 
 class Packet:
@@ -220,7 +224,7 @@ class DataPacket(Packet):
     def __init__(self, number, acknowledgement, timestamp, source, destination):
         Packet.__init__(self, timestamp, source, destination)
         self.number = number
-        self.acknowledgment = acknowledgment
+        self.acknowledgment = acknowledgement
 
 class RouterPacket(Packet):
     def __init__(self, timestamp, routertable, source):
@@ -244,18 +248,18 @@ class Router:
         self.address = address
         self.links = []
         self.table = {}
-		self.defaul_gateway = None
+        self.defaul_gateway = None
   
     def initialize_routing_table(self, all_host_ip_addresses):
-	"""
-	the key of table is destination (IP_address of hosts)
-	the first element in value of table is the distance between current router to final host
-	the second element in value of table is where to go for next hop
-	"""
-		self.default_gateway = self.links[0].destination.address
-		for host_ip_address in all_host_ip_addresses:
-			val = float("inf"), default_gateway
-			table[host_ip_address] = val
+        """
+        the key of table is destination (IP_address of hosts)
+        the first element in value of table is the distance between current router to final host
+        the second element in value of table is where to go for next hop
+        """
+        self.default_gateway = self.links[0].destination.address
+        for host_ip_address in all_host_ip_addresses:
+            val = float("inf"), default_gateway
+            table[host_ip_address] = val
     
     def update_router_table(self, RouterPacket):
         """
@@ -300,7 +304,7 @@ class Router:
             If it is normal packet, call map_route function
             If it is update_RT_communication packet, call update_router_table function
             """
-		packet = event.value
+        packet = event.value
         if isinstance(packet, DataPacket):
             map_route(packet)
         elif isinstance(packet, RouterPacket):

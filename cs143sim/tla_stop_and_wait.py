@@ -20,8 +20,12 @@ class StopAndWait:
         
         self.last_acked_packet_number=-1 
         
-        
-    def response_to_ack(self):
+    def react_to_flow_start(self):
+        packet=self.flow.make_packet(0)
+        self.flow.send_packet(packet)
+    
+   
+    def react_to_ack(self, ack_packet):
         self.last_acked_packet_number+=1
         n=self.last_acked_packet_number
         
@@ -30,7 +34,7 @@ class StopAndWait:
             self.flow.send_packet(packet)
 
     
-    def response_to_time_out(self):
+    def react_to_time_out(self, timeout_packet_number):
         n=self.last_acked_packet_number
         packet=self.flow.make_packet(n)
         self.flow.send_packet(packet)
