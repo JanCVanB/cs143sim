@@ -19,6 +19,10 @@ This module contains all actor definitions.
 
 from tla_stop_and_wait import StopAndWait
 from cs143sim.constants import PACKET_SIZE
+from cs143sim.events import PacketReceipt
+from random import randint
+
+
 
 
 class Actor(object):
@@ -82,18 +86,20 @@ class Flow(Actor):
         self.amount = amount
         
         self.W=1
-        self.tla=StopAndWait(self)
+        self.tla=StopAndWait(env=self.env, flow=self)
         
 
     def __str__(self):
         return ('Flow from ' + self.source.address +
                 ' to ' + self.destination.address)
 
-    def make_packet(self, packet_num):
+    def make_packet(self, packet_number):
         """
         Make a packet based on the packet number
         """
-        packet=DataPacket(self.env, packet_num, False, 0, self.source, self.destination)
+
+        packet=DataPacket(self.env, packet_number, False, 0, self.source, self.destination)
+
         return packet
         
     def make_ack_packet(self, packet):
@@ -109,20 +115,31 @@ class Flow(Actor):
         """
         #self.source.send(packet)
         
-        #make up
-        self.destination.flows[0].receive_packet(packet)
+        #to test ack and time out, there is a probability of 0.5 for the packet to be sent.
+        r=randint(0,1)
+        if packet.acknowledgement==True:
+            r=0
+            
+        if r==0:
+            PacketReceipt(env=self.env, delay=5, receiver=self.destination.flows[0], packet=packet)
+        else:
+            pass
         
-    def receive_packet(self, packet):
+        
+    def react_to_packet_receipt(self, event):
+        packet=event.value
         """
         If the packet is a data packet, generate an ack packet
-        """
+        """        
         if packet.acknowledgement==False:
+            print "    Data "+str(packet.number)+" Received"
             ack_packet=self.make_ack_packet(packet)
             self.send_packet(ack_packet)
         """
         If the packet is a ack packet, call tla.rcv_ack()
         """
         if packet.acknowledgement==True:
+            print "    Ack "+str(packet.number)+" Received"
             self.tla.react_to_ack(packet)
 
     def time_out(self, timeout_packet_number):
@@ -133,7 +150,8 @@ class Flow(Actor):
         self.tla.react_to_time_out(timeout_packet_number)
 
     def react_to_flow_start(self, event):
-        self.tla.react_to_flow_start()
+        self.tla.react_to_flow_start(event=event)
+    
 
 
 class Host(Actor):
