@@ -185,7 +185,8 @@ class Controller:
                         for attribute in ['BUFFER', 'DELAY', 'RATE', 'SRC', 'DST']:
                             if store_in[attribute] in ['', []]:
                                 # Make sure all the attributes are not empty
-                                raise MissingAttribute(obj_type, obj_id, attribute)
+                                raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
+                                                       missing_attr=attribute)
                         # If all the attributes are present, create the object
                         if DEBUG:
                             print 'Making Link: ' + obj_id
@@ -207,33 +208,38 @@ class Controller:
                                     the_dst = self.routers[target]
                             else:
                                 raise InputFileUnknownReference(line_number, target + ' is not a valid Host/Router.')
-                        self.make_link(obj_id, the_src, the_dst, float(store_in['RATE']),
-                                       float(store_in['DELAY']), int(store_in['BUFFER']))
+                        self.make_link(name=obj_id, source=the_src, destination=the_dst,
+                                       rate=float(store_in['RATE']),
+                                       delay=float(store_in['DELAY']), buffer_capacity=int(store_in['BUFFER']))
+                                        # TODO: Make sure I'm passing the right units
                     elif obj_type == 'HOST':
                         # check the attribute(s) (there's only one for HOSTS so far: IP)
                         for attribute in ['IP']:
                             if store_in[attribute] in ['', []]:
                                 # Make sure all the attributes are not empty
-                                raise MissingAttribute(obj_type, obj_id, attribute)
+                                raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
+                                                       missing_attr=attribute)
                         if DEBUG:
                             print 'Making host: ' + obj_id
-                        self.make_host(obj_id, store_in['IP'])
+                        self.make_host(name=obj_id, ip_address=store_in['IP'])
 
                     elif obj_type == 'ROUTER':
                         # check the attribute(s) (only one so far: IP)
                         # TODO: Add router update-routing-tables value to attributes
                         for attribute in ['IP']:
                             if store_in[attribute] in ['', []]:
-                                raise MissingAttribute(obj_type, obj_id, attribute)
+                                raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
+                                                       missing_attr=attribute)
                         if DEBUG:
                             print 'Making Router: ' + obj_id
-                        self.make_router(obj_id, store_in['IP'])
+                        self.make_router(name=obj_id, ip_address=store_in['IP'])
 
                     elif obj_type == 'FLOW':
                         # TODO: Specify congestion control algorithm as attribute
                         for attribute in ['SRC', 'DST', 'START', 'DATA']:
                             if store_in[attribute] in ['', []]:
-                                raise MissingAttribute(obj_type, obj_id, attribute)
+                                raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
+                                                       missing_attr=attribute)
                         # if all the attributes are there, lets go ahead and create the flow
                         # BUT FIRST, we need to make sure the SRC/DST hosts actually exist..
                         # if they don't, warn the user that "No, i'm sorry, you have to specify
@@ -241,16 +247,17 @@ class Controller:
                         if DEBUG:
                             print 'Making Flow: ' + obj_id
                         try:
-                            self.make_flow(obj_id, self.hosts[store_in['SRC']], self.hosts[store_in['DST']],
-                                           int(store_in['DATA']), float(store_in['START']))
+                            self.make_flow(name=obj_id, source=self.hosts[store_in['SRC']],
+                                           destination=self.hosts[store_in['DST']],
+                                           amount=int(store_in['DATA']),
+                                           start_time=float(store_in['START']))
                         except KeyError as e:
-                            raise InputFileUnknownReference(line_number,
-                                                            'Input File Formatting Error: ' +
+                            raise InputFileUnknownReference(line_number=line_number,
+                                                            message='Input File Formatting Error: ' +
                                                             'Reference to unknown object: ' + repr(e))
-
                     else:
                         # Unexpected ID attribute (out of context of an object Type)
-                        raise InputFileSyntaxError(line_number, 'Unexpected "ID" attribute.')
+                        raise InputFileSyntaxError(line_number=line_number, message='Unexpected "ID" attribute.')
                     if keyword == 'ID':
                         obj_id = line_comp[1].upper()
                     else:
@@ -261,11 +268,13 @@ class Controller:
                         store_in['SRC'] = line_comp[1].upper()
                         store_in['DST'] = line_comp[2].upper()
                     else:
-                        raise InputFileSyntaxError(line_number,
-                                                   'Input File Formatting Error: CONNECTS attribute ' +
+                        raise InputFileSyntaxError(line_number=line_number,
+                                                   message='Input File Formatting Error: CONNECTS attribute ' +
                                                    'formatted incorrectly.\nExpects: CONNECTS A B')
                 else:
-                    raise InputFileSyntaxError(line_number, 'Unrecognized keyword: ' + keyword)
+                    raise InputFileSyntaxError(line_number=line_number,
+                                               message='Unrecognized keyword: ' + keyword)
+        # TODO: Once simulation network is setup, call routers` "initialize routing table" function.
 
     def run(self, until=None):
         """Run the simulation for a specified duration
