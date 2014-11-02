@@ -19,7 +19,11 @@ This module contains all actor definitions.
 
 from tla_stop_and_wait import StopAndWait
 from cs143sim.constants import PACKET_SIZE
+<<<<<<< HEAD
 
+=======
+from cs143sim.events import PacketReceipt
+>>>>>>> FETCH_HEAD
 
 class Buffer:
     """Representation of a data storage container
@@ -79,27 +83,35 @@ class Flow:
         """
         Make a packet based on the packet number
         """
-
+        packet=DataPacket(packet_num, False, 0, self.source, self.destination)
+        return packet
         
     def make_ack_packet(self, packet):
         """
         Make a ack packet
         """
-
+        ack_packet=DataPacket(packet.number, True, 0, packet.destination, packet.source)
+        return ack_packet
+    
+    
     def send_packet(self, packet):
         """
         When possible, TLA use this method to send a packet
         """
-
-    def receive_packet(self):
+        self.source.send(packet)
+        
+    def receive_packet(self, packet):
         """
         If the packet is a data packet, generate an ack packet
         """
-        
+        if packet.ack==False:
+            ack_packet=make_ack_packet(packet)
+            send_packet(ack_packet)
         """
         If the packet is a ack packet, call tla.rcv_ack()
         """
-        
+        if packet.ack==True:
+            self.tla.react_to_ack(packet)
 
     def time_out(self):
         """
@@ -108,8 +120,7 @@ class Flow:
         """
 
     def react_to_flow_start(self, event):
-        # TODO: react by sending packets to Host
-        pass
+        self.tla.react_to_flow_start()
 
 
 class Host:
@@ -132,7 +143,8 @@ class Host:
         return 'Host at ' + self.address
 
     def send(self, packet):
-        self.link.add(packet)
+        #self.link.add(packet)
+        pass
 
     def receive(self, packet):
         # TODO: pass to flows[packet.destination]
@@ -185,6 +197,7 @@ class Link:
 
     def send(self, packet):
         # TODO: implement sending by scheduling LinkAvailable and PacketReceipt
+        
         pass
 
 class Packet:
@@ -215,7 +228,11 @@ class DataPacket(Packet):
     def __init__(self, number, acknowledgement, timestamp, source, destination):
         Packet.__init__(self, timestamp, source, destination)
         self.number = number
+<<<<<<< HEAD
         self.acknowledgement = acknowledgement
+=======
+        self.acknowledgment = acknowledgement
+>>>>>>> FETCH_HEAD
 
 class RouterPacket(Packet):
     def __init__(self, timestamp, routertable, source):
@@ -223,42 +240,93 @@ class RouterPacket(Packet):
         self.routertable = routertable
 
 class Router:
-    """Representation of a data router
-
-    Routers route :class:`Packets <.Packet>` through the network to their
-    respective destination :class:`Hosts <.Host>`.
-
-    :param str address: IP address
-    :ivar str address: IP address
-    :ivar list links: all connected :class:`Links <.Link>`
-    :ivar dict table: routing table
-    :ivar default_gateway: default :class:`.Link`
-    """
+    """Representation of a router...
+        
+        Routers route packets through the network to their destination Hosts.
+        
+        :param address:IP address for router
+        :param list links: all connected Links
+        :param Link default_gateway: default route
+        :param default_gateway: default out port if can not decide route
+        :ivar list links: all connected Links
+        :ivar dict table: routing table
+        :ivar default_gateway: default out port if can not decide route
+        """
     def __init__(self, address):
         self.address = address
         self.links = []
         self.table = {}
-        self.default_gateway = None
-
-
-    def __str__(self):
-        return 'Router at ' + self.address
+        self.defaul_gateway = None
+  
+    def initialize_routing_table(self, all_host_ip_addresses):
+        """
+        the key of table is destination (IP_address of hosts)
+        the first element in value of table is the distance between current router to final host
+        the second element in value of table is where to go for next hop
+        """
+        self.default_gateway = self.links[0].destination.address
+        for host_ip_address in all_host_ip_addresses:
+            val = float("inf"), default_gateway
+            table[host_ip_address] = val
+    
+    def update_router_table(self, RouterPacket):
+        """
+            This function is to check every item in router table if any update.
+            Implement Bellman Ford algorithm here
+            
+        """
+        
+        for destination, val in RouterPacket.routertable:
+            if destination in self.table:
+                if val[0] + 1 < self.table[destination]:
+                    update_val = val[0] + 1, RouterPacket.source
+                    self.table[destination] = update_val
+            else:
+                update_val = val[0] + 1, RouterPacket.source
+                self.table[destination] = update_val
+        
+        
+    
+    def generate_communication_packet(self):
+        """
+            Design a sepcial packet that send the whole router table of this router to communicate with its neighbor
+        """
+        for l in links:
+            router_packet = RouterPackect(routertable = self.table, source = self.address)
+            send(link = l, packet = router_packet)
+      
+    
+    def map_route(self, packet):
+        if packet.destination in table:
+            route_link = table[packet.destination]
+            send(link = route_link, packet = packet)
+        else:
+            route_link = self.default_gateway
+            send(link = route_link, packet = packet)
+      
+    
+    
+    def receive(self, packet):
+        """
+            Read packet head to tell whether is a normal packet or a update_RT_communication packet
+            If it is normal packet, call map_route function
+            If it is update_RT_communication packet, call update_router_table function
+            """
+        packet = event.value
+        if isinstance(packet, DataPacket):
+            map_route(packet)
+        elif isinstance(packet, RouterPacket):
+            update_router_table(packet)
+        
+       
+      
+    
+    def send(self, link, packet):
+        """
+            send packet to certain link
+            the packet could be normal packet to forward or communication packet to send to all links.
+         """
+        link.add(packet)
 
     def react_to_routing_table_outdated(self, event):
-        self.update_router_table()
-
-    def update_router_table(self):
-        # TODO: update router table
-        pass
-
-    def map_route(self, packet):
-        # TODO: get output_link
-        return output_link
-
-    def read_packet_head(packet):
-        # TODO: get destination_address
-        return destination_address
-
-    def get_neighbor_router(self):
-        # TODO: get neighbor_routers
-        return neighbor_routers
+        self.generate_communication_packet()
