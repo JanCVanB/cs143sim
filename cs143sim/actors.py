@@ -98,26 +98,30 @@ class Flow:
         """
         When possible, TLA use this method to send a packet
         """
-        self.source.send(packet)
+        #self.source.send(packet)
+        
+        #make up
+        self.destination.flows[0].receive_packet(packet)
         
     def receive_packet(self, packet):
         """
         If the packet is a data packet, generate an ack packet
         """
-        if packet.ack==False:
-            ack_packet=make_ack_packet(packet)
-            send_packet(ack_packet)
+        if packet.acknowledgment==False:
+            ack_packet=self.make_ack_packet(packet)
+            self.send_packet(ack_packet)
         """
         If the packet is a ack packet, call tla.rcv_ack()
         """
-        if packet.ack==True:
+        if packet.acknowledgment==True:
             self.tla.react_to_ack(packet)
 
-    def time_out(self):
+    def time_out(self, timeout_packet_number):
         """
         When time out happens, run TLA
         Time_out timers should be reset if a the ack arrive
         """
+        self.tla.react_to_time_out(timeout_packet_number)
 
     def react_to_flow_start(self, event):
         self.tla.react_to_flow_start()
