@@ -168,7 +168,8 @@ class Controller:
         """
         with open(case, 'rb') as case_file:
             # Open the file for line-by-line consumption
-            obj_type = ''  # obj_type holds the current object type (LINK/HOST/Etc) to which attributes apply
+            obj_type = ''  # obj_type holds the current object type (LINK/HOST/Etc)
+                           # to which attributes apply
             obj_id = ''    # obj_id is the current ID of the object
             # These are "simple" attributes that have only 1 argument.
             # Not included in this list is the CONNECTS attribute, which has 2 arguments,
@@ -210,7 +211,8 @@ class Controller:
                         obj_id = line_comp[1].upper()
                     elif obj_type == 'LINK':
                         # if we're getting an additional ID attribute on a LINK
-                        # make sure we have all the attributes available, then create the link object
+                        # make sure we have all the attributes available,
+                        # then create the link object
                         for attribute in ['BUFFER', 'DELAY', 'RATE', 'SRC', 'DST']:
                             if store_in[attribute] in ['', []]:
                                 # Make sure all the attributes are not empty
@@ -219,7 +221,7 @@ class Controller:
                         # If all the attributes are present, create the object
                         if DEBUG:
                             print 'Making Link: ' + obj_id
-                        the_src = ''  # temporary variables that will point to the actual src/dst instances
+                        the_src = ''  # temp variables that will point to src/dst instances
                         the_dst = ''
                         # Enforce referential integrity (aka check that the specified
                         # hosts/routers actually exist in the simulation)
@@ -236,10 +238,12 @@ class Controller:
                                 else:
                                     the_dst = self.routers[target]
                             else:
-                                raise InputFileUnknownReference(line_number, target + ' is not a valid Host/Router.')
+                                raise InputFileUnknownReference(line_number, target +
+                                                                ' is not a valid Host/Router.')
                         self.make_link(name=obj_id, source=the_src, destination=the_dst,
                                        rate=float(store_in['RATE']),
-                                       delay=float(store_in['DELAY']), buffer_capacity=int(store_in['BUFFER']))
+                                       delay=float(store_in['DELAY']),
+                                       buffer_capacity=int(store_in['BUFFER']))
                                         # TODO: Make sure I'm passing the right units
                     elif obj_type == 'HOST':
                         # check the attribute(s) (there's only one for HOSTS so far: IP)
@@ -249,7 +253,7 @@ class Controller:
                                 raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
                                                        missing_attr=attribute)
                         if DEBUG:
-                            print 'Making host: ' + obj_id
+                            print 'Making Host: ' + obj_id
                         self.make_host(name=obj_id, ip_address=store_in['IP'])
 
                     elif obj_type == 'ROUTER':
@@ -286,7 +290,8 @@ class Controller:
                                                             'Reference to unknown object: ' + repr(e))
                     else:
                         # Unexpected ID attribute (out of context of an object Type)
-                        raise InputFileSyntaxError(line_number=line_number, message='Unexpected "ID" attribute.')
+                        raise InputFileSyntaxError(line_number=line_number,
+                                                   message='Unexpected "ID" attribute.')
                     if keyword == 'ID':
                         obj_id = line_comp[1].upper()
                     else:
@@ -298,12 +303,13 @@ class Controller:
                         store_in['DST'] = line_comp[2].upper()
                     else:
                         raise InputFileSyntaxError(line_number=line_number,
-                                                   message='Input File Formatting Error: CONNECTS attribute ' +
-                                                   'formatted incorrectly.\nExpects: CONNECTS A B')
+                                                   message='Input File Formatting Error: CONNECTS attr' +
+                                                   'ibute formatted incorrectly.\nExpects: CONNECTS A B')
                 else:
                     raise InputFileSyntaxError(line_number=line_number,
                                                message='Unrecognized keyword: ' + keyword)
         # TODO: Once simulation network is setup, call routers` "initialize routing table" function.
+        pass
 
     def record(self, recorder, actor, value):
         recorder[actor].append((self.env.now, value))
