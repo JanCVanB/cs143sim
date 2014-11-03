@@ -21,7 +21,8 @@ from cs143sim.events import FlowStart
 
 class MissingAttribute(Exception):
     """
-    MissingAttribute is an `Exception` designed to notify the user that the input file is missing information
+    MissingAttribute is an `Exception` designed to notify the user that the
+    input file is missing information
     """
     def __init__(self, obj_type, obj_id, missing_attr):
         self.obj_type = obj_type
@@ -29,14 +30,14 @@ class MissingAttribute(Exception):
         self.missing_attr = missing_attr
 
     def __str__(self):
-        return 'I/O Error: Type ' + self.obj_type + ' (ID: ' + self.obj_id + ') is missing attribute ' + \
-               self.missing_attr
+        return 'I/O Error: Type ' + self.obj_type + ' (ID: ' + self.obj_id + \
+               ') is missing attribute ' + self.missing_attr
 
 
 class InputFileSyntaxError(Exception):
     """
-    InputFileSyntaxError is an `Exception` thrown when an unrecognized syntax is used in
-    the input file.
+    InputFileSyntaxError is an `Exception` thrown when an unrecognized syntax
+    is used in the input file.
     """
     def __init__(self, line_number, message):
         self.line_number = line_number
@@ -68,14 +69,34 @@ class Controller:
     :ivar dict hosts: all :class:`Hosts <.Host>` in the simulation
     :ivar dict links: all :class:`Links <.Link>` in the simulation
     :ivar dict routers: all :class:`Routers <.Router>` in the simulation
+    :ivar dict buffer_occupancy: buffer occupancy records for each link;
+        :class:`Links <.Link>` key to lists of (time, value) tuples
+    :ivar dict flow_rate: flow rate records for each flow;
+        :class:`Flows <.Flow>` key to lists of (time, value) tuples
+    :ivar dict link_rate: link rate records for each link;
+        :class:`Links <.Link>` key to lists of (time, value) tuples
+    :ivar dict packet_delay: packet delay records for each flow;
+        :class:`Flows <.Flow>` key to lists of (time, value) tuples
+    :ivar dict packet_loss: packet loss records for each link;
+        :class:`Links <.Link>` key to lists of (time, value) tuples
+    :ivar dict window_size: window size records for each flow;
+        :class:`Flows <.Flow>` key to lists of (time, value) tuples
     """
 
     def __init__(self, case='cs143sim/cases/case0_newformat.txt'):
-        self.env = Environment()
+        self.env = ControlledEnvironment(controller=self)
         self.flows = {}
         self.hosts = {}
         self.links = {}
         self.routers = {}
+
+        self.buffer_occupancy = {}
+        self.flow_rate = {}
+        self.link_rate = {}
+        self.packet_delay = {}
+        self.packet_loss = {}
+        self.window_size = {}
+
         self.read_case(case)
 
     def make_flow(self, name, source, destination, amount, start_time):
@@ -87,10 +108,14 @@ class Controller:
         :param int amount: amount of data to transfer, in bits
         :param float start_time: time the new :class:`.Flow` starts
         """
-        new_flow = Flow(source=source, destination=destination, amount=amount)
+        new_flow = Flow(env=self.env, source=source, destination=destination,
+                        amount=amount)
         source.flows.append(new_flow)
         destination.flows.append(new_flow)
         self.flows[name] = new_flow
+        self.flow_rate[new_flow] = [(0, 0)]
+        self.packet_delay[new_flow] = [(0, 0)]
+        self.window_size[new_flow] = [(0, 0)]
         FlowStart(env=self.env, delay=start_time, flow=new_flow)
 
     def make_host(self, name, ip_address):
@@ -99,7 +124,7 @@ class Controller:
         :param str name: new :class:`.Host` name
         :param str ip_address: new :class:`.Host`'s IP address
         """
-        new_host = Host(address=ip_address)
+        new_host = Host(env=self.env, address=ip_address)
         self.hosts[name] = new_host
 
     def make_link(self, name, source, destination, rate, delay, buffer_capacity):
@@ -112,8 +137,8 @@ class Controller:
         :param float delay: delay for data transfer, in ms
         :param int buffer_capacity: size of receiver :class:`.Buffer`, in KB
         """
-        new_link = Link(source=source, destination=destination, delay=delay,
-                        rate=rate, buffer_capacity=buffer_capacity)
+        new_link = Link(env=self.env, source=source, destination=destination,
+                        delay=delay, rate=rate, buffer_capacity=buffer_capacity)
         for actor in (source, destination):
             if isinstance(actor, Host):
                 actor.link = new_link
@@ -122,6 +147,9 @@ class Controller:
             else:
                 raise Exception('Unknown Source/Destination: ' + actor)
         self.links[name] = new_link
+        self.buffer_occupancy[new_link] = [(0, 0)]
+        self.link_rate[new_link] = [(0, 0)]
+        self.packet_loss[new_link] = [(0, 0)]
 
     def make_router(self, name, ip_address):
         """Make a new :class:`.Router` and add it to `self.routers`
@@ -129,11 +157,12 @@ class Controller:
         :param str name: new :class:`.Router` name
         :param str ip_address: new :class:`.Router`'s IP Address
         """
-        new_router = Router(address=ip_address)
+        new_router = Router(env=self.env, address=ip_address)
         self.routers[name] = new_router
 
     def read_case(self, case):
-        """Read input file at path `case` and create actors (and events?) accordingly
+        """Read input file at path `case` and create actors (and events?)
+        accordingly
 
         :param str case: path to simulation input file
         """
@@ -276,9 +305,45 @@ class Controller:
                                                message='Unrecognized keyword: ' + keyword)
         # TODO: Once simulation network is setup, call routers` "initialize routing table" function.
 
+    def record(self, recorder, actor, value):
+        recorder[actor].append((self.env.now, value))
+
+    def record_buffer_occupancy(self, link, buffer_occupancy):
+        self.record(recorder=self.buffer_occupancy, actor=link,
+                    value=buffer_occupancy)
+
+    def record_flow_rate(self, flow, flow_rate):
+        self.record(recorder=self.flow_rate, actor=flow, value=flow_rate)
+
+    def record_link_rate(self, link, link_rate):
+        self.record(recorder=self.link_rate, actor=link, value=link_rate)
+
+    def record_packet_delay(self, flow, packet_delay):
+        self.record(recorder=self.packet_delay, actor=flow, value=packet_delay)
+
+    def record_packet_loss(self, link):
+        # TODO: determine packet loss metric
+        # TODO: write controller_record_packet_loss test
+        self.record(recorder=self.packet_loss, actor=link, value='???')
+
+    def record_window_size(self, flow, window_size):
+        self.record(recorder=self.window_size, actor=flow, value=window_size)
+
     def run(self, until=None):
         """Run the simulation for a specified duration
 
         :param float until: simulation duration
         """
         self.env.run(until=until)
+
+
+class ControlledEnvironment(Environment):
+    """SimPy :class:`~simpy.core.Environment` with a reference to its
+        :class:`.Controller`
+
+    :param controller: :class:`.Controller` that created the
+        :class:`~simpy.core.Environment`
+    """
+    def __init__(self, controller):
+        super(ControlledEnvironment, self).__init__()
+        self.controller = controller

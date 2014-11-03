@@ -20,19 +20,36 @@ This module contains all actor definitions.
 from tla_stop_and_wait import StopAndWait
 from cs143sim.constants import PACKET_SIZE
 from cs143sim.events import PacketReceipt
+from random import randint
 
 
-class Buffer:
+
+
+class Actor(object):
+    """Representation of an actor
+
+    :param env: SimPy simulation :class:`~simpy.core.Environment`
+    :ivar env: SimPy simulation :class:`~simpy.core.Environment`
+    """
+    def __init__(self, env):
+        self.env = env
+
+
+class Buffer(Actor):
     """Representation of a data storage container
 
     Buffers store data to be linked while :class:`.Link` is busy sending data.
 
     :param int capacity: maximum number of bits that can be stored
+    :param link: :class:`.Link` containing this buffer
     :ivar int capacity: maximum number of bits that can be stored
+    :ivar link: :class:`.Link` containing this buffer
     :ivar list packets: :class:`Packets <.Packet>` currently in storage
     """
-    def __init__(self, capacity):
+    def __init__(self, env, capacity, link):
+        super(Buffer, self).__init__(env=env)
         self.capacity = capacity
+        self.link = link
         self.packets = []
 
     def add(self, packet):
@@ -47,11 +64,10 @@ class Buffer:
             self.packets.append(packet)
         else:
             # The packet cannot be stored, so the packet is dropped
-            # TODO: Insert callback for simulation monitor (report that a packet was dropped)
-            pass
+            self.env.controller.record_packet_loss(link=self.link)
 
 
-class Flow:
+class Flow(Actor):
     """Representation of a connection between access points
 
     Flows try to transmit data from :class:`.Host` to :class:`.Host`.
@@ -63,54 +79,67 @@ class Flow:
     :ivar destination: destination :class:`.Host`
     :ivar float amount: amount of data to transmit
     """
-    def __init__(self, source, destination, amount):
+    def __init__(self, env, source, destination, amount):
+        super(Flow, self).__init__(env=env)
         self.source = source
         self.destination = destination
         self.amount = amount
         
         self.W=1
-        self.tla=StopAndWait(self)
+        self.tla=StopAndWait(env=self.env, flow=self)
         
 
     def __str__(self):
         return ('Flow from ' + self.source.address +
                 ' to ' + self.destination.address)
 
-    def make_packet(self, packet_num):
+    def make_packet(self, packet_number):
         """
         Make a packet based on the packet number
         """
-        packet=DataPacket(packet_num, False, 0, self.source, self.destination)
+
+        packet=DataPacket(self.env, packet_number, False, 0, self.source, self.destination)
+
         return packet
         
     def make_ack_packet(self, packet):
         """
         Make a ack packet
         """
-        ack_packet=DataPacket(packet.number, True, 0, packet.destination, packet.source)
+        ack_packet=DataPacket(self.env, packet.number, True, 0, packet.destination, packet.source)
         return ack_packet
-    
-    
+
     def send_packet(self, packet):
         """
         When possible, TLA use this method to send a packet
         """
         #self.source.send(packet)
         
-        #make up
-        self.destination.flows[0].receive_packet(packet)
+        #to test ack and time out, there is a probability of 0.5 for the packet to be sent.
+        r=randint(0,1)
+        if packet.acknowledgement==True:
+            r=0
+            
+        if r==0:
+            PacketReceipt(env=self.env, delay=5, receiver=self.destination.flows[0], packet=packet)
+        else:
+            pass
         
-    def receive_packet(self, packet):
+        
+    def react_to_packet_receipt(self, event):
+        packet=event.value
         """
         If the packet is a data packet, generate an ack packet
-        """
+        """        
         if packet.acknowledgement==False:
+            print "    Data "+str(packet.number)+" Received"
             ack_packet=self.make_ack_packet(packet)
             self.send_packet(ack_packet)
         """
         If the packet is a ack packet, call tla.rcv_ack()
         """
         if packet.acknowledgement==True:
+            print "    Ack "+str(packet.number)+" Received"
             self.tla.react_to_ack(packet)
 
     def time_out(self, timeout_packet_number):
@@ -121,10 +150,11 @@ class Flow:
         self.tla.react_to_time_out(timeout_packet_number)
 
     def react_to_flow_start(self, event):
-        self.tla.react_to_flow_start()
+        self.tla.react_to_flow_start(event=event)
+    
 
 
-class Host:
+class Host(Actor):
     """Representation of an access point
 
     Hosts send :class:`Packets <.Packet>` through a :class:`.Link` to a
@@ -135,7 +165,8 @@ class Host:
     :ivar list flows: :class:`Flows <.Flow>` on this :class:`.Host`
     :ivar link: :class:`Link` connected to this :class:`.Host`
     """
-    def __init__(self, address):
+    def __init__(self, env, address):
+        super(Host, self).__init__(env=env)
         self.address = address
         self.flows = []
         self.link = None
@@ -152,7 +183,7 @@ class Host:
         pass
 
 
-class Link:
+class Link(Actor):
     """Representation of a physical link between access points or routers
 
     Links carry packets from one end to the other.
@@ -169,12 +200,13 @@ class Link:
     :ivar bool busy: whether currently removing data from source
     :ivar float utilization: fraction of capacity in use
     """
-    def __init__(self, source, destination, delay, rate, buffer_capacity):
+    def __init__(self, env, source, destination, delay, rate, buffer_capacity):
+        super(Link, self).__init__(env=env)
         self.source = source
         self.destination = destination
         self.delay = delay
         self.rate = rate
-        self.buffer = Buffer(capacity=buffer_capacity)
+        self.buffer = Buffer(env=env, capacity=buffer_capacity, link=self)
         self.busy = False
         self.utilization = 0
 
@@ -201,7 +233,8 @@ class Link:
         
         pass
 
-class Packet:
+
+class Packet(Actor):
     """Representation of a quantum of information
 
     Packets carry information along the network, between :class:`Hosts <.Host>`
@@ -219,39 +252,44 @@ class Packet:
     :ivar int size: size, in bits
     :ivar str timestamp: time at which the packet was created
     """
-    def __init__(self, timestamp, source, destination):
+    def __init__(self, env, timestamp, source, destination):
+        super(Packet, self).__init__(env=env)
         self.timestamp = timestamp
         self.source = source
         self.destination = destination
         self.size = PACKET_SIZE
 
+
 class DataPacket(Packet):
-    def __init__(self, number, acknowledgement, timestamp, source, destination):
-        Packet.__init__(self, timestamp, source, destination)
+    def __init__(self, env, number, acknowledgement, timestamp, source,
+                 destination):
+        super(DataPacket, self).__init__(env, timestamp, source, destination)
         self.number = number
 
         self.acknowledgement = acknowledgement
 
 
 class RouterPacket(Packet):
-    def __init__(self, timestamp, routertable, source):
-        Packet.__init__(self, timestamp, source, destination = 0)
+    def __init__(self, env, timestamp, routertable, source):
+        super(RouterPacket, self).__init__(env, timestamp, source, destination=0)
         self.routertable = routertable
 
-class Router:
+
+class Router(Actor):
     """Representation of a router...
-        
-        Routers route packets through the network to their destination Hosts.
-        
-        :param address:IP address for router
-        :param list links: all connected Links
-        :param Link default_gateway: default route
-        :param default_gateway: default out port if can not decide route
-        :ivar list links: all connected Links
-        :ivar dict table: routing table
-        :ivar default_gateway: default out port if can not decide route
-        """
-    def __init__(self, address):
+
+    Routers route packets through the network to their destination Hosts.
+
+    :param address:IP address for router
+    :param list links: all connected Links
+    :param Link default_gateway: default route
+    :param default_gateway: default out port if can not decide route
+    :ivar list links: all connected Links
+    :ivar dict table: routing table
+    :ivar default_gateway: default out port if can not decide route
+    """
+    def __init__(self, env, address):
+        super(Router, self).__init__(env=env)
         self.address = address
         self.links = []
         self.table = {}

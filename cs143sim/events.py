@@ -42,11 +42,14 @@ class FlowStart(Timeout):
     :param flow: :class:`~cs143sim.actors.Flow` that starts
     """
     def __init__(self, env, delay, flow):
-        super(FlowStart, self).__init__(env, delay)
-        self.callbacks.append(flow.react_to_flow_start)
+
+        super(FlowStart, self).__init__(env=env, delay=delay)
+
         if DEBUG:
             self.actor = flow
             self.callbacks.append(print_event)
+            
+        self.callbacks.append(flow.react_to_flow_start)
 
 
 class LinkAvailable(Timeout):
@@ -60,7 +63,7 @@ class LinkAvailable(Timeout):
         :class:`~cs143sim.actors.Packet` was sent
     """
     def __init__(self, env, delay, link):
-        super(LinkAvailable, self).__init__(env, delay)
+        super(LinkAvailable, self).__init__(env=env, delay=delay)
         self.callbacks.append(link.react_to_link_available)
         if DEBUG:
             self.actor = link
@@ -80,12 +83,35 @@ class PacketReceipt(Timeout):
     :param packet: :class:`~cs143sim.actors.Packet` that arrives
     """
     def __init__(self, env, delay, receiver, packet):
-        super(PacketReceipt, self).__init__(env, delay, value=packet)
-        # TODO: self.callbacks.append(receiver.receive_packet)
+
+        super(PacketReceipt, self).__init__(env=env, delay=delay, value=packet)
+
+
         if DEBUG:
+            if packet.acknowledgement==False:
+                print "    send packet "+str(packet.number)
+            else:
+                print "    send ack "+str(packet.number)
+                
             self.actor = receiver
             self.callbacks.append(print_event)
+        # TODO: 
+        self.callbacks.append(receiver.react_to_packet_receipt)
 
+class PacketTimeOut(Timeout):
+    """
+    Time out event for tla
+    """
+    def __init__(self, env, delay, actor, packet_number):
+        super(PacketTimeOut, self).__init__(env, delay, value=packet_number)
+        if DEBUG:
+            print "    set packet "+str(packet_number)+ " time out: "+str(env.now+delay)
+    
+        if DEBUG:
+            self.actor = actor
+            self.callbacks.append(print_event)
+        # TODO: 
+        self.callbacks.append(actor.react_to_time_out)    
 
 class RoutingTableOutdated(Timeout):
     """A :class:`~cs143sim.actors.Router` updates its routing table
@@ -95,7 +121,7 @@ class RoutingTableOutdated(Timeout):
     :param router: :class:`~cs143sim.actors.Router` that updates
     """
     def __init__(self, env, delay, router):
-        super(RoutingTableOutdated, self).__init__(env, delay)
+        super(RoutingTableOutdated, self).__init__(env=env, delay=delay)
         self.callbacks.append(router.react_to_routing_table_outdated)
         if DEBUG:
             self.actor = router

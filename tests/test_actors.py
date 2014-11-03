@@ -4,39 +4,49 @@ from cs143sim.actors import Host
 from cs143sim.actors import Link
 from cs143sim.actors import DataPacket
 from cs143sim.actors import Router
+from cs143sim.simulation import Controller
+from cs143sim.simulation import ControlledEnvironment
 
 
 def basic_buffer():
-    return Buffer(capacity=1)
+    return Buffer(env=ControlledEnvironment(controller=Controller()),
+                  capacity=1, link=basic_link())
 
 
 def basic_flow():
-    return Flow(source=basic_host(), destination=basic_host(), amount=1.0)
+    return Flow(env=ControlledEnvironment(controller=Controller()),
+                source=basic_host(), destination=basic_host(),
+                amount=1.0)
 
 
 def basic_host():
-    return Host(address='')
+    return Host(env=ControlledEnvironment(controller=Controller()), address='')
 
 
 def basic_link():
-    return Link(source=basic_host(), destination=basic_host(), delay=1.0,
-                rate=1.0, buffer_capacity=1)
+    return Link(env=ControlledEnvironment(controller=Controller()),
+                source=basic_host(), destination=basic_host(),
+                delay=1.0, rate=1.0, buffer_capacity=1)
 
 
 def basic_packet():
     #return Packet(source=basic_host(), destination=basic_host(), number=1,
     #              acknowledgement=object())
-    return DataPacket(source=basic_host(), destination=basic_host(), number=1, acknowledgement=object(), timestamp=0)
+    return DataPacket(env=ControlledEnvironment(controller=Controller()),
+                      source=basic_host(), destination=basic_host(),
+                      number=1, acknowledgement=object(), timestamp=0)
 
 
 def basic_router():
-    return Router(address='')
+    return Router(env=ControlledEnvironment(controller=Controller()),
+                  address='')
 
 
 def buffer_overflow():
     buffer_capacity = 2
     number_of_packets = 3
     buffer_ = basic_buffer()
+    buffer_.env.controller.packet_loss[buffer_.link] = []
     packets = []
     for _ in range(number_of_packets):
         packet_ = basic_packet()
