@@ -309,7 +309,8 @@ class Router(Actor):
     def update_router_table(self, RouterPacket):
         """
             This function is to check every item in router table if any update.
-            Implement Bellman Ford algorithm here
+            Implement Bellman Ford algorithm here.
+            mesurement is hop.
             
         """
         
@@ -324,7 +325,7 @@ class Router(Actor):
         
         
     
-    def generate_communication_packet(self):
+    def generate_router_packet(self):
         """
             Design a sepcial packet that send the whole router table of this router to communicate with its neighbor
         """
@@ -343,7 +344,7 @@ class Router(Actor):
       
     
     
-    def receive(self, packet):
+    def react_to_packet_receipt(self, event):
         """
             Read packet head to tell whether is a normal packet or a update_RT_communication packet
             If it is normal packet, call map_route function
@@ -351,9 +352,9 @@ class Router(Actor):
             """
         packet = event.value
         if isinstance(packet, DataPacket):
-            map_route(packet)
+            map_route(packet = packet)
         elif isinstance(packet, RouterPacket):
-            update_router_table(packet)
+            update_router_table(packet = packet)
         
        
       
@@ -363,7 +364,8 @@ class Router(Actor):
             send packet to certain link
             the packet could be normal packet to forward or communication packet to send to all links.
          """
-        link.add(packet)
+        link.add(packet = packet)
 
     def react_to_routing_table_outdated(self, event):
-        self.generate_communication_packet()
+        self.generate_router_packet()
+        RoutingTableOutdated(env=self.env, delay=GENERATE_ROUTERPACKET_TIME_INTEVAL,router=self)

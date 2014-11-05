@@ -5,6 +5,7 @@ This file contains all constant definitions
 
 DEBUG = True
 PACKET_SIZE = 8192
+GENERATE_ROUTERPACKET_TIME_INTEVAL = 20000 #milliseconds
 
 ### INPUT FILE UNIT CONVERSIONS:
 # Rate needs to go from Mbps to Bytes per millisecond (internally)
