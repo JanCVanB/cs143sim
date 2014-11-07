@@ -175,12 +175,14 @@ class Host(Actor):
         return 'Host at ' + self.address
 
     def send(self, packet):
-        #self.link.add(packet)
-        pass
+        link.add(packet)
 
-    def receive(self, packet):
-        # TODO: pass to flows[packet.destination]
-        pass
+    def react_to_packet_receipt(self, event):
+        packet=event.value
+        if isinstance(packet, DataPacket):
+            for f in self.flows:
+                if (packet.source==f.source)and(packet.destination==f.destination):
+                    f.react_to_packet_receipt(event=event)
 
 
 class Link(Actor):
