@@ -36,6 +36,12 @@ def basic_packet():
                       source=basic_host(), destination=basic_host(),
                       number=1, acknowledgement=object(), timestamp=0)
 
+def basic_router_packet():
+    #return Packet(source=basic_host(), destination=basic_host(), number=1,
+    #              acknowledgement=object())
+    return RouterPacket(env=ControlledEnvironment(controller=Controller()),
+                      source=basic_host(), destination=basic_host(),
+                      number=1, acknowledgement=object(), timestamp=0)
 
 def basic_router():
     return Router(env=ControlledEnvironment(controller=Controller()),
@@ -73,6 +79,49 @@ def link_busy():
     assert packet_ in link_.buffer.packets
 
 
+def router_initialize():
+    router_ip_address = '1'
+    router = basic_router()
+    router.address = router_ip_address
+    #router.default_gateway = '5'
+    links = []
+    number_of_links = 2
+    
+    link1_ = basic_link()
+    link1_.destination = router
+    link2_ = basic_link()
+    link2_.source = router
+    links.append(link1_)
+    links.append(link2_)
+
+    router.links = links
+    assert link2_ in router.links
+    assert link1_ == router.links[0]
+
+    all_host_ip_addresses = ['11','12','13','14']
+    router.initialize_routing_table(all_host_ip_addresses)
+    
+
+
+
+def router_forward():
+    pass
+
+
+def router_receive_update_packet():
+    # packet_ = basic_packet()
+    # link_1 = basic_link()
+    # link_2 = basic_link()
+    # router_ = basic_router()
+    # router_.links.extend([link_1, link_2])
+    # router_.do_things()
+
+    pass
+
+def router_send_update_packet():
+    pass
+
+
 def test_buffer():
     basic_buffer()
     buffer_overflow()
@@ -97,3 +146,7 @@ def test_packet():
 
 def test_router():
     basic_router()
+    router_initialize()
+    # router_forward()
+    # router_receive_update_packet()
+    # router_send_update_packet()

@@ -18,7 +18,7 @@ This module contains all actor definitions.
 """
 
 from tla_stop_and_wait import StopAndWait
-from cs143sim.constants import PACKET_SIZE
+from cs143sim.constants import PACKET_SIZE,GENERATE_ROUTERPACKET_TIME_INTEVAL
 from cs143sim.events import PacketReceipt
 from random import randint
 
@@ -305,8 +305,8 @@ class Router(Actor):
         """
         self.default_gateway = self.links[0].destination.address
         for host_ip_address in all_host_ip_addresses:
-            val = float("inf"), default_gateway
-            table[host_ip_address] = val
+            val = float("inf"), self.default_gateway
+            self.table[host_ip_address] = val
     
     def update_router_table(self, RouterPacket):
         """
@@ -338,11 +338,15 @@ class Router(Actor):
     
     def map_route(self, packet):
         if packet.destination in table:
-            route_link = table[packet.destination]
+            next_hop = table[packet.destination][1]
+            for link in links:
+                if (next_hop == link.destination.address):
+                    route_link = link
+                    break
             send(link = route_link, packet = packet)
         else:
-            route_link = self.default_gateway
-            send(link = route_link, packet = packet)
+            next_hop = self.default_gateway # can be delete
+            send(link = links[0], packet = packet)
       
     
     
@@ -365,9 +369,9 @@ class Router(Actor):
         """
             send packet to certain link
             the packet could be normal packet to forward or communication packet to send to all links.
-         """
+        """
         link.add(packet = packet)
 
     def react_to_routing_table_outdated(self, event):
         self.generate_router_packet()
-        RoutingTableOutdated(env=self.env, delay=GENERATE_ROUTERPACKET_TIME_INTEVAL,router=self)
+        RoutingTableOutdated(env=self.env, delay=GENERATE_ROUTERPACKET_TIME_INTEVAL, router=self)
