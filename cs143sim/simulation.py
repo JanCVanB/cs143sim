@@ -297,27 +297,61 @@ class Controller:
                     raise InputFileSyntaxError(line_number, 'Unrecognized keyword: ' + keyword)
 
     def record(self, recorder, actor, value):
+        """Record the time and `value` in the recorder keyed by the `actor`
+
+        :param dict recorder: recorder to record the change
+        :param actor: :class:`.Actor` that experienced the change
+        :param value: new value of changed quantity
+        """
         recorder[actor].append((self.env.now, value))
 
     def record_buffer_occupancy(self, link, buffer_occupancy):
+        """Record the occupancy of a link buffer
+
+        :param link: :class:`.Link` changing its buffer occupancy
+        :param float buffer_occupancy: new buffer occupancy (bytes)
+        """
         self.record(recorder=self.buffer_occupancy, actor=link,
                     value=buffer_occupancy)
 
-    def record_flow_rate(self, flow, flow_rate):
-        self.record(recorder=self.flow_rate, actor=flow, value=flow_rate)
+    def record_flow_rate(self, flow, packet_size):
+        """Record the size of a delivered packet
 
-    def record_link_rate(self, link, link_rate):
-        self.record(recorder=self.link_rate, actor=link, value=link_rate)
+        :param flow: :class:`.Flow` to which the delivered packet belongs
+        :param float packet_size: size of the delivered packet (bytes)
+        """
+        self.record(recorder=self.flow_rate, actor=flow, value=packet_size)
+
+    def record_link_rate(self, link, send_duration):
+        """Record the duration a link sends a packet
+
+        :param link: :class:`.Link` sending the packet
+        :param float send_duration: duration required to send the packet (ms)
+        """
+        self.record(recorder=self.link_rate, actor=link, value=send_duration)
 
     def record_packet_delay(self, flow, packet_delay):
+        """Record the delay of a delivered packet
+
+        :param flow: :class:`.Flow` to which the delivered packet belongs
+        :param int packet_delay: time since the delivered packet was sent (ms)
+        """
         self.record(recorder=self.packet_delay, actor=flow, value=packet_delay)
 
     def record_packet_loss(self, link):
-        # TODO: determine packet loss metric
+        """Record a packet loss
+
+        :param link: :class:`.Link` that dropped the packet
+        """
         # TODO: write controller_record_packet_loss test
-        self.record(recorder=self.packet_loss, actor=link, value='???')
+        self.record(recorder=self.packet_loss, actor=link, value=None)
 
     def record_window_size(self, flow, window_size):
+        """Record the flow's window size
+
+        :param flow: :class:`.Flow` changing its window size
+        :param int window_size: new window size
+        """
         self.record(recorder=self.window_size, actor=flow, value=window_size)
 
     def run(self, until=None):
