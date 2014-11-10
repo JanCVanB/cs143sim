@@ -17,8 +17,7 @@ This module contains all actor definitions.
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
 """
 
-from tla_stop_and_wait import StopAndWait
-from tla_go_back_n import GoBackN
+from tla import *
 from cs143sim.constants import PACKET_SIZE,GENERATE_ROUTERPACKET_TIME_INTEVAL
 from cs143sim.events import PacketReceipt
 from random import randint

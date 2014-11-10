@@ -1,3 +1,3 @@
 pip install pytest
-pip install -e 
+pip install -e .
 pause
