@@ -20,6 +20,7 @@ This module contains all actor definitions.
 from tla import *
 from cs143sim.constants import PACKET_SIZE,GENERATE_ROUTERPACKET_TIME_INTEVAL
 from cs143sim.events import PacketReceipt
+from cs143sim.constants import *
 from random import randint
 from test.test_socketserver import receive
 
@@ -91,7 +92,7 @@ class Flow(Actor):
         self.destination = destination
         self.amount = amount
         
-        self.W=1
+
         self.tla=GoBackN(env=self.env, flow=self)
         
         self.rcv_expect_to_receive=0;
@@ -106,7 +107,9 @@ class Flow(Actor):
         Make a packet based on the packet number
         """
 
-        packet=DataPacket(self.env, packet_number, False, 0, self.source, self.destination)
+        packet=DataPacket(env=self.env, number=packet_number, 
+                          acknowledgement=False, timestamp=self.env.now, 
+                          source=self.source, destination=self.destination)
 
         return packet
         
@@ -135,7 +138,7 @@ class Flow(Actor):
             while flag:
                 for x in self.rcv_received_packets:
                     if x==self.rcv_expect_to_receive:
-                        self.rcv_received_packets+=1
+                        self.rcv_expect_to_receive+=1
                         continue
                 flag=False
         else:
@@ -146,8 +149,13 @@ class Flow(Actor):
             Store it
             """
             self.rcv_received_packets.append(n)
-
-        ack_packet=DataPacket(self.env, self.rcv_expect_to_receive, True, 0, packet.destination, packet.source)
+        """
+        using the timestamp of packet to be acked as the timestamp of ack packet
+        to calculate RTT
+        """
+        ack_packet=DataPacket(env=self.env, number=self.rcv_expect_to_receive,
+                              acknowledgement=True, timestamp=packet.timestamp, 
+                              source=packet.destination, destination=packet.source)
         return ack_packet
 
     def send_packet(self, packet):
@@ -157,13 +165,19 @@ class Flow(Actor):
         #self.source.send(packet)
         
         #to test ack and time out, there is a probability of 0.5 for the packet to be sent.
-        r=randint(0,1)
-        if packet.acknowledgement==True:
-            r=0
-        r=0    
-        if r==0:
-            PacketReceipt(env=self.env, delay=5, receiver=self.destination, packet=packet)
+        r=randint(0,3)
+#         if packet.acknowledgement==True:
+#             r=0
+#         r=0    
+        if r!=0:
+            r=randint(0,3)
+            PacketReceipt(env=self.env, delay=5+r, receiver=self.destination, packet=packet)
         else:
+            if DEBUG:
+                if packet.acknowledgement==False:
+                    print "    send packet "+str(packet.number)+' (fail)'
+                else:
+                    print "    send ack "+str(packet.number)+' (fail)'
             pass
         
         

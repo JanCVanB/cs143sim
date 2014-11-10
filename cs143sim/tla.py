@@ -2,6 +2,7 @@
 This module includes simple transport layer algorithm: stop and wait
 """
 from cs143sim.events import PacketTimeOut
+from cs143sim.constants import *
 
 packet_size=1024*8
 
@@ -24,7 +25,7 @@ class StopAndWait:
         
         self.last_acked_packet_number=-1 
         
-        self.TimeOut=13
+        self.TimeOut=15
         
     def __str__(self):
         return self.flow.__str__()
@@ -66,6 +67,7 @@ class GoBackN:
     """
     :ivar W: window size
     :ivar packet_number: number of packets to be sent
+    :ivar TimeOut: timer's waiting time
 
     """
 
@@ -77,13 +79,16 @@ class GoBackN:
         self.flow=flow
         self.env=env
         
-        self.W=3
-        self.TimeOut=13
-        
         self.packet_number=self.flow.amount/packet_size
         if self.packet_number*packet_size<self.flow.amount:
             self.packet_number+=1
+          
+        self.W=5
         
+        self.time_out=15
+        self.first_ack_flag=True
+        #self.rtt_avg
+        #self.rtt_div
         
         self.snd_not_sent=0
         self.snd_sending=list()
@@ -96,12 +101,46 @@ class GoBackN:
         self.send_new_packets()
     
     def react_to_ack(self, ack_packet):
+        """
+        Updating Time out (according to 7.4.4 Timers)
+        """
+        b=0.1
+        if self.first_ack_flag:
+            t=self.env.now-ack_packet.timestamp
+            self.rtt_avg=t
+            self.rtt_div=t
+            self.first_ack_flag=False
+
+        else:
+            t=self.env.now-ack_packet.timestamp
+            self.rtt_avg=(1-b)*self.rtt_avg+b*t
+            self.rtt_div=(1-b)*self.rtt_div+b*abs(t-self.rtt_avg)
+            self.time_out=int(self.rtt_avg+4*self.rtt_div)
+        
+        RTT_DEBUG=True
+        if DEBUG and RTT_DEBUG:
+            print "      rtt_avg "+str(self.rtt_avg)
+            print "      rtt_div "+str(self.rtt_div)
+        """
+        Process sending
+        """
         n=ack_packet.number
         
-        for x in self.snd_sending:
+        if DEBUG:
+            print "            Old "+str(self.snd_sending)   
+        
+        del_list=list()
+                 
+        for x in self.snd_sending:            
             if x<n:
-                self.snd_sending.remove(x)
+                del_list.append(x)
                 
+        for x in del_list:            
+            self.snd_sending.remove(x)
+                
+        if DEBUG:
+            print "            New "+str(self.snd_sending) 
+                                
         self.send_new_packets()
 
     def react_to_time_out(self, event):
@@ -109,7 +148,7 @@ class GoBackN:
         if n in self.snd_sending:
             packet=self.flow.make_packet(packet_number=n)
             self.flow.send_packet(packet)
-            PacketTimeOut(env=self.env, delay=self.TimeOut, actor=self, packet_number=n)
+            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet_number=n)
         pass
     
     def send_new_packets(self):
@@ -117,8 +156,10 @@ class GoBackN:
             n=self.snd_not_sent
             packet=self.flow.make_packet(packet_number=n)
             self.flow.send_packet(packet)
-            PacketTimeOut(env=self.env, delay=self.TimeOut, actor=self, packet_number=n)
+            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet_number=n)
             
             self.snd_sending.append(n)
-            self.snd_not_sent+=1            
+            self.snd_not_sent+=1
+        if DEBUG:
+            print "        Sending "+str(self.snd_sending) 
     pass
