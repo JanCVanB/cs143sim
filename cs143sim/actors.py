@@ -18,9 +18,11 @@ This module contains all actor definitions.
 """
 
 from tla_stop_and_wait import StopAndWait
+from tla_go_back_n import GoBackN
 from cs143sim.constants import PACKET_SIZE,GENERATE_ROUTERPACKET_TIME_INTEVAL
 from cs143sim.events import PacketReceipt
 from random import randint
+from test.test_socketserver import receive
 
 
 
@@ -78,6 +80,11 @@ class Flow(Actor):
     :ivar source: source :class:`.Host`
     :ivar destination: destination :class:`.Host`
     :ivar float amount: amount of data to transmit
+    
+    
+    Receiver
+    :ivar rcv_expect_to_receive: next packet expect to receive
+    :ivar rcv_received_packets:  list of packets that have been received, but not what we need now.
     """
     def __init__(self, env, source, destination, amount):
         super(Flow, self).__init__(env=env)
@@ -86,8 +93,10 @@ class Flow(Actor):
         self.amount = amount
         
         self.W=1
-        self.tla=StopAndWait(env=self.env, flow=self)
+        self.tla=GoBackN(env=self.env, flow=self)
         
+        self.rcv_expect_to_receive=0;
+        self.rcv_received_packets=list();
 
     def __str__(self):
         return ('Flow from ' + self.source.address +
@@ -106,7 +115,40 @@ class Flow(Actor):
         """
         Make a ack packet
         """
-        ack_packet=DataPacket(self.env, packet.number, True, 0, packet.destination, packet.source)
+        """
+        Go Back N version, compatible with stop and wait
+        """
+        n=packet.number
+        if n< self.rcv_expect_to_receive:
+            """
+            This packet has been received before
+            """
+            pass
+        elif n==self.rcv_expect_to_receive:
+            """
+            This packet is what we expect to receive
+            """
+            """
+            Find out next packet expect to receive
+            """
+            self.rcv_expect_to_receive=self.rcv_expect_to_receive+1
+            flag=True
+            while flag:
+                for x in self.rcv_received_packets:
+                    if x==self.rcv_expect_to_receive:
+                        self.rcv_received_packets+=1
+                        continue
+                flag=False
+        else:
+            """
+            This packet is not what we expect to receive
+            """
+            """
+            Store it
+            """
+            self.rcv_received_packets.append(n)
+
+        ack_packet=DataPacket(self.env, self.rcv_expect_to_receive, True, 0, packet.destination, packet.source)
         return ack_packet
 
     def send_packet(self, packet):

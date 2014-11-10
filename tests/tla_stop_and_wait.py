@@ -13,6 +13,7 @@ class StopAndWait:
     :ivar last_acked_packet_number
     :ivar last_sent_packet_number=
     """
+    global env
     def __init__(self, env, flow):
         self.flow=flow
         self.env=env
@@ -25,8 +26,6 @@ class StopAndWait:
         
         self.last_acked_packet_number=-1 
         
-        self.TimeOut=13
-        
     def __str__(self):
         return self.flow.__str__()
     
@@ -36,17 +35,17 @@ class StopAndWait:
         n=0
         packet=self.flow.make_packet(packet_number=n)
         self.flow.send_packet(packet)
-        PacketTimeOut(env=self.env, delay=self.TimeOut, actor=self, packet_number=n)
+        PacketTimeOut(env=self.env, delay=10, actor=self, packet_number=n)
     
     def react_to_ack(self, ack_packet):
-        if ack_packet.number==self.last_acked_packet_number+2:
+        if ack_packet.number==self.last_acked_packet_number+1:
             self.last_acked_packet_number+=1
             n=self.last_acked_packet_number+1
     
             if n<self.packet_number:
                 packet=self.flow.make_packet(packet_number=n)
                 self.flow.send_packet(packet)
-                PacketTimeOut(env=self.env, delay=self.TimeOut, actor=self, packet_number=n)
+                PacketTimeOut(env=self.env, delay=10, actor=self, packet_number=n)
 
     def react_to_time_out(self, event):
 
@@ -58,7 +57,7 @@ class StopAndWait:
             n=time_out_packet_number;
             packet=self.flow.make_packet(packet_number=n)
             self.flow.send_packet(packet)
-            PacketTimeOut(env=self.env, delay=self.TimeOut, actor=self, packet_number=n)
+            PacketTimeOut(env=self.env, delay=10, actor=self, packet_number=n)
         pass
     
     pass
