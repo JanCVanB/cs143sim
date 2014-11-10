@@ -119,9 +119,9 @@ class Flow(Actor):
         r=randint(0,1)
         if packet.acknowledgement==True:
             r=0
-            
+        r=0    
         if r==0:
-            PacketReceipt(env=self.env, delay=5, receiver=self.destination.flows[0], packet=packet)
+            PacketReceipt(env=self.env, delay=5, receiver=self.destination, packet=packet)
         else:
             pass
         
@@ -183,6 +183,9 @@ class Host(Actor):
             for f in self.flows:
                 if (packet.source==f.source)and(packet.destination==f.destination):
                     f.react_to_packet_receipt(event=event)
+                if (packet.acknowledgement==True):
+                    if (packet.source==f.destination)and(packet.destination==f.source):
+                        f.react_to_packet_receipt(event=event)
 
 
 class Link(Actor):
