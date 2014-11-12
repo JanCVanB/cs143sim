@@ -374,7 +374,8 @@ class Router(Actor):
             
         """
         
-        for destination, val in RouterPacket.routertable:
+        for (destination, val) in RouterPacket.routertable.items():
+            
             if destination in self.table:
                 if val[0] + 1 < self.table[destination]:
                     update_val = val[0] + 1, RouterPacket.source
@@ -389,9 +390,10 @@ class Router(Actor):
         """
             Design a sepcial packet that send the whole router table of this router to communicate with its neighbor
         """
-        for l in links:
-            router_packet = RouterPackect(routertable = self.table, source = self.address)
-            send(link = l, packet = router_packet)
+        for l in self.links:
+            router_packet = RouterPacket(env=self.env, timestamp=0,routertable = self.table, source = self.address)
+            self.send(link = l, packet = router_packet)
+            
       
     
     def map_route(self, packet):
@@ -401,10 +403,10 @@ class Router(Actor):
                 if (next_hop == link.destination.address):
                     route_link = link
                     break
-            send(link = route_link, packet = packet)
+            self.send(link = route_link, packet = packet)
         else:
             next_hop = self.default_gateway # can be delete
-            send(link = links[0], packet = packet)
+            self.send(link = links[0], packet = packet)
       
     
     
@@ -413,11 +415,13 @@ class Router(Actor):
             Read packet head to tell whether is a normal packet or a update_RT_communication packet
             If it is normal packet, call map_route function
             If it is update_RT_communication packet, call update_router_table function
-            """
+        """
         packet = event.value
         if isinstance(packet, DataPacket):
+            print "This is DataPacket"
             map_route(packet = packet)
         elif isinstance(packet, RouterPacket):
+            print "This is RouterPacket"
             update_router_table(packet = packet)
         
        

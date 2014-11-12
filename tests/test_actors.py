@@ -3,6 +3,7 @@ from cs143sim.actors import Flow
 from cs143sim.actors import Host
 from cs143sim.actors import Link
 from cs143sim.actors import DataPacket
+from cs143sim.actors import RouterPacket
 from cs143sim.actors import Router
 from cs143sim.simulation import Controller
 from cs143sim.simulation import ControlledEnvironment
@@ -40,8 +41,8 @@ def basic_router_packet():
     #return Packet(source=basic_host(), destination=basic_host(), number=1,
     #              acknowledgement=object())
     return RouterPacket(env=ControlledEnvironment(controller=Controller()),
-                      source=basic_host(), destination=basic_host(),
-                      number=1, acknowledgement=object(), timestamp=0)
+                      source=basic_host(),
+                       routertable={}, timestamp=0)
 
 def basic_router():
     return Router(env=ControlledEnvironment(controller=Controller()),
@@ -105,7 +106,20 @@ def router_initialize():
 
 
 def router_forward():
-    pass
+    Dpacket = basic_packet()
+    
+    Dpacket.destination = 'H1'
+
+    router = basic_router()
+
+    link1_ = basic_link()
+    link1_.destination = 'H1'
+
+    router.table = {}
+    router.table['H1'] = 5, 'R4'
+    router.table['H2'] = 6, 'R5'
+    router.table['H3'] = 7, 'R6'
+    router.map_route(Dpacket)
 
 
 def router_receive_update_packet():
@@ -116,9 +130,48 @@ def router_receive_update_packet():
     # router_.links.extend([link_1, link_2])
     # router_.do_things()
 
-    pass
+    Rpacket = basic_router_packet()
+    
+    Rpacket.source = 'R9'
+    Rpacket.routertable['H1'] = 5, 'R4'
+    Rpacket.routertable['H2'] = 6, 'R5'
+    Rpacket.routertable['H3'] = 3, 'R3'
+
+    router = basic_router()
+    router.table = {}
+    router.table['H1'] = 5, 'R4'
+    router.table['H2'] = 6, 'R5'
+    router.table['H3'] = 7, 'R6'
+    router.update_router_table(Rpacket)
+    assert router.table['H3'] == (4, 'R9')
+    #=========== ===========
+    Dpacket = basic_packet()
+
 
 def router_send_update_packet():
+    router = basic_router()
+    router.address = 'R9'
+
+    links = []
+    number_of_links = 2
+    
+    link1_ = basic_link()
+    link1_.destination = router
+    link2_ = basic_link()
+    link2_.source = router
+    links.append(link1_)
+    links.append(link2_)
+
+    router.links = links
+
+    router.table = {}
+    router.table['H1'] = 5, 'R4'
+    router.table['H2'] = 6, 'R5'
+    router.table['H3'] = 7, 'R6'
+    
+    router.generate_router_packet()
+    # assert len(link1_.buffer.packets) == 1
+    
     pass
 
 
@@ -146,7 +199,7 @@ def test_packet():
 
 def test_router():
     basic_router()
-    router_initialize()
+    # router_initialize()
     # router_forward()
     # router_receive_update_packet()
-    # router_send_update_packet()
+    router_send_update_packet()
