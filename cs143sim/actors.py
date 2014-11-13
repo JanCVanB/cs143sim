@@ -236,8 +236,9 @@ class Host(Actor):
         packet=event.value
         if isinstance(packet, DataPacket):
             for f in self.flows:
-                if (packet.source==f.source)and(packet.destination==f.destination):
-                    f.react_to_packet_receipt(event=event)
+                if (packet.acknowledgement==False):
+                    if (packet.source==f.source)and(packet.destination==f.destination):
+                        f.react_to_packet_receipt(event=event)
                 if (packet.acknowledgement==True):
                     if (packet.source==f.destination)and(packet.destination==f.source):
                         f.react_to_packet_receipt(event=event)
