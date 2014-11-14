@@ -142,7 +142,7 @@ class Flow(Actor):
         self.amount = amount
         
 
-        self.tla=GoBackN(env=self.env, flow=self)
+        self.tla=TCPTahoe(env=self.env, flow=self)
         
         self.rcv_expect_to_receive=0;
         self.rcv_received_packets=list();
