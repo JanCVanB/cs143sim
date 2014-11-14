@@ -340,7 +340,6 @@ class Link(Actor):
         #     self.send(self.buffer.get_first_packet())
         self.busy = False
         if self.buffer.packets.empty()==False:
-            self.busy=True
             self.send(self.buffer.get())
         pass
 

@@ -350,9 +350,9 @@ class TCPTahoe:
         if self.packet_number*packet_size<self.flow.amount:
             self.packet_number+=1
           
-        self.change_W(W=1)
         
-        self.time_out=15
+        
+        self.time_out=1000
         self.first_ack_flag=True
         #self.rtt_avg
         #self.rtt_div
@@ -366,12 +366,13 @@ class TCPTahoe:
         self.enable_fast_retransmit=False
         
         self.slow_start_flag=True
-        self.slow_start_treshold=1e10
+        self.slow_start_treshold=64
         
         self.last_reset=0
         
+        self.change_W(W=1)
         #slew rate of AIMD:AI
-        self.k=1
+        self.k=0.5
         
         print self.recorder
     def __str__(self):
@@ -385,7 +386,10 @@ class TCPTahoe:
         """
         Updating Time out (according to 7.4.4 Timers)
         """
-        b=0.1
+        #RFC 6298
+        alpha=0.125
+        beta=0.25
+        
         if self.first_ack_flag:
             t=self.env.now-ack_packet.timestamp
             self.rtt_avg=t
@@ -394,9 +398,13 @@ class TCPTahoe:
 
         else:
             t=self.env.now-ack_packet.timestamp
-            self.rtt_avg=(1-b)*self.rtt_avg+b*t
-            self.rtt_div=(1-b)*self.rtt_div+b*abs(t-self.rtt_avg)
-            self.time_out=int(5+1.01*(self.rtt_avg+4*self.rtt_div))
+            
+            self.rtt_div=(1-beta)*self.rtt_div+beta*abs(t-self.rtt_avg)
+            self.rtt_avg=(1-alpha)*self.rtt_avg+alpha*t
+            
+            self.time_out=int(1+(self.rtt_avg+4*self.rtt_div))
+            if self.time_out<1000:
+                self.time_out=1000
         
         RTT_DEBUG=True
         if DEBUG and RTT_DEBUG:
@@ -471,7 +479,7 @@ class TCPTahoe:
             
             PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet=packet)
             
-            if packet.timestamp>self.last_reset:
+            if packet.timestamp>self.last_reset+2*self.time_out:
                 self.slow_start_treshold=self.W/2
                 self.slow_start_flag=True
                 self.change_W(W=1)
@@ -499,6 +507,6 @@ class TCPTahoe:
         if DEBUG:
                 print "        W="+str(self.W) 
                 
-        self.recorder.write("{0},{1}\r\n".format(str(self.env.now),str(self.W)))
+        self.recorder.write("{0},{1},{2},{3}\r\n".format(str(self.env.now),str(self.W),str(int(self.slow_start_flag)),str(self.slow_start_treshold)))
         
     pass

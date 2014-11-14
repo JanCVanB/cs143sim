@@ -90,7 +90,7 @@ def test_tla_tcp_tahoe():
     H1=Host(env=env, address="0")
     H2=Host(env=env, address="1")
     
-    F1=Flow(env=env, source=H1, destination=H2, amount=20*1024*PACKET_SIZE-10)
+    F1=Flow(env=env, source=H1, destination=H2, amount=10*1024*PACKET_SIZE-10)
     F1.tla=TCPTahoe(env=env, flow=F1)
     
     H1.flows.append(F1)
@@ -105,10 +105,10 @@ def test_tla_tcp_tahoe():
     FlowStart(env=env, delay=0, flow=F1)
 
     
-    env.run(250)    
+    env.run()    
     n=env.now
 
-test_tla_stop_and_wait_basic()
-test_tla_go_back_n_basic()
-test_tla_fast_retransmit_basic()
+#test_tla_stop_and_wait_basic()
+#test_tla_go_back_n_basic()
+#test_tla_fast_retransmit_basic()
 test_tla_tcp_tahoe()
