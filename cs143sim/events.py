@@ -93,12 +93,12 @@ class PacketReceipt(Timeout):
 
 
         if DEBUG:
-            if hasattr(packet, "acknowledgement"):
-                if packet.acknowledgement==False:
-                    print "    send Data "+str(packet.number)
-                else:
-                    print "    send Ack "+str(packet.number)
-                
+#             if hasattr(packet, "acknowledgement"):
+#                 if packet.acknowledgement==False:
+#                     print "    send Data "+str(packet.number)
+#                 else:
+#                     print "    send Ack "+str(packet.number)
+#                 
             self.actor = receiver
             self.callbacks.append(print_event)
         # TODO: 
@@ -108,8 +108,8 @@ class PacketTimeOut(Timeout):
     """
     Time out event for tla
     """
-    def __init__(self, env, delay, actor, packet):
-        super(PacketTimeOut, self).__init__(env, delay, value=packet)
+    def __init__(self, env, delay, actor, expected_time):
+        super(PacketTimeOut, self).__init__(env, delay, value=expected_time)
         if DEBUG:
             #print "    set packet "+str(packet_number)+ " time out: "+str(env.now+delay)
             pass

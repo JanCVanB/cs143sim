@@ -6,6 +6,7 @@ Fix window:
     GoBackN
 """
 from cs143sim.events import PacketTimeOut
+from cs143sim.events import full_string
 from cs143sim.constants import *
 
 packet_size=1024*8
@@ -364,6 +365,7 @@ class TCPTahoe:
         self.duplicate_ack_times=0
         
         self.enable_fast_retransmit=False
+        self.enable_fast_recovery=True
         
         self.slow_start_flag=True
         self.slow_start_treshold=64
@@ -373,6 +375,10 @@ class TCPTahoe:
         self.change_W(W=1)
         #slew rate of AIMD:AI
         self.k=0.5
+        
+        self.time_out_event=None
+        
+        self.fast_recovery_flag=False
         
         print self.recorder
     def __str__(self):
@@ -423,15 +429,42 @@ class TCPTahoe:
             self.duplicate_ack_times=0
             
             
-        if self.enable_fast_retransmit and self.duplicate_ack_times>=3:
+        if self.enable_fast_retransmit and self.duplicate_ack_times==4:
             if DEBUG:
                 print "    Duplicate Ack "+str(n)
-            self.react_to_time_out_base(n)
+                print "    Fast retransmit"
+            self.react_to_time_out_base()
+        elif self.enable_fast_recovery and self.duplicate_ack_times==4:
+            if DEBUG:
+                print "    Duplicate Ack "+str(n)
+                print "    Fast recovery"
+                
+            self.fast_recovery_flag=True
+                
+            self.change_W(self.W/2+3)
+            while len(self.snd_sending)>=self.W:
+                self.snd_sending.pop()     
+            n=self.duplicate_ack_number
+            packet=self.flow.make_packet(packet_number=n)  
+            self.flow.send_packet(packet)
+            
+            
+        elif self.enable_fast_recovery and self.duplicate_ack_times>4:
+            if DEBUG:
+                print "    Duplicate Ack "+str(n)
+                print "    Fast recovery" 
+            self.change_W(self.W+1)
+            self.send_new_packets()
         else:
             """
             Process Ack
             """
-            
+            if self.enable_fast_recovery and self.fast_recovery_flag==True:
+                """
+                Just leave fast recovery
+                """
+                self.change_W(self.W/2)
+                
             if self.slow_start_flag:
                 self.change_W(self.W+1)
                 if self.W>self.slow_start_treshold:
@@ -462,42 +495,43 @@ class TCPTahoe:
             self.send_new_packets()
 
     def react_to_time_out(self, event):
-        n=event.value.number
-        if n in self.snd_sending:
-            
-            if event.value.acknowledgement==False:
-                print "    Packet "+str(n)+" Timeout"
-            else:
-                print "    Ack "+str(n)+" Timeout"
-            self.react_to_time_out_base(packet=event.value)
+        if event==self.time_out_event:
+            if DEBUG:
+                print "    "+full_string(self.flow)+" Timeout"
+            self.react_to_time_out_base()
 
             
     
-    def react_to_time_out_base(self, packet):
-            packet=self.flow.make_packet(packet_number=packet.number)
+    def react_to_time_out_base(self):
+        if len(self.snd_sending)>0:
+            n=self.snd_sending[0]
+            packet=self.flow.make_packet(packet_number=n)
             self.flow.send_packet(packet)
             
-            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet=packet)
-            
-            if packet.timestamp>self.last_reset+2*self.time_out:
-                self.slow_start_treshold=self.W/2
-                self.slow_start_flag=True
-                self.change_W(W=1)
-                self.last_reset=self.env.now
-        
+            self.time_out=2*self.time_out
+            self.reset_timer()
+    
+            self.slow_start_treshold=self.W/2
+            self.slow_start_flag=True
+            self.change_W(W=1)
+            self.last_reset=self.env.now
+    
     
     def send_new_packets(self):
-           
+        send_flag=False
         while self.snd_not_sent<self.packet_number and len(self.snd_sending)<self.W:
+            send_flag=True
             n=self.snd_not_sent
             packet=self.flow.make_packet(packet_number=n)
             
             self.flow.send_packet(packet)
             
-            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet=packet)
-            
             self.snd_sending.append(n)
             self.snd_not_sent+=1
+        
+        if send_flag==True:
+            self.reset_timer()
+            
         if DEBUG:
             print "        Sending "+str(self.snd_sending) 
             
@@ -510,3 +544,7 @@ class TCPTahoe:
         self.recorder.write("{0},{1},{2},{3}\r\n".format(str(self.env.now),str(self.W),str(int(self.slow_start_flag)),str(self.slow_start_treshold)))
         
     pass
+
+    def reset_timer(self):
+        self.time_out_event=PacketTimeOut(env=self.env, delay=self.time_out, actor=self, expected_time=self.env.now+self.time_out)
+

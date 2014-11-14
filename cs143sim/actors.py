@@ -61,9 +61,11 @@ class Buffer(Actor):
         current_level = sum(packet.size for packet in self.packets)
         if current_level + packet.size <= self.capacity:
             self.packets.append(packet)
+            return True
         else:
             # The packet cannot be stored, so the packet is dropped
             self.env.controller.record_packet_loss(link=self.link)
+            return False
 
 class FIFO(Actor):
     """Representation of a data storage container
@@ -96,6 +98,7 @@ class FIFO(Actor):
         if self.current_level + packet.size <= self.capacity:
             self.packets.put(packet)
             self.current_level=self.current_level+packet.size
+            return True
         else:
             # The packet cannot be stored, so the packet is dropped
             
@@ -107,6 +110,7 @@ class FIFO(Actor):
                     print "    ---packet "+str(packet.number)+' (loss)'
                 else:
                     print "    ---ack "+str(packet.number)+' (loss)'
+            return False
                     
     def get(self):
         packet=self.packets.get()
@@ -236,15 +240,19 @@ class Flow(Actor):
         """
         If the packet is a data packet, generate an ack packet
         """        
+        
+        
         if packet.acknowledgement==False:
-            print "    Data "+str(packet.number)+" Received"
+            if DEBUG:
+                print "    Data "+str(packet.number)+" Received"
             ack_packet=self.make_ack_packet(packet)
             self.send_packet(ack_packet)
         """
         If the packet is a ack packet, call tla.rcv_ack()
         """
         if packet.acknowledgement==True:
-            print "    Ack "+str(packet.number)+" Received"
+            if DEBUG:
+                print "    Ack "+str(packet.number)+" Received"
             self.tla.react_to_ack(packet)
 
     def time_out(self, timeout_packet_number):
@@ -328,7 +336,22 @@ class Link(Actor):
 
     def add(self, packet):
         if self.busy:
-            self.buffer.add(packet)
+            flag=self.buffer.add(packet)
+            
+            if flag==True and hasattr(packet, "acknowledgement"):   
+                if DEBUG:
+                    if packet.acknowledgement==False:
+                        print "    --buff Data "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
+                    else:
+                        print "    --buff Ack "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
+            
+            if flag==False and hasattr(packet, "acknowledgement"):   
+                if DEBUG:
+                    if packet.acknowledgement==False:
+                        print "    --drop Data "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
+                    else:
+                        print "    --drop Ack "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
+
         else:
             self.send(packet)
 
