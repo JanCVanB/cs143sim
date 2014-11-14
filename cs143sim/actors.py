@@ -18,8 +18,9 @@ This module contains all actor definitions.
 """
 
 from tla import *
+from Queue import Queue
 from cs143sim.constants import PACKET_SIZE,GENERATE_ROUTERPACKET_TIME_INTEVAL
-from cs143sim.events import PacketReceipt
+from cs143sim.events import PacketReceipt, LinkAvailable
 from cs143sim.constants import *
 from random import randint
 from test.test_socketserver import receive
@@ -36,12 +37,9 @@ class Actor(object):
     def __init__(self, env):
         self.env = env
 
-
 class Buffer(Actor):
     """Representation of a data storage container
-
     Buffers store data to be linked while :class:`.Link` is busy sending data.
-
     :param int capacity: maximum number of bits that can be stored
     :param link: :class:`.Link` containing this buffer
     :ivar int capacity: maximum number of bits that can be stored
@@ -58,7 +56,6 @@ class Buffer(Actor):
         """
         Adds packet to `packets` if `capacity` will not be exceeded,
         drops packet if buffer if full.
-
         :param packet: :class:`.Packet` added to buffer.
         """
         current_level = sum(packet.size for packet in self.packets)
@@ -67,6 +64,54 @@ class Buffer(Actor):
         else:
             # The packet cannot be stored, so the packet is dropped
             self.env.controller.record_packet_loss(link=self.link)
+
+class FIFO(Actor):
+    """Representation of a data storage container
+
+    Buffers store data to be linked while :class:`.Link` is busy sending data.
+
+    :param int capacity: maximum number of bits that can be stored
+    :param link: :class:`.Link` containing this buffer
+    :ivar int capacity: maximum number of bits that can be stored
+    :ivar link: :class:`.Link` containing this buffer
+    :ivar list packets: :class:`Packets <.Packet>` currently in storage
+    """
+    def __init__(self, env, capacity, link):
+        super(FIFO, self).__init__(env=env)
+        
+        self.link = link
+        self.packets = Queue()
+        
+        self.capacity = capacity
+        self.current_level=0
+
+    def add(self, packet):
+        """
+        Adds packet to `packets` if `capacity` will not be exceeded,
+        drops packet if buffer if full.
+
+        :param packet: :class:`.Packet` added to buffer.
+        """
+
+        if self.current_level + packet.size <= self.capacity:
+            self.packets.put(packet)
+            self.current_level=self.current_level+packet.size
+        else:
+            # The packet cannot be stored, so the packet is dropped
+            
+            #DISABLE for debugging!!!!
+            # self.env.controller.record_packet_loss(link=self.link)
+            
+            if DEBUG:
+                if packet.acknowledgement==False:
+                    print "    ---packet "+str(packet.number)+' (loss)'
+                else:
+                    print "    ---ack "+str(packet.number)+' (loss)'
+                    
+    def get(self):
+        packet=self.packets.get()
+        self.current_level=self.current_level-packet.size
+        return packet
 
 
 class Flow(Actor):
@@ -110,7 +155,7 @@ class Flow(Actor):
         packet=DataPacket(env=self.env, number=packet_number, 
                           acknowledgement=False, timestamp=self.env.now, 
                           source=self.source, destination=self.destination)
-
+        packet.size=PACKET_SIZE
         return packet
         
     def make_ack_packet(self, packet):
@@ -156,6 +201,7 @@ class Flow(Actor):
         ack_packet=DataPacket(env=self.env, number=self.rcv_expect_to_receive,
                               acknowledgement=True, timestamp=packet.timestamp, 
                               source=packet.destination, destination=packet.source)
+        ack_packet.size=PACKET_SIZE/8
         return ack_packet
 
     def send_packet(self, packet):
@@ -165,21 +211,25 @@ class Flow(Actor):
         #self.source.send(packet)
         
         #to test ack and time out, there is a probability of 0.5 for the packet to be sent.
-        r=randint(0,3)
+        r=randint(1,3)
 #         if packet.acknowledgement==True:
 #             r=0
 #         r=0    
-        if r!=0:
-            r=randint(0,3)
-            PacketReceipt(env=self.env, delay=5+r, receiver=self.destination, packet=packet)
+#         if r!=0:
+#             r=randint(0,3)
+#             r=0
+#             PacketReceipt(env=self.env, delay=5+r, receiver=self.destination, packet=packet)
+#         else:
+#             if DEBUG:
+#                 if packet.acknowledgement==False:
+#                     print "    send packet "+str(packet.number)+' (fail)'
+#                 else:
+#                     print "    send ack "+str(packet.number)+' (fail)'ink
+#             pass
+        if packet.acknowledgement==False:
+            self.source.send(packet)
         else:
-            if DEBUG:
-                if packet.acknowledgement==False:
-                    print "    send packet "+str(packet.number)+' (fail)'
-                else:
-                    print "    send ack "+str(packet.number)+' (fail)'
-            pass
-        
+            self.destination.send(packet)
         
     def react_to_packet_receipt(self, event):
         packet=event.value
@@ -230,7 +280,7 @@ class Host(Actor):
         return 'Host at ' + self.address
 
     def send(self, packet):
-        link.add(packet)
+        self.link.add(packet)
 
     def react_to_packet_receipt(self, event):
         packet=event.value
@@ -267,9 +317,10 @@ class Link(Actor):
         self.destination = destination
         self.delay = delay
         self.rate = rate
-        self.buffer = Buffer(env=env, capacity=buffer_capacity, link=self)
+        self.buffer = FIFO(env=env, capacity=buffer_capacity, link=self)
         self.busy = False
         self.utilization = 0
+        self.env=env
 
     def __str__(self):
         return ('Link from ' + self.source.address +
@@ -287,11 +338,28 @@ class Link(Actor):
         # if packets in buffer:
         #     self.busy = True
         #     self.send(self.buffer.get_first_packet())
+        self.busy = False
+        if self.buffer.packets.empty()==False:
+            self.busy=True
+            self.send(self.buffer.get())
         pass
 
     def send(self, packet):
         # TODO: implement sending by scheduling LinkAvailable and PacketReceipt
+        self.busy=True
+        PacketReceipt(env=self.env, delay=self.delay, receiver=self.destination, packet=packet)
         
+        if packet.size>=PACKET_SIZE:
+            LinkAvailable(env=self.env, delay=1, link=self)
+        else:      
+            LinkAvailable(env=self.env, delay=0, link=self)
+         
+        if hasattr(packet, "acknowledgement"):   
+            if DEBUG:
+                if packet.acknowledgement==False:
+                    print "    --send Data "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
+                else:
+                    print "    --send Ack "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
         pass
 
 

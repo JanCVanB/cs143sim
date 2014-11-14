@@ -63,11 +63,16 @@ class LinkAvailable(Timeout):
         :class:`~cs143sim.actors.Packet` was sent
     """
     def __init__(self, env, delay, link):
+        
         super(LinkAvailable, self).__init__(env=env, delay=delay)
-        self.callbacks.append(link.react_to_link_available)
+        
         if DEBUG:
             self.actor = link
             self.callbacks.append(print_event)
+            
+        
+        self.callbacks.append(link.react_to_link_available)
+
 
 
 class PacketReceipt(Timeout):
@@ -88,10 +93,11 @@ class PacketReceipt(Timeout):
 
 
         if DEBUG:
-            if packet.acknowledgement==False:
-                print "    send packet "+str(packet.number)
-            else:
-                print "    send ack "+str(packet.number)
+            if hasattr(packet, "acknowledgement"):
+                if packet.acknowledgement==False:
+                    print "    send Data "+str(packet.number)
+                else:
+                    print "    send Ack "+str(packet.number)
                 
             self.actor = receiver
             self.callbacks.append(print_event)
@@ -102,8 +108,8 @@ class PacketTimeOut(Timeout):
     """
     Time out event for tla
     """
-    def __init__(self, env, delay, actor, packet_number):
-        super(PacketTimeOut, self).__init__(env, delay, value=packet_number)
+    def __init__(self, env, delay, actor, packet):
+        super(PacketTimeOut, self).__init__(env, delay, value=packet)
         if DEBUG:
             #print "    set packet "+str(packet_number)+ " time out: "+str(env.now+delay)
             pass

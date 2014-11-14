@@ -29,7 +29,7 @@ class StopAndWait:
         
         self.last_acked_packet_number=-1 
         
-        self.TimeOut=15
+        self.time_out=15
         self.first_ack_flag=True
         
     def __str__(self):
@@ -41,7 +41,7 @@ class StopAndWait:
         n=0
         packet=self.flow.make_packet(packet_number=n)
         self.flow.send_packet(packet)
-        PacketTimeOut(env=self.env, delay=self.TimeOut, actor=self, packet_number=n)
+        PacketTimeOut(env=self.env, delay=15, actor=self, packet=packet)
     
     def react_to_ack(self, ack_packet):
         """
@@ -75,7 +75,7 @@ class StopAndWait:
             if n<self.packet_number:
                 packet=self.flow.make_packet(packet_number=n)
                 self.flow.send_packet(packet)
-                PacketTimeOut(env=self.env, delay=self.TimeOut, actor=self, packet_number=n)
+                PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet=packet)
 
     def react_to_time_out(self, event):
 
@@ -87,7 +87,7 @@ class StopAndWait:
             n=time_out_packet_number;
             packet=self.flow.make_packet(packet_number=n)
             self.flow.send_packet(packet)
-            PacketTimeOut(env=self.env, delay=self.TimeOut, actor=self, packet_number=n)
+            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet=packet)
 
 class GoBackN:
     """
@@ -177,7 +177,7 @@ class GoBackN:
     def react_to_time_out_base(self, n):
             packet=self.flow.make_packet(packet_number=n)
             self.flow.send_packet(packet)
-            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet_number=n)
+            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet=packet)
         
     
     def send_new_packets(self):
@@ -185,7 +185,7 @@ class GoBackN:
             n=self.snd_not_sent
             packet=self.flow.make_packet(packet_number=n)
             self.flow.send_packet(packet)
-            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet_number=n)
+            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet=packet)
             
             self.snd_sending.append(n)
             self.snd_not_sent+=1
@@ -312,10 +312,193 @@ class FastRetransmit:
             n=self.snd_not_sent
             packet=self.flow.make_packet(packet_number=n)
             self.flow.send_packet(packet)
-            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet_number=n)
+            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet=packet)
             
             self.snd_sending.append(n)
             self.snd_not_sent+=1
         if DEBUG:
             print "        Sending "+str(self.snd_sending) 
+    pass
+
+
+class TCPTahoe:
+    """
+    :ivar W: window size
+    :ivar packet_number: number of packets to be sent
+    :ivar TimeOut: timer's waiting time
+
+    """
+
+    """
+    :ivar snd_not_sent: packet that has not been sent
+    :ivar snd_sending: list of packet that are being sent
+    """
+    """
+    :ivar enable_fast_retransmit
+    """
+    """
+    :ivar slow_start_flag
+    """
+    def __init__(self, env, flow):
+        
+        self.recorder=open("W_record.txt","w")
+        
+        self.flow=flow
+        self.env=env
+        
+        self.packet_number=self.flow.amount/packet_size
+        if self.packet_number*packet_size<self.flow.amount:
+            self.packet_number+=1
+          
+        self.change_W(W=1)
+        
+        self.time_out=15
+        self.first_ack_flag=True
+        #self.rtt_avg
+        #self.rtt_div
+        
+        self.snd_not_sent=0
+        self.snd_sending=list()
+        
+        self.duplicate_ack_number=-1
+        self.duplicate_ack_times=0
+        
+        self.enable_fast_retransmit=False
+        
+        self.slow_start_flag=True
+        self.slow_start_treshold=1e10
+        
+        self.last_reset=0
+        
+        #slew rate of AIMD:AI
+        self.k=1
+        
+        print self.recorder
+    def __str__(self):
+        return self.flow.__str__()
+    
+    def react_to_flow_start(self, event):
+        print "    Packet Amount: "+str(self.packet_number)             
+        self.send_new_packets()
+    
+    def react_to_ack(self, ack_packet):
+        """
+        Updating Time out (according to 7.4.4 Timers)
+        """
+        b=0.1
+        if self.first_ack_flag:
+            t=self.env.now-ack_packet.timestamp
+            self.rtt_avg=t
+            self.rtt_div=t
+            self.first_ack_flag=False
+
+        else:
+            t=self.env.now-ack_packet.timestamp
+            self.rtt_avg=(1-b)*self.rtt_avg+b*t
+            self.rtt_div=(1-b)*self.rtt_div+b*abs(t-self.rtt_avg)
+            self.time_out=int(5+1.01*(self.rtt_avg+4*self.rtt_div))
+        
+        RTT_DEBUG=True
+        if DEBUG and RTT_DEBUG:
+            print "      rtt_avg "+str(self.rtt_avg)
+            print "      rtt_div "+str(self.rtt_div)
+            
+        """
+        Process Duplicate Ack
+         
+        """
+        n=ack_packet.number
+        if n==self.duplicate_ack_number:
+            self.duplicate_ack_times+=1
+        else:
+            self.duplicate_ack_number=n
+            self.duplicate_ack_times=0
+            
+            
+        if self.enable_fast_retransmit and self.duplicate_ack_times>=3:
+            if DEBUG:
+                print "    Duplicate Ack "+str(n)
+            self.react_to_time_out_base(n)
+        else:
+            """
+            Process Ack
+            """
+            
+            if self.slow_start_flag:
+                self.change_W(self.W+1)
+                if self.W>self.slow_start_treshold:
+                    self.slow_start_flag=False
+            else:
+                self.change_W(self.W+self.k*1.0/self.W)
+                #self.change_W(self.W+1)
+                
+           
+            if DEBUG:
+                print "            Old "+str(self.snd_sending)   
+            
+            del_list=list()
+                     
+            for x in self.snd_sending:            
+                if x<n:
+                    del_list.append(x)
+                    
+            for x in del_list:            
+                self.snd_sending.remove(x)
+                    
+            if DEBUG:
+                print "            New "+str(self.snd_sending) 
+            
+            """
+            Process sending
+            """             
+            self.send_new_packets()
+
+    def react_to_time_out(self, event):
+        n=event.value.number
+        if n in self.snd_sending:
+            
+            if event.value.acknowledgement==False:
+                print "    Packet "+str(n)+" Timeout"
+            else:
+                print "    Ack "+str(n)+" Timeout"
+            self.react_to_time_out_base(packet=event.value)
+
+            
+    
+    def react_to_time_out_base(self, packet):
+            packet=self.flow.make_packet(packet_number=packet.number)
+            self.flow.send_packet(packet)
+            
+            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet=packet)
+            
+            if packet.timestamp>self.last_reset:
+                self.slow_start_treshold=self.W/2
+                self.slow_start_flag=True
+                self.change_W(W=1)
+                self.last_reset=self.env.now
+        
+    
+    def send_new_packets(self):
+           
+        while self.snd_not_sent<self.packet_number and len(self.snd_sending)<self.W:
+            n=self.snd_not_sent
+            packet=self.flow.make_packet(packet_number=n)
+            
+            self.flow.send_packet(packet)
+            
+            PacketTimeOut(env=self.env, delay=self.time_out, actor=self, packet=packet)
+            
+            self.snd_sending.append(n)
+            self.snd_not_sent+=1
+        if DEBUG:
+            print "        Sending "+str(self.snd_sending) 
+            
+    def change_W(self, W):
+        self.W=W
+        
+        if DEBUG:
+                print "        W="+str(self.W) 
+                
+        self.recorder.write("{0},{1}\r\n".format(str(self.env.now),str(self.W)))
+        
     pass
