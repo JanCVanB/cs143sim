@@ -3,7 +3,7 @@ This file contains all constant definitions
 """
 
 
-DEBUG = True
+DEBUG = False
 PACKET_SIZE = 8192
 GENERATE_ROUTERPACKET_TIME_INTEVAL = 20000 #milliseconds
 
