@@ -341,18 +341,35 @@ class Link(Actor):
             if flag==True and hasattr(packet, "acknowledgement"):   
                 if DEBUG:
                     if packet.acknowledgement==False:
-                        print "    --buff Data "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
+                        print ("    --buff Data "+str(packet.number)
+                        +" buffer="+str(self.buffer.packets.qsize())
+                        +" at "+full_string(self))
                     else:
-                        print "    --buff Ack "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
+                        print ("    --buff Ack "+str(packet.number)
+                        +" buffer="+str(self.buffer.packets.qsize())
+                        +" at "+full_string(self))
             
             if flag==False and hasattr(packet, "acknowledgement"):   
                 if DEBUG:
                     if packet.acknowledgement==False:
-                        print "    --drop Data "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
+                        print ("    --drop Data "+str(packet.number)
+                        +" buffer="+str(self.buffer.packets.qsize())
+                        +" at "+full_string(self))
                     else:
-                        print "    --drop Ack "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
-
+                        print ("    --drop Ack "+str(packet.number)
+                        +" buffer="+str(self.buffer.packets.qsize())
+                        +" at "+full_string(self))
         else:
+            if hasattr(packet, "acknowledgement"):
+                if DEBUG:
+                    if packet.acknowledgement==False:
+                        print ("    --send Data "+str(packet.number)
+                        +" buffer="+str(self.buffer.packets.qsize())
+                        +" at "+full_string(self))
+                    else:
+                        print ("    --send Ack "+str(packet.number)
+                        +" buffer="+str(self.buffer.packets.qsize())
+                        +" at "+full_string(self))
             self.send(packet)
 
     def react_to_link_available(self, event):
@@ -374,14 +391,8 @@ class Link(Actor):
         if packet.size>=PACKET_SIZE:
             LinkAvailable(env=self.env, delay=1, link=self)
         else:      
-            LinkAvailable(env=self.env, delay=0, link=self)
+            LinkAvailable(env=self.env, delay=0.02, link=self)
          
-        if hasattr(packet, "acknowledgement"):   
-            if DEBUG:
-                if packet.acknowledgement==False:
-                    print "    --send Data "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
-                else:
-                    print "    --send Ack "+str(packet.number)+' buffer='+str(self.buffer.packets.qsize())
         pass
 
 

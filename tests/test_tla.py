@@ -17,8 +17,8 @@ def test_tla_tcp_tahoe():
     F1=Flow(env=env, source=H1, destination=H2, amount=20*1024*PACKET_SIZE-10)
     F1.tla=TCPTahoe(env=env, flow=F1, recorder="L1_record.txt")
     
-    F2=Flow(env=env, source=H2, destination=H1, amount=1*1024*PACKET_SIZE-10)
-    F2.tla=TCPTahoe(env=env, flow=F1, recorder="L2_record.txt")
+    F2=Flow(env=env, source=H2, destination=H1, amount=20*1024*PACKET_SIZE-10)
+    F2.tla=TCPTahoe(env=env, flow=F2, recorder="L2_record.txt")
     
     H1.flows.append(F1)
     H2.flows.append(F1)
@@ -32,17 +32,18 @@ def test_tla_tcp_tahoe():
     H2.link=L2
     
     FlowStart(env=env, delay=0, flow=F1)
-    #FlowStart(env=env, delay=1000, flow=F2)
+    FlowStart(env=env, delay=1000, flow=F2)
     
     if DEBUG==True:
         env.run(1200)    
     else:
         env.run(50000)
            
-    n=env.now
+    return env.now
 
 #test_tla_stop_and_wait_basic()
 #test_tla_go_back_n_basic()
 #test_tla_fast_retransmit_basic()
-test_tla_tcp_tahoe()
+n=test_tla_tcp_tahoe()
+print n
 print "DONE"
