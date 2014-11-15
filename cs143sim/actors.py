@@ -20,7 +20,7 @@ This module contains all actor definitions.
 from tla import *
 from Queue import Queue
 from cs143sim.constants import PACKET_SIZE,GENERATE_ROUTERPACKET_TIME_INTEVAL
-from cs143sim.events import PacketReceipt, LinkAvailable
+from cs143sim.events import PacketReceipt, LinkAvailable,RoutingTableOutdated
 from cs143sim.constants import *
 from random import randint
 from test.test_socketserver import receive
@@ -467,6 +467,10 @@ class Router(Actor):
         for host_ip_address in all_host_ip_addresses:
             val = float("inf"), self.default_gateway
             self.table[host_ip_address] = val
+        for link in self.links:
+            if isinstance(link.destination, Host):
+                val = 1, link.destination.address
+                self.table[link.destination.address] = val
     
     def update_router_table(self, RouterPacket):
         """
@@ -475,15 +479,16 @@ class Router(Actor):
             mesurement is hop.
             
         """
-        
+        print self.table
+
         for (destination, val) in RouterPacket.routertable.items():
             
             if destination in self.table:
-                if val[0] + 1 < self.table[destination]:
-                    update_val = val[0] + 1, RouterPacket.source
+                if val[0] + 1 < self.table[destination][0]:
+                    update_val = val[0] + 1, RouterPacket.source.address
                     self.table[destination] = update_val
             else:
-                update_val = val[0] + 1, RouterPacket.source
+                update_val = val[0] + 1, RouterPacket.source.address
                 self.table[destination] = update_val
         
         
@@ -493,13 +498,13 @@ class Router(Actor):
             Design a sepcial packet that send the whole router table of this router to communicate with its neighbor
         """
         for l in self.links:
-            router_packet = RouterPacket(env=self.env, timestamp=0,routertable = self.table, source = self.address)
+            router_packet = RouterPacket(env=self.env, timestamp=self.env.now,routertable = self.table, source = self)
             self.send(link = l, packet = router_packet)
             
       
     
     def map_route(self, packet):
-        if packet.destination in table:
+        if packet.destination in self.table:
             next_hop = table[packet.destination][1]
             for link in links:
                 if (next_hop == link.destination.address):
@@ -508,7 +513,7 @@ class Router(Actor):
             self.send(link = route_link, packet = packet)
         else:
             next_hop = self.default_gateway # can be delete
-            self.send(link = links[0], packet = packet)
+            self.send(link = self.links[0], packet = packet)
       
     
     
@@ -520,11 +525,17 @@ class Router(Actor):
         """
         packet = event.value
         if isinstance(packet, DataPacket):
-            print "This is DataPacket"
-            map_route(packet = packet)
+            if DEBUG:
+                print "This is DataPacket"
+            self.map_route(packet = packet)
         elif isinstance(packet, RouterPacket):
-            print "This is RouterPacket"
-            update_router_table(packet = packet)
+            if DEBUG:
+                #print "This is RouterPacket"
+                print 'At', event.env.now, str(self.address), 'received RouterPacke from',
+                print str(packet.source.address)
+                #print full_string(event.actor)
+                
+            self.update_router_table(RouterPacket = packet)
         
        
       
