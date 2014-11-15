@@ -455,7 +455,7 @@ class Router(Actor):
         self.address = address
         self.links = []
         self.table = {}
-        self.defaul_gateway = None
+        self.default_gateway = None
   
     def initialize_routing_table(self, all_host_ip_addresses):
         """
