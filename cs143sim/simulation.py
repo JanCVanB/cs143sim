@@ -17,6 +17,9 @@ from cs143sim.actors import Link
 from cs143sim.actors import Router
 from cs143sim.constants import DEBUG
 from cs143sim.constants import INPUT_FILE_RATE_SCALE_FACTOR
+from cs143sim.constants import INPUT_FILE_BUFFER_SCALE_FACTOR
+from cs143sim.constants import INPUT_FILE_DATA_SCALE_FACTOR
+from cs143sim.constants import INPUT_FILE_TIME_SCALE_FACTOR
 from cs143sim.events import FlowStart
 
 
@@ -247,13 +250,14 @@ class Controller:
                                        rate=float(store_in['RATE'])*INPUT_FILE_RATE_SCALE_FACTOR,
                                        # rate needs to be in Bytes/ms
                                        delay=float(store_in['DELAY']),  # delay is already in ms
-                                       buffer_capacity=int(store_in['BUFFER'])*1000) # in Bytes
+                                       buffer_capacity=int(store_in['BUFFER'])*INPUT_FILE_BUFFER_SCALE_FACTOR)
+                                       # in Bytes
                         # TODO: THIS IS A TEMPORARY FIX: (making second link for opposite direction)
                         self.make_link(name=obj_id + 'b', source=the_dst, destination=the_src,
                                        rate=float(store_in['RATE'])*INPUT_FILE_RATE_SCALE_FACTOR,
                                        delay=float(store_in['DELAY']),
-                                       buffer_capacity=int(store_in['BUFFER'])*1000)  # in Bytes
-                                        # TODO: Make sure I'm passing the right units
+                                       buffer_capacity=int(store_in['BUFFER'])*INPUT_FILE_BUFFER_SCALE_FACTOR)
+                                       # in Bytes
                     elif obj_type == 'HOST':
                         # check the attribute(s) (there's only one for HOSTS so far: IP)
                         for attribute in ['IP']:
@@ -291,8 +295,8 @@ class Controller:
                         try:
                             self.make_flow(name=obj_id, source=self.hosts[store_in['SRC']],
                                            destination=self.hosts[store_in['DST']],
-                                           amount=int(store_in['DATA']),
-                                           start_time=float(store_in['START']))
+                                           amount=int(store_in['DATA'])*INPUT_FILE_DATA_SCALE_FACTOR,
+                                           start_time=float(store_in['START'])*INPUT_FILE_TIME_SCALE_FACTOR)
                         except KeyError as e:
                             raise InputFileUnknownReference(line_number=line_number,
                                                             message='Input File Formatting Error: ' +
