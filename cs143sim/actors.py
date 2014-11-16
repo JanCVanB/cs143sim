@@ -386,12 +386,10 @@ class Link(Actor):
     def send(self, packet):
         # TODO: implement sending by scheduling LinkAvailable and PacketReceipt
         self.busy=True
-        PacketReceipt(env=self.env, delay=self.delay, receiver=self.destination, packet=packet)
+        d_trans=(1.0*packet.size)/self.rate
+        PacketReceipt(env=self.env, delay=self.delay+d_trans, receiver=self.destination, packet=packet)
         
-        if packet.size>=PACKET_SIZE:
-            LinkAvailable(env=self.env, delay=1, link=self)
-        else:      
-            LinkAvailable(env=self.env, delay=0.02, link=self)
+        LinkAvailable(env=self.env, delay=d_trans, link=self)
          
         pass
 

@@ -68,7 +68,7 @@ class LinkAvailable(Timeout):
         
         if DEBUG:
             self.actor = link
-            self.callbacks.append(print_event)
+            #self.callbacks.append(print_event)
             
         
         self.callbacks.append(link.react_to_link_available)

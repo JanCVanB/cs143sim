@@ -25,17 +25,18 @@ def test_tla_tcp_tahoe():
     H1.flows.append(F2)
     H2.flows.append(F2)
     
-    L1=Link(env=env, source=H1, destination=H2, delay=10, rate=0, buffer_capacity=64*PACKET_SIZE)
-    L2=Link(env=env, source=H2, destination=H1, delay=10, rate=0, buffer_capacity=64*PACKET_SIZE)
+    rate=10.0*1024*1024/1000;
+    L1=Link(env=env, source=H1, destination=H2, delay=10, rate=rate, buffer_capacity=64*PACKET_SIZE)
+    L2=Link(env=env, source=H2, destination=H1, delay=10, rate=rate, buffer_capacity=64*PACKET_SIZE)
 
     H1.link=L1
     H2.link=L2
     
     FlowStart(env=env, delay=0, flow=F1)
-    FlowStart(env=env, delay=1000, flow=F2)
+    #FlowStart(env=env, delay=1000, flow=F2)
     
     if DEBUG==True:
-        env.run(1200)    
+        env.run(3000)    
     else:
         env.run(50000)
            

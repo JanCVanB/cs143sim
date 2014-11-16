@@ -153,8 +153,8 @@ class GoBackN:
         """
         n=ack_packet.number
         
-        if DEBUG:
-            print "            Old "+str(self.snd_sending)   
+#         if DEBUG:
+#             print "            Old "+str(self.snd_sending)   
         
         del_list=list()
                  
@@ -165,8 +165,8 @@ class GoBackN:
         for x in del_list:            
             self.snd_sending.remove(x)
                 
-        if DEBUG:
-            print "            New "+str(self.snd_sending) 
+#         if DEBUG:
+#             print "            New "+str(self.snd_sending) 
                                 
         self.send_new_packets()
 
@@ -190,8 +190,8 @@ class GoBackN:
             
             self.snd_sending.append(n)
             self.snd_not_sent+=1
-        if DEBUG:
-            print "        Sending "+str(self.snd_sending) 
+#         if DEBUG:
+#             print "        Sending "+str(self.snd_sending) 
     pass
 
 class FastRetransmit:
@@ -369,7 +369,7 @@ class TCPTahoe:
         self.duplicate_ack_times=0
         
         self.enable_fast_retransmit=False
-        self.enable_fast_recovery=True
+        self.enable_fast_recovery=False
         
         self.slow_start_flag=True
         self.slow_start_treshold=64
@@ -378,7 +378,7 @@ class TCPTahoe:
         
         self.change_W(W=1)
         #slew rate of AIMD:AI
-        self.k=0.5
+        self.k=1
         
         self.time_out_event=None
         
@@ -416,7 +416,7 @@ class TCPTahoe:
             if self.time_out<1000:
                 self.time_out=1000
         
-        RTT_DEBUG=True
+        RTT_DEBUG=False
         if DEBUG and RTT_DEBUG:
             print "      rtt_avg "+str(self.rtt_avg)
             print "      rtt_div "+str(self.rtt_div)
@@ -502,6 +502,9 @@ class TCPTahoe:
                 if x<n:
                     del_list.append(x)
                     
+            if len(del_list)>0:
+                self.reset_timer()
+                
             for x in del_list:            
                 self.snd_sending.remove(x)
                     
@@ -526,25 +529,25 @@ class TCPTahoe:
     
     def react_to_time_out_base(self):
         if len(self.snd_sending)>0:
-            n=self.snd_sending[0]
-            packet=self.flow.make_packet(packet_number=n)
-            self.flow.send_packet(packet)
+
             
             self.time_out=2*self.time_out
             self.reset_timer()
     
             self.slow_start_treshold=self.W/2
             self.slow_start_flag=True
+            
             self.change_W(W=1)
-            self.last_reset=self.env.now
-    
+            self.snd_sending=[]
+            self.send_new_packets()
     
     def send_new_packets(self):
 
         send_flag=False
         last_sent=-1
-        while len(self.snd_sending)<self.W:
-
+        Cnt=4
+        while len(self.snd_sending)<self.W and Cnt>0:
+            Cnt-=1
             send_flag=True
             
             l=len(self.snd_sending)
@@ -560,11 +563,11 @@ class TCPTahoe:
             self.flow.send_packet(packet)            
             self.snd_sending.append(n)
         
-        if send_flag==True:
+        if send_flag==True and self.time_out_event==None:
             self.reset_timer()
             
-        if DEBUG:
-            print "        Sending "+str(self.snd_sending) 
+#         if DEBUG:
+#             print "        Sending "+str(self.snd_sending) 
             
     def change_W(self, W):
         self.W=W
