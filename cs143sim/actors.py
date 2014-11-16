@@ -508,7 +508,7 @@ class Router(Actor):
     def map_route(self, packet):
         if packet.destination in self.table:
             next_hop = self.table[packet.destination][1]
-            route_link=self.links[1]
+            route_link=self.links[0]
             for link in self.links:
                 if (next_hop == link.destination):
                     route_link = link
