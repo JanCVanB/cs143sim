@@ -223,7 +223,7 @@ class Controller:
                                                        missing_attr=attribute)
                         # If all the attributes are present, create the object
                         if DEBUG:
-                            print 'Making Link: ' + obj_id
+                            print 'Making Link: ' + obj_id + 'a & b'
                         the_src = ''  # temp variables that will point to src/dst instances
                         the_dst = ''
                         # Enforce referential integrity (aka check that the specified
