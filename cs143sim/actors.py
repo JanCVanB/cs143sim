@@ -292,14 +292,15 @@ class Host(Actor):
 
     def react_to_packet_receipt(self, event):
         packet=event.value
-        if isinstance(packet, DataPacket):
-            for f in self.flows:
-                if (packet.acknowledgement==False):
-                    if (packet.source==f.source)and(packet.destination==f.destination):
-                        f.react_to_packet_receipt(event=event)
-                if (packet.acknowledgement==True):
-                    if (packet.source==f.destination)and(packet.destination==f.source):
-                        f.react_to_packet_receipt(event=event)
+        if packet.destination==self:
+            if isinstance(packet, DataPacket):
+                for f in self.flows:
+                    if (packet.acknowledgement==False):
+                        if (packet.source==f.source)and(packet.destination==f.destination):
+                            f.react_to_packet_receipt(event=event)
+                    if (packet.acknowledgement==True):
+                        if (packet.source==f.destination)and(packet.destination==f.source):
+                            f.react_to_packet_receipt(event=event)
 
 
 class Link(Actor):
@@ -386,7 +387,7 @@ class Link(Actor):
     def send(self, packet):
         # TODO: implement sending by scheduling LinkAvailable and PacketReceipt
         self.busy=True
-        d_trans=(1.0*packet.size)/self.rate
+        d_trans=(1.0*packet.size)/(self.rate*1024*1024/1000.0)
         PacketReceipt(env=self.env, delay=self.delay+d_trans, receiver=self.destination, packet=packet)
         
         LinkAvailable(env=self.env, delay=d_trans, link=self)
