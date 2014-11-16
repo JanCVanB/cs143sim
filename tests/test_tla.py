@@ -25,7 +25,7 @@ def test_tla_tcp_tahoe():
     H1.flows.append(F2)
     H2.flows.append(F2)
     
-    rate=10.0*1024*1024/1000;
+    rate=10.0
     L1=Link(env=env, source=H1, destination=H2, delay=10, rate=rate, buffer_capacity=64*PACKET_SIZE)
     L2=Link(env=env, source=H2, destination=H1, delay=10, rate=rate, buffer_capacity=64*PACKET_SIZE)
 
@@ -36,7 +36,7 @@ def test_tla_tcp_tahoe():
     #FlowStart(env=env, delay=1000, flow=F2)
     
     if DEBUG==True:
-        env.run(3000)    
+        env.run(500)    
     else:
         env.run(50000)
            

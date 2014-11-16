@@ -372,14 +372,15 @@ class TCPTahoe:
         self.enable_fast_recovery=False
         
         self.slow_start_flag=True
-        self.slow_start_treshold=64
+        self.slow_start_treshold=1e10
         
-        self.last_reset=0
+        
         
         self.change_W(W=1)
         #slew rate of AIMD:AI
         self.k=1
         
+        self.last_reset=0
         self.time_out_event=None
         
         self.fast_recovery_flag=False
@@ -416,7 +417,7 @@ class TCPTahoe:
             if self.time_out<1000:
                 self.time_out=1000
         
-        RTT_DEBUG=False
+        RTT_DEBUG=True
         if DEBUG and RTT_DEBUG:
             print "      rtt_avg "+str(self.rtt_avg)
             print "      rtt_div "+str(self.rtt_div)
@@ -426,98 +427,98 @@ class TCPTahoe:
          
         """
         n=ack_packet.number
-        if n==self.duplicate_ack_number:
-            self.duplicate_ack_times+=1
-        else:
-            self.duplicate_ack_number=n
-            self.duplicate_ack_times=0
-            
-            
-        if self.enable_fast_retransmit and self.duplicate_ack_times==4:
-            if DEBUG:
-                print "    Duplicate Ack "+str(n)
-                print "    Fast retransmit"
-            self.react_to_time_out_base()
-        elif self.enable_fast_recovery and self.duplicate_ack_times==4:
-            if DEBUG:
-                print "    Duplicate Ack "+str(n)+" Times "+str(self.duplicate_ack_times)
-                print "    Enter Fast recovery"
-                
-            self.fast_recovery_flag=True
-            self.slow_start_treshold=self.W/2    
-            #self.change_W(self.W/2+3)
-            """
-            Acturally, W is not windows size at that means. 
-            W is number of packets between the first and the last unacked packets
-            """
-            while len(self.snd_sending)>=self.W:
-                self.snd_sending.pop()
-                     
-            n=self.duplicate_ack_number
-            packet=self.flow.make_packet(packet_number=n)  
-            self.flow.send_packet(packet)
-            
-            
-        elif self.enable_fast_recovery and self.duplicate_ack_times>4:
-            if DEBUG:
-                print "    Duplicate Ack "+str(n)+" Times "+str(self.duplicate_ack_times)
-                print "    More Fast recovery" 
-            self.change_W(self.W+1)
-            self.send_new_packets()
-        else:
-            """
-            Process Ack
-            """
-            if self.enable_fast_recovery and self.fast_recovery_flag==True:
-                """
-                Just leave fast recovery
-                """
-                self.change_W(self.slow_start_treshold-1)
-                self.fast_recovery_flag=False
-                self.slow_start_flag=False
-                
-                
-                """
-                Note: you can not start sending a lot of packets now. 
-                See send_new_packets: limit the packets send for each ack
-                (Data Burst: RFC3782)
-                """
-                
-                
-            if self.slow_start_flag:
-                self.change_W(self.W+1)
-                if self.W>self.slow_start_treshold:
-                    self.slow_start_flag=False
+        if n>self.snd_acked:
+            if n==self.duplicate_ack_number:
+                self.duplicate_ack_times+=1
             else:
-                self.change_W(self.W+self.k*1.0/self.W)
-                #self.change_W(self.W+1)
+                self.duplicate_ack_number=n
+                self.duplicate_ack_times=0
                 
-           
-            if DEBUG:
-                print "            Old "+str(self.snd_sending)   
-            
-            del_list=list()
-                     
-            for x in self.snd_sending:            
-                if x<n:
-                    del_list.append(x)
-                    
-            if len(del_list)>0:
-                self.reset_timer()
                 
-            for x in del_list:            
-                self.snd_sending.remove(x)
+            if self.enable_fast_retransmit and self.duplicate_ack_times==4:
+                if DEBUG:
+                    print "    Duplicate Ack "+str(n)
+                    print "    Fast retransmit"
+                self.react_to_time_out_base()
+            elif self.enable_fast_recovery and self.duplicate_ack_times==4:
+                if DEBUG:
+                    print "    Duplicate Ack "+str(n)+" Times "+str(self.duplicate_ack_times)
+                    print "    Enter Fast recovery"
                     
-            if DEBUG:
-                print "            New "+str(self.snd_sending) 
-            
-            n=ack_packet.number
-            self.snd_acked=max([self.snd_acked,n-1])
-            
-            """
-            Process sending
-            """             
-            self.send_new_packets()
+                self.fast_recovery_flag=True
+                self.slow_start_treshold=self.W/2    
+                #self.change_W(self.W/2+3)
+                """
+                Acturally, W is not windows size at that means. 
+                W is number of packets between the first and the last unacked packets
+                """
+                while len(self.snd_sending)>=self.W:
+                    self.snd_sending.pop()
+                         
+                n=self.duplicate_ack_number
+                packet=self.flow.make_packet(packet_number=n)  
+                self.flow.send_packet(packet)
+                
+                
+            elif self.enable_fast_recovery and self.duplicate_ack_times>4:
+                if DEBUG:
+                    print "    Duplicate Ack "+str(n)+" Times "+str(self.duplicate_ack_times)
+                    print "    More Fast recovery" 
+                self.change_W(self.W+1)
+                self.send_new_packets()
+            elif ack_packet.timestamp>=self.last_reset:
+                """
+                Process Ack
+                """
+                if self.enable_fast_recovery and self.fast_recovery_flag==True:
+                    """
+                    Just leave fast recovery
+                    """
+                    self.change_W(self.slow_start_treshold-1)
+                    self.fast_recovery_flag=False
+                    self.slow_start_flag=False
+                    
+                    """
+                    Note: you can not start sending a lot of packets now. 
+                    See send_new_packets: limit the packets send for each ack
+                    (Data Burst: RFC3782)
+                    """
+                    
+                    
+                if self.slow_start_flag:
+                    self.change_W(self.W+1)
+                    if self.W>self.slow_start_treshold:
+                        self.slow_start_flag=False
+                else:
+                    self.change_W(self.W+self.k*1.0/self.W)
+                    #self.change_W(self.W+1)
+                    
+               
+                if DEBUG:
+                    print "            Old "+str(self.snd_sending)   
+                
+                del_list=list()
+                         
+                for x in self.snd_sending:            
+                    if x<n:
+                        del_list.append(x)
+                        
+                if len(del_list)>0:
+                    self.reset_timer()
+                    
+                for x in del_list:            
+                    self.snd_sending.remove(x)
+                        
+                if DEBUG:
+                    print "            New "+str(self.snd_sending) 
+                
+                n=ack_packet.number
+                self.snd_acked=max([self.snd_acked,n-1])
+                
+                """
+                Process sending
+                """             
+                self.send_new_packets()
 
     def react_to_time_out(self, event):
         if event==self.time_out_event:
@@ -540,12 +541,14 @@ class TCPTahoe:
             self.change_W(W=1)
             self.snd_sending=[]
             self.send_new_packets()
+            
+            self.last_reset=self.env.now
     
     def send_new_packets(self):
 
         send_flag=False
         last_sent=-1
-        Cnt=4
+        Cnt=2
         while len(self.snd_sending)<self.W and Cnt>0:
             Cnt-=1
             send_flag=True
