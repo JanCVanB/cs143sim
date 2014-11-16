@@ -16,6 +16,7 @@ from cs143sim.actors import Host
 from cs143sim.actors import Link
 from cs143sim.actors import Router
 from cs143sim.constants import DEBUG
+from cs143sim.constants import INPUT_FILE_RATE_SCALE_FACTOR
 from cs143sim.events import FlowStart
 
 
@@ -139,13 +140,15 @@ class Controller:
         """
         new_link = Link(env=self.env, source=source, destination=destination,
                         delay=delay, rate=rate, buffer_capacity=buffer_capacity)
-        for actor in (source, destination):
-            if isinstance(actor, Host):
-                actor.link = new_link
-            elif isinstance(actor, Router):
-                actor.links.append(new_link)
-            else:
-                raise Exception('Unknown Source/Destination: ' + actor)
+        # TODO: THIS IS A TEMPORARY FIX. Need to implement two buffers per link (if full-duplex) or shared link/buffer
+        # NOTE: This temporary fix also affects read_case (below)
+        actor = source  # OLD: for actor in (source, destination):
+        if isinstance(actor, Host):
+            actor.link = new_link
+        elif isinstance(actor, Router):
+            actor.links.append(new_link)
+        else:
+            raise Exception('Unknown Source/Destination: ' + actor)
         self.links[name] = new_link
         self.buffer_occupancy[new_link] = [(0, 0)]
         self.link_rate[new_link] = [(0, 0)]
@@ -240,10 +243,16 @@ class Controller:
                             else:
                                 raise InputFileUnknownReference(line_number, target +
                                                                 ' is not a valid Host/Router.')
-                        self.make_link(name=obj_id, source=the_src, destination=the_dst,
-                                       rate=float(store_in['RATE']),
+                        self.make_link(name=obj_id + 'a', source=the_src, destination=the_dst,
+                                       rate=float(store_in['RATE'])*INPUT_FILE_RATE_SCALE_FACTOR,
+                                       # rate needs to be in Bytes/ms
+                                       delay=float(store_in['DELAY']),  # delay is already in ms
+                                       buffer_capacity=int(store_in['BUFFER'])*1000) # in Bytes
+                        # TODO: THIS IS A TEMPORARY FIX: (making second link for opposite direction)
+                        self.make_link(name=obj_id + 'b', source=the_dst, destination=the_src,
+                                       rate=float(store_in['RATE'])*INPUT_FILE_RATE_SCALE_FACTOR,
                                        delay=float(store_in['DELAY']),
-                                       buffer_capacity=int(store_in['BUFFER']))
+                                       buffer_capacity=int(store_in['BUFFER'])*1000)  # in Bytes
                                         # TODO: Make sure I'm passing the right units
                     elif obj_type == 'HOST':
                         # check the attribute(s) (there's only one for HOSTS so far: IP)
