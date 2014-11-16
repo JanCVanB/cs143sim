@@ -455,6 +455,9 @@ class Router(Actor):
         self.links = []
         self.table = {}
         self.default_gateway = None
+
+    def __str__(self):
+        return self.address
   
     def initialize_routing_table(self, all_host_ip_addresses):
         """
@@ -505,16 +508,17 @@ class Router(Actor):
     def map_route(self, packet):
         if packet.destination in self.table:
             next_hop = self.table[packet.destination][1]
+            route_link=self.links[1]
             for link in self.links:
-                if (next_hop == link.destination.address):
+                if (next_hop == link.destination):
                     route_link = link
                     break
             self.send(link = route_link, packet = packet)
         else:
             next_hop = self.default_gateway # can be delete
             self.send(link = self.links[0], packet = packet)
-      
-    
+
+        
     
     def react_to_packet_receipt(self, event):
         """
