@@ -1,0 +1,22 @@
+// Case 0
+// For simulation
+
+HOST
+    ID       H1
+    IP       192.168.1.1
+    ID       H2
+    IP       192.168.1.2
+
+LINK
+    ID       L1
+    RATE     10
+    DELAY    10
+    BUFFER   64
+    CONNECTS H1 H2
+
+FLOW
+    ID      F1
+    SRC     H1
+    DST     H2
+    DATA    20
+    START   1.0
