@@ -301,9 +301,8 @@ class Controller:
                                                message='Unrecognized keyword: ' + keyword)
         all_host_ip_addresses = [host.address for host in self.hosts.values()]
         assert len(all_host_ip_addresses) > 0
-        for router in self.routers:
+        for router in self.routers.values():
             router.initialize_routing_table(all_host_ip_addresses=all_host_ip_addresses)
-
 
     def record(self, recorder, actor, value):
         """Record the time and `value` in the recorder keyed by the `actor`
