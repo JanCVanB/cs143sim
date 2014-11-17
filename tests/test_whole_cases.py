@@ -20,4 +20,4 @@ def test_case_1():
     else:
         run_case(case_number=1, until=2000)
 
-test_case_0()
+test_case_1()

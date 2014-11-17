@@ -64,7 +64,7 @@ class TCPTahoe:
         self.duplicate_ack_times=0
         
         self.enable_fast_retransmit=False
-        self.enable_fast_recovery=False
+        self.enable_fast_recovery=True
         
         self.slow_start_flag=True
         self.slow_start_treshold=64
@@ -73,7 +73,7 @@ class TCPTahoe:
         
         self.change_W(W=1)
         #slew rate of AIMD:AI
-        self.ka=0.5
+        self.ka=1
         self.ks=1
         
         self.last_reset=0
@@ -162,8 +162,8 @@ class TCPTahoe:
                     print "    More Fast recovery" 
                 self.change_W(self.W+1)
                 self.send_new_packets()
-#             elif ack_packet.timestamp>=self.last_reset:
-            else:
+            elif ack_packet.timestamp>=self.last_reset:
+#             else:
                 """
                 Process Ack
                 """
