@@ -87,7 +87,7 @@ class Controller:
         :class:`Flows <.Flow>` key to lists of (time, value) tuples
     """
 
-    def __init__(self, case='cs143sim/cases/case0_newformat.txt'):
+    def __init__(self, case='cs143sim/cases/case0.txt'):
         self.env = ControlledEnvironment(controller=self)
         self.flows = {}
         self.hosts = {}
@@ -172,6 +172,8 @@ class Controller:
 
         :param str case: path to simulation input file
         """
+        if DEBUG:
+            print 'Reading test case from file "' + case
         with open(case, 'rb') as case_file:
             # Open the file for line-by-line consumption
             obj_type = ''  # obj_type holds the current object type (LINK/HOST/Etc)
