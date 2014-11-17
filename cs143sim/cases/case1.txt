@@ -7,6 +7,12 @@ HOST
     ID      H2
     IP      192.168.1.2
 
+FLOW
+    ID      F1
+    SRC     H1
+    DST     H2
+    DATA    20
+    START   0.5
 
 ROUTER
     ID      R1
@@ -45,9 +51,4 @@ LINK
     CONNECTS R3 R4
 
 
-FLOW
-    ID      F1
-    SRC     H1
-    DST     H2
-    DATA    20
-    START   0.5
+

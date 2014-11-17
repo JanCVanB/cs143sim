@@ -175,7 +175,7 @@ class Flow(Actor):
         using the timestamp of packet to be acked as the timestamp of ack packet
         to calculate RTT
         """
-        ack_packet=DataPacket(env=self.env, number=self.rcv_expect_to_receive,
+        ack_packet=DataPacket(number=self.rcv_expect_to_receive,
                               acknowledgement=True, timestamp=packet.timestamp, 
                               source=packet.destination, destination=packet.source)
         ack_packet.size=PACKET_SIZE/8
@@ -413,9 +413,8 @@ class Router(Actor):
             mesurement is hop.
             
         """
-        print self.table
 
-        for (destination, val) in RouterPacket.routertable.items():
+        for (destination, val) in RouterPacket.router_table.items():
             
             if destination in self.table:
                 if val[0] + 1 < self.table[destination][0]:
@@ -438,15 +437,16 @@ class Router(Actor):
       
     
     def map_route(self, packet):
-        if packet.destination in self.table:
-            next_hop = self.table[packet.destination][1]
-            route_link=self.links[0]
+        if packet.destination.address in self.table:
+            next_hop = self.table[packet.destination.address][1]
+            #route_link=self.links[0]
             for link in self.links:
-                if (next_hop == link.destination):
+                if (next_hop == link.destination.address):
                     route_link = link
                     break
             self.send(link = route_link, packet = packet)
         else:
+            print '     ---WARNING: Default Gateway'
             next_hop = self.default_gateway # can be delete
             self.send(link = self.links[0], packet = packet)
 

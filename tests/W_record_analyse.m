@@ -1,9 +1,10 @@
 close all
 
 f=figure();
-subplot(1,2,1);
+subplot(1,1,1);
 
-name='L1_record.txt';
+%name='L1_record.txt';
+name='W_record.txt'
 W=load(name);
 
 title(name);

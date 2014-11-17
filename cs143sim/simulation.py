@@ -22,7 +22,7 @@ from cs143sim.constants import INPUT_FILE_TIME_SCALE_FACTOR
 from cs143sim.errors import InputFileSyntaxError
 from cs143sim.errors import InputFileUnknownReference
 from cs143sim.errors import MissingAttribute
-from cs143sim.events import FlowStart
+from cs143sim.events import FlowStart, RoutingTableOutdated
 
 
 class ControlledEnvironment(Environment):
@@ -138,6 +138,7 @@ class Controller:
         """
         new_router = Router(env=self.env, address=ip_address)
         self.routers[name] = new_router
+        RoutingTableOutdated(env=self.env, delay=0, router=new_router)
 
     def read_case(self, case):
         """Read input file at path `case` and create actors (and events?)
@@ -172,7 +173,6 @@ class Controller:
                     keyword = ''
                 except IndexError:
                     keyword = ''
-
                 if keyword == '//':
                     continue  # ignore the comment line in the file
                 elif keyword in ['HOST', 'ROUTER', 'LINK', 'FLOW']:
@@ -255,7 +255,7 @@ class Controller:
                             print 'Making Router: ' + obj_id
                         self.make_router(name=obj_id, ip_address=store_in['IP'])
 
-                    elif obj_type == 'FLOW':
+                    elif obj_type == 'FLOW':                        
                         # TODO: Specify congestion control algorithm as attribute
                         for attribute in ['SRC', 'DST', 'START', 'DATA']:
                             if store_in[attribute] in ['', []]:

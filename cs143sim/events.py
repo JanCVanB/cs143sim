@@ -88,7 +88,7 @@ class PacketTimeOut(Timeout):
     def __init__(self, env, delay, actor, expected_time):
         super(PacketTimeOut, self).__init__(env, delay, value=expected_time)
         if DEBUG:
-            #print "    set packet "+str(packet_number)+ " time out: "+str(env.now+delay)
+#             print "    set packet "+str(packet_number)+ " time out: "+str(env.now+delay)
             pass
         if DEBUG:
             self.actor = actor
