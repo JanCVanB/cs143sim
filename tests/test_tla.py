@@ -5,9 +5,6 @@ from cs143sim.tla import *
 from cs143sim.constants import *
 
 
-
-
-
 def test_tla_tcp_tahoe():
     env=Environment()
     
@@ -41,6 +38,7 @@ def test_tla_tcp_tahoe():
         env.run(50000)
            
     return env.now
+
 
 #test_tla_stop_and_wait_basic()
 #test_tla_go_back_n_basic()

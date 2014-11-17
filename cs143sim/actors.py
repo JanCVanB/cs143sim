@@ -7,7 +7,6 @@ This module contains all actor definitions.
     Flow
     Host
     Link
-    Packet
     Router
 
 .. moduleauthor:: Lan Hongjian <lanhongjianlr@gmail.com>
@@ -16,16 +15,19 @@ This module contains all actor definitions.
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
 """
-
-from tla import *
 from Queue import Queue
-from cs143sim.constants import PACKET_SIZE,GENERATE_ROUTERPACKET_TIME_INTEVAL
-from cs143sim.events import PacketReceipt, LinkAvailable,RoutingTableOutdated
-from cs143sim.constants import *
 from random import randint
-from test.test_socketserver import receive
 
-
+from cs143sim.constants import DEBUG
+from cs143sim.constants import GENERATE_ROUTERPACKET_TIME_INTEVAL
+from cs143sim.constants import PACKET_SIZE
+from cs143sim.events import LinkAvailable
+from cs143sim.events import PacketReceipt
+from cs143sim.events import RoutingTableOutdated
+from cs143sim.packets import DataPacket
+from cs143sim.packets import RouterPacket
+from cs143sim.tla import TCPTahoe
+from cs143sim.utilities import full_string
 
 
 class Actor(object):
@@ -37,9 +39,12 @@ class Actor(object):
     def __init__(self, env):
         self.env = env
 
+
 class Buffer(Actor):
     """Representation of a data storage container
+
     Buffers store data to be linked while :class:`.Link` is busy sending data.
+
     :param int capacity: maximum number of bits that can be stored
     :param link: :class:`.Link` containing this buffer
     :ivar int capacity: maximum number of bits that can be stored
@@ -48,38 +53,6 @@ class Buffer(Actor):
     """
     def __init__(self, env, capacity, link):
         super(Buffer, self).__init__(env=env)
-        self.capacity = capacity
-        self.link = link
-        self.packets = []
-
-    def add(self, packet):
-        """
-        Adds packet to `packets` if `capacity` will not be exceeded,
-        drops packet if buffer if full.
-        :param packet: :class:`.Packet` added to buffer.
-        """
-        current_level = sum(packet.size for packet in self.packets)
-        if current_level + packet.size <= self.capacity:
-            self.packets.append(packet)
-            return True
-        else:
-            # The packet cannot be stored, so the packet is dropped
-            self.env.controller.record_packet_loss(link=self.link)
-            return False
-
-class FIFO(Actor):
-    """Representation of a data storage container
-
-    Buffers store data to be linked while :class:`.Link` is busy sending data.
-
-    :param int capacity: maximum number of bits that can be stored
-    :param link: :class:`.Link` containing this buffer
-    :ivar int capacity: maximum number of bits that can be stored
-    :ivar link: :class:`.Link` containing this buffer
-    :ivar list packets: :class:`Packets <.Packet>` currently in storage
-    """
-    def __init__(self, env, capacity, link):
-        super(FIFO, self).__init__(env=env)
         
         self.link = link
         self.packets = Queue()
@@ -98,13 +71,12 @@ class FIFO(Actor):
         if self.current_level + packet.size <= self.capacity:
             self.packets.put(packet)
             self.current_level=self.current_level+packet.size
+            self.env.controller.record_buffer_occupancy(link=self.link,
+                                                        buffer_occupancy=self.current_level)
             return True
         else:
             # The packet cannot be stored, so the packet is dropped
-            
-            #DISABLE for debugging!!!!
-            # self.env.controller.record_packet_loss(link=self.link)
-            
+            self.env.controller.record_packet_loss(link=self.link)
             if DEBUG:
                 if packet.acknowledgement==False:
                     print "    ---packet "+str(packet.number)+' (loss)'
@@ -112,9 +84,11 @@ class FIFO(Actor):
                     print "    ---ack "+str(packet.number)+' (loss)'
             return False
                     
-    def get(self):
-        packet=self.packets.get()
+    def get(self, timeout=None):
+        packet=self.packets.get(timeout=timeout)
         self.current_level=self.current_level-packet.size
+        self.env.controller.record_buffer_occupancy(link=self.link,
+                                                    buffer_occupancy=self.current_level)
         return packet
 
 
@@ -156,7 +130,7 @@ class Flow(Actor):
         Make a packet based on the packet number
         """
 
-        packet=DataPacket(env=self.env, number=packet_number, 
+        packet=DataPacket(number=packet_number,
                           acknowledgement=False, timestamp=self.env.now, 
                           source=self.source, destination=self.destination)
         packet.size=PACKET_SIZE
@@ -237,6 +211,9 @@ class Flow(Actor):
         
     def react_to_packet_receipt(self, event):
         packet=event.value
+        self.env.controller.record_flow_rate(flow=self, packet_size=packet.size)
+        packet_delay = self.env.now - packet.timestamp
+        self.env.controller.record_packet_delay(flow=self, packet_delay=packet_delay)
         """
         If the packet is a data packet, generate an ack packet
         """        
@@ -325,7 +302,7 @@ class Link(Actor):
         self.destination = destination
         self.delay = delay
         self.rate = rate
-        self.buffer = FIFO(env=env, capacity=buffer_capacity, link=self)
+        self.buffer = Buffer(env=env, capacity=buffer_capacity, link=self)
         self.busy = False
         self.utilization = 0
         self.env=env
@@ -381,7 +358,6 @@ class Link(Actor):
         self.busy = False
         if self.buffer.packets.empty()==False:
             self.send(self.buffer.get())
-        pass
 
     def send(self, packet):
         # TODO: implement sending by scheduling LinkAvailable and PacketReceipt
@@ -389,51 +365,8 @@ class Link(Actor):
         d_trans = (1.0*packet.size)/(self.rate)  # (bits to be tx'ed)/(rate in bits/ms) should give the
                                                  # transit time in ms
         PacketReceipt(env=self.env, delay=self.delay+d_trans, receiver=self.destination, packet=packet)
-        
         LinkAvailable(env=self.env, delay=d_trans, link=self)
-         
-        pass
-
-
-class Packet(Actor):
-    """Representation of a quantum of information
-
-    Packets carry information along the network, between :class:`Hosts <.Host>`
-    or :class:`Routers <.Router>`.
-
-    :param source: source :class:`.Host` or :class:`.Router`
-    :param destination: destination :class:`.Host` or :class:`.Router`
-    :param int number: sequence number
-    :param acknowledgement: acknowledgement... something
-    :cvar int PACKET_SIZE: size of every :class:`.Packet`, in bits
-    :ivar source: source :class:`.Host` or :class:`.Router`
-    :ivar destination: destination :class:`.Host` or :class:`.Router`
-    :ivar int number: sequence number
-    :ivar acknowledgement: acknowledgement... something
-    :ivar int size: size, in bits
-    :ivar str timestamp: time at which the packet was created
-    """
-    def __init__(self, env, timestamp, source, destination):
-        super(Packet, self).__init__(env=env)
-        self.timestamp = timestamp
-        self.source = source
-        self.destination = destination
-        self.size = PACKET_SIZE
-
-
-class DataPacket(Packet):
-    def __init__(self, env, number, acknowledgement, timestamp, source,
-                 destination):
-        super(DataPacket, self).__init__(env, timestamp, source, destination)
-        self.number = number
-
-        self.acknowledgement = acknowledgement
-
-
-class RouterPacket(Packet):
-    def __init__(self, env, timestamp, routertable, source):
-        super(RouterPacket, self).__init__(env, timestamp, source, destination=0)
-        self.routertable = routertable
+        self.env.controller.record_link_rate(link=self, send_duration=d_trans)
 
 
 class Router(Actor):
@@ -500,7 +433,7 @@ class Router(Actor):
             Design a sepcial packet that send the whole router table of this router to communicate with its neighbor
         """
         for l in self.links:
-            router_packet = RouterPacket(env=self.env, timestamp=self.env.now,routertable = self.table, source = self)
+            router_packet = RouterPacket(timestamp=self.env.now, router_table= self.table, source = self)
             self.send(link = l, packet = router_packet)
             
       

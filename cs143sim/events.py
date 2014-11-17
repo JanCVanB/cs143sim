@@ -10,28 +10,10 @@ This module contains all event definitions.
 
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
-
-
 from simpy.events import Timeout
 
 from cs143sim.constants import DEBUG
-
-
-def print_event(event):
-    print 'At', event.env.now, event.__class__.__name__, 'for',
-    print full_string(event.actor)
-
-
-def full_string(thing):
-    if type(thing) == dict:
-        return ', '.join(full_string(key) + ' : ' + full_string(thing[key])
-                         for key in thing)
-    if type(thing) == list:
-        return '[' + ', '.join(full_string(item) for item in thing) + ']'
-    if type(thing) == tuple:
-        return '(' + ', '.join(full_string(item) for item in thing) + ')'
-    else:
-        return str(thing)
+from cs143sim.utilities import print_event
 
 
 class FlowStart(Timeout):
@@ -63,16 +45,11 @@ class LinkAvailable(Timeout):
         :class:`~cs143sim.actors.Packet` was sent
     """
     def __init__(self, env, delay, link):
-        
         super(LinkAvailable, self).__init__(env=env, delay=delay)
-        
         if DEBUG:
             self.actor = link
             #self.callbacks.append(print_event)
-            
-        
         self.callbacks.append(link.react_to_link_available)
-
 
 
 class PacketReceipt(Timeout):
@@ -104,6 +81,7 @@ class PacketReceipt(Timeout):
         # TODO: 
         self.callbacks.append(receiver.react_to_packet_receipt)
 
+
 class PacketTimeOut(Timeout):
     """
     Time out event for tla
@@ -118,6 +96,7 @@ class PacketTimeOut(Timeout):
             self.callbacks.append(print_event)
         # TODO: 
         self.callbacks.append(actor.react_to_time_out)    
+
 
 class RoutingTableOutdated(Timeout):
     """A :class:`~cs143sim.actors.Router` updates its routing table

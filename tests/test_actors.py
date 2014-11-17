@@ -1,3 +1,5 @@
+from Queue import Empty
+
 from cs143sim.actors import Buffer
 from cs143sim.actors import Flow
 from cs143sim.actors import Host
@@ -33,16 +35,15 @@ def basic_link():
 def basic_packet():
     #return Packet(source=basic_host(), destination=basic_host(), number=1,
     #              acknowledgement=object())
-    return DataPacket(env=ControlledEnvironment(controller=Controller()),
-                      source=basic_host(), destination=basic_host(),
+    return DataPacket(source=basic_host(), destination=basic_host(),
                       number=1, acknowledgement=object(), timestamp=0)
+
 
 def basic_router_packet():
     #return Packet(source=basic_host(), destination=basic_host(), number=1,
     #              acknowledgement=object())
-    return RouterPacket(env=ControlledEnvironment(controller=Controller()),
-                      source=basic_host(),
-                       routertable={}, timestamp=0)
+    return RouterPacket(source=basic_host(), timestamp=0, router_table={})
+
 
 def basic_router():
     return Router(env=ControlledEnvironment(controller=Controller()),
@@ -63,11 +64,17 @@ def buffer_overflow():
     for packet_ in packets:
         buffer_.add(packet_)
         print(buffer_.packets)
+    buffer_packets = []
+    while True:
+        try:
+            buffer_packets.append(buffer_.get(timeout=1))
+        except Empty:
+            break
     for i in range(number_of_packets):
         if i < buffer_capacity:
-            assert packets[i] in buffer_.packets
+            assert packets[i] in buffer_packets
         else:
-            assert packets[i] not in buffer_.packets
+            assert packets[i] not in buffer_packets
 
 
 def link_busy():
@@ -101,8 +108,6 @@ def router_initialize():
 
     all_host_ip_addresses = ['11','12','13','14']
     router.initialize_routing_table(all_host_ip_addresses)
-    
-
 
 
 def router_forward():
@@ -133,9 +138,9 @@ def router_receive_update_packet():
     Rpacket = basic_router_packet()
     
     Rpacket.source = 'R9'
-    Rpacket.routertable['H1'] = 5, 'R4'
-    Rpacket.routertable['H2'] = 6, 'R5'
-    Rpacket.routertable['H3'] = 3, 'R3'
+    Rpacket.router_table['H1'] = 5, 'R4'
+    Rpacket.router_table['H2'] = 6, 'R5'
+    Rpacket.router_table['H3'] = 3, 'R3'
 
     router = basic_router()
     router.table = {}

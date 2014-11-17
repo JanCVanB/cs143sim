@@ -3,12 +3,12 @@ This module contains the simulation setup and execution.
 
 .. autosummary:
 
+    ControlledEnvironment
     Controller
 
+.. moduleauthor:: Samuel Richerd <dondiego152@gmail.com>
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
-
-
 from simpy.core import Environment
 
 from cs143sim.actors import Flow
@@ -20,48 +20,22 @@ from cs143sim.constants import INPUT_FILE_RATE_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_BUFFER_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_DATA_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_TIME_SCALE_FACTOR
+from cs143sim.errors import InputFileSyntaxError
+from cs143sim.errors import InputFileUnknownReference
+from cs143sim.errors import MissingAttribute
 from cs143sim.events import FlowStart
 
 
-class MissingAttribute(Exception):
+class ControlledEnvironment(Environment):
+    """SimPy :class:`~simpy.core.Environment` with a reference to its
+        :class:`.Controller`
+
+    :param controller: :class:`.Controller` that created the
+        :class:`~simpy.core.Environment`
     """
-    MissingAttribute is an `Exception` designed to notify the user that the
-    input file is missing information
-    """
-    def __init__(self, obj_type, obj_id, missing_attr):
-        self.obj_type = obj_type
-        self.obj_id = obj_id
-        self.missing_attr = missing_attr
-
-    def __str__(self):
-        return 'I/O Error: Type ' + self.obj_type + ' (ID: ' + self.obj_id + \
-               ') is missing attribute ' + self.missing_attr
-
-
-class InputFileSyntaxError(Exception):
-    """
-    InputFileSyntaxError is an `Exception` thrown when an unrecognized syntax
-    is used in the input file.
-    """
-    def __init__(self, line_number, message):
-        self.line_number = line_number
-        self.message = message
-
-    def __str__(self):
-        return 'Input File Syntax Error: (Line ' + str(self.line_number) + ') ' + self.message
-
-
-class InputFileUnknownReference(Exception):
-    """
-    InputFileUnknownReference is an `Exception` thrown when a link or host makes reference
-    to an unknown object (Host/Router/Link)
-    """
-    def __init__(self, line_number, message):
-        self.line_number = line_number
-        self.message = message
-
-    def __str__(self):
-        return 'InputFileUnknownReference (Line ' + str(self.line_number) + '): ' + self.message
+    def __init__(self, controller):
+        super(ControlledEnvironment, self).__init__()
+        self.controller = controller
 
 
 class Controller:
@@ -87,7 +61,7 @@ class Controller:
         :class:`Flows <.Flow>` key to lists of (time, value) tuples
     """
 
-    def __init__(self, case='cs143sim/cases/case0_newformat.txt'):
+    def __init__(self, case='cs143sim/cases/case0.txt'):
         self.env = ControlledEnvironment(controller=self)
         self.flows = {}
         self.hosts = {}
@@ -333,7 +307,11 @@ class Controller:
         :param actor: :class:`.Actor` that experienced the change
         :param value: new value of changed quantity
         """
-        recorder[actor].append((self.env.now, value))
+        entry = (self.env.now, value)
+        try:
+            recorder[actor].append(entry)
+        except KeyError:
+            recorder[actor] = [entry]
 
     def record_buffer_occupancy(self, link, buffer_occupancy):
         """Record the occupancy of a link buffer
@@ -373,7 +351,6 @@ class Controller:
 
         :param link: :class:`.Link` that dropped the packet
         """
-        # TODO: write controller_record_packet_loss test
         self.record(recorder=self.packet_loss, actor=link, value=None)
 
     def record_window_size(self, flow, window_size):
@@ -390,15 +367,3 @@ class Controller:
         :param float until: simulation duration
         """
         self.env.run(until=until)
-
-
-class ControlledEnvironment(Environment):
-    """SimPy :class:`~simpy.core.Environment` with a reference to its
-        :class:`.Controller`
-
-    :param controller: :class:`.Controller` that created the
-        :class:`~simpy.core.Environment`
-    """
-    def __init__(self, controller):
-        super(ControlledEnvironment, self).__init__()
-        self.controller = controller

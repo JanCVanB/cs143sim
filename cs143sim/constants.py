@@ -1,11 +1,17 @@
 """
 This file contains all constant definitions
+
+.. moduleauthor:: Lan Hongjian <lanhongjianlr@gmail.com>
+.. moduleauthor:: Yamei Ou <oym111@gmail.com>
+.. moduleauthor:: Samuel Richerd <dondiego152@gmail.com>
+.. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
+.. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
 """
 
-
-DEBUG = True
+DEBUG = False
 PACKET_SIZE = 8192
 GENERATE_ROUTERPACKET_TIME_INTEVAL = 20  #milliseconds
+
 
 ### INPUT FILE UNIT CONVERSIONS:
 # Rate needs to go from Mbps to bits per millisecond (internally)
