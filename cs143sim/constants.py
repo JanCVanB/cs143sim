@@ -1,5 +1,4 @@
-"""
-This file contains all constant definitions
+"""This file contains all constant definitions
 
 .. moduleauthor:: Lan Hongjian <lanhongjianlr@gmail.com>
 .. moduleauthor:: Yamei Ou <oym111@gmail.com>

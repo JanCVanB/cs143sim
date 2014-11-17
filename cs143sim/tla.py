@@ -1,5 +1,4 @@
-"""
-This module includes simple transport layer algorithm: stop and wait
+"""This module includes simple transport layer algorithm: stop and wait
 
 .. autosummary::
 
@@ -29,6 +28,7 @@ class GoBackN:
     :ivar snd_not_sent: packet that has not been sent
     :ivar snd_sending: list of packet that are being sent
     """
+    # TODO: define class in docstring and fix duplicate docstring
     def __init__(self, env, flow):
         self.flow=flow
         self.env=env
@@ -134,6 +134,7 @@ class FastRetransmit:
     :ivar snd_not_sent: packet that has not been sent
     :ivar snd_sending: list of packet that are being sent
     """
+    # TODO: define class in docstring and fix duplicate docstring
     def __init__(self, env, flow):
         self.flow=flow
         self.env=env
@@ -257,6 +258,7 @@ class StopAndWait:
     :ivar last_acked_packet_number
     :ivar last_sent_packet_number=
     """
+    # TODO: define class in docstring
     def __init__(self, env, flow):
         self.flow=flow
         self.env=env
@@ -348,6 +350,7 @@ class TCPTahoe:
     """
     :ivar slow_start_flag
     """
+    # TODO: define class in docstring and fix triplicate docstring
     def __init__(self, env, flow, recorder=None):
         
         if recorder==None:

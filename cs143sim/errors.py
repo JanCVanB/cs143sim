@@ -1,5 +1,4 @@
-"""
-This module contains all error definitions.
+"""This module contains all error definitions.
 
 .. autosummary:
 
@@ -13,8 +12,7 @@ This module contains all error definitions.
 
 
 class InputFileSyntaxError(Exception):
-    """
-    InputFileSyntaxError is an `Exception` thrown when an unrecognized syntax
+    """InputFileSyntaxError is an `Exception` thrown when an unrecognized syntax
     is used in the input file.
     """
     def __init__(self, line_number, message):
@@ -26,8 +24,7 @@ class InputFileSyntaxError(Exception):
 
 
 class InputFileUnknownReference(Exception):
-    """
-    InputFileUnknownReference is an `Exception` thrown when a link or host makes reference
+    """InputFileUnknownReference is an `Exception` thrown when a link or host makes reference
     to an unknown object (Host/Router/Link)
     """
     def __init__(self, line_number, message):
@@ -39,8 +36,7 @@ class InputFileUnknownReference(Exception):
 
 
 class MissingAttribute(Exception):
-    """
-    MissingAttribute is an `Exception` designed to notify the user that the
+    """MissingAttribute is an `Exception` designed to notify the user that the
     input file is missing information
     """
     def __init__(self, obj_type, obj_id, missing_attr):

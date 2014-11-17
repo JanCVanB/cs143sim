@@ -1,5 +1,4 @@
-"""
-This module contains all actor definitions.
+"""This module contains all actor definitions.
 
 .. autosummary::
 
@@ -61,8 +60,7 @@ class Buffer(Actor):
         self.current_level=0
 
     def add(self, packet):
-        """
-        Adds packet to `packets` if `capacity` will not be exceeded,
+        """Adds packet to `packets` if `capacity` will not be exceeded,
         drops packet if buffer if full.
 
         :param packet: :class:`.Packet` added to buffer.
@@ -85,6 +83,7 @@ class Buffer(Actor):
             return False
                     
     def get(self, timeout=None):
+        # TODO: add docstring
         packet=self.packets.get(timeout=timeout)
         self.current_level=self.current_level-packet.size
         self.env.controller.record_buffer_occupancy(link=self.link,

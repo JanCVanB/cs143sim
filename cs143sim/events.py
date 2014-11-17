@@ -1,5 +1,4 @@
-"""
-This module contains all event definitions.
+"""This module contains all event definitions.
 
 .. autosummary::
 

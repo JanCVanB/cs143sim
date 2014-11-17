@@ -1,5 +1,4 @@
-"""
-This module contains the simulation setup and execution.
+"""This module contains the simulation setup and execution.
 
 .. autosummary:
 
@@ -28,7 +27,7 @@ from cs143sim.events import FlowStart
 
 class ControlledEnvironment(Environment):
     """SimPy :class:`~simpy.core.Environment` with a reference to its
-        :class:`.Controller`
+    :class:`.Controller`
 
     :param controller: :class:`.Controller` that created the
         :class:`~simpy.core.Environment`

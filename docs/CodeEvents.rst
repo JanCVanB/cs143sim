@@ -23,8 +23,14 @@ Packet Receipt
 .. autoclass:: PacketReceipt
     :members:
 
-Update Routing Table
+PacketTimeOut
+-------------
+
+.. autoclass:: PacketTimeOut
+    :members:
+
+RoutingTableOutdated
 --------------------
 
-.. autoclass:: UpdateRoutingTable
+.. autoclass:: RoutingTableOutdated
     :members:
