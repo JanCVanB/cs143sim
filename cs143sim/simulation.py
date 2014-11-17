@@ -146,6 +146,8 @@ class Controller:
 
         :param str case: path to simulation input file
         """
+        if DEBUG:
+            print 'Reading test case from file "' + case
         with open(case, 'rb') as case_file:
             # Open the file for line-by-line consumption
             obj_type = ''  # obj_type holds the current object type (LINK/HOST/Etc)
