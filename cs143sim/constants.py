@@ -13,6 +13,9 @@ DEBUG = False
 PACKET_SIZE = 8192
 """Size of every :class:`.Packet` in the simulation, in bits"""
 
+ACK_PACKET_SIZE = 512
+"""Size of every :class:`.Packet` in the simulation, in bits"""
+
 GENERATE_ROUTERPACKET_TIME_INTEVAL = 20
 """Time for every :class:`.Router` to wait before generating a new
 :class:`.RouterPacket`, in milliseconds"""
@@ -26,5 +29,5 @@ INPUT_FILE_DATA_SCALE_FACTOR = 8000000
 INPUT_FILE_TIME_SCALE_FACTOR = 1000
 """Conversion factor for seconds to milliseconds (for flow start time)"""
 
-INPUT_FILE_BUFFER_SCALE_FACTOR = 1000
-"""Conversion factor for KB to bytes (for buffer size)"""
+INPUT_FILE_BUFFER_SCALE_FACTOR = 8000
+"""Conversion factor for KB to bits (for buffer size)"""

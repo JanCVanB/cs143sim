@@ -17,7 +17,7 @@
 from Queue import Queue
 from random import randint
 
-from cs143sim.constants import DEBUG
+from cs143sim.constants import DEBUG, ACK_PACKET_SIZE
 from cs143sim.constants import GENERATE_ROUTERPACKET_TIME_INTEVAL
 from cs143sim.constants import PACKET_SIZE
 from cs143sim.events import LinkAvailable
@@ -178,7 +178,7 @@ class Flow(Actor):
         ack_packet=DataPacket(number=self.rcv_expect_to_receive,
                               acknowledgement=True, timestamp=packet.timestamp, 
                               source=packet.destination, destination=packet.source)
-        ack_packet.size=PACKET_SIZE/8
+        ack_packet.size=ACK_PACKET_SIZE
         return ack_packet
 
     def send_packet(self, packet):
