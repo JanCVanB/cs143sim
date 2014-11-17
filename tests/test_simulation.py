@@ -11,7 +11,7 @@ def controller_record_buffer_occupancy():
     controller_ = basic_controller()
     link = basic_link()
     controller_.buffer_occupancy[link] = []
-    buffer_occupancies = list(range(5))
+    buffer_occupancies = range(5)
     for buffer_occupancy in buffer_occupancies:
         controller_.record_buffer_occupancy(link=link,
                                             buffer_occupancy=buffer_occupancy)
@@ -24,29 +24,31 @@ def controller_record_flow_rate():
     controller_ = basic_controller()
     flow = basic_flow()
     controller_.flow_rate[flow] = []
-    flow_rates = list(range(5))
-    for flow_rate in flow_rates:
-        controller_.record_flow_rate(flow=flow, flow_rate=flow_rate)
-    recorded_flow_rates = [record[1] for record in controller_.flow_rate[flow]]
-    assert recorded_flow_rates == flow_rates
+    packet_sizes = range(5)
+    for packet_size in packet_sizes:
+        controller_.record_flow_rate(flow=flow, packet_size=packet_size)
+    recorded_packet_sizes = [record[1] for record in
+                             controller_.flow_rate[flow]]
+    assert recorded_packet_sizes == packet_sizes
 
 
 def controller_record_link_rate():
     controller_ = basic_controller()
     link = basic_link()
     controller_.link_rate[link] = []
-    link_rates = list(range(5))
-    for link_rate in link_rates:
-        controller_.record_link_rate(link=link, link_rate=link_rate)
-    recorded_link_rates = [record[1] for record in controller_.link_rate[link]]
-    assert recorded_link_rates == link_rates
+    send_durations = range(5)
+    for send_duration in send_durations:
+        controller_.record_link_rate(link=link, send_duration=send_duration)
+    recorded_send_durations = [record[1] for record in
+                               controller_.link_rate[link]]
+    assert recorded_send_durations == send_durations
 
 
 def controller_record_packet_delay():
     controller_ = basic_controller()
     flow = basic_flow()
     controller_.packet_delay[flow] = []
-    packet_delays = list(range(5))
+    packet_delays = range(5)
     for packet_delay in packet_delays:
         controller_.record_packet_delay(flow=flow, packet_delay=packet_delay)
     recorded_packet_delays = [record[1] for record in
@@ -55,15 +57,22 @@ def controller_record_packet_delay():
 
 
 def controller_record_packet_loss():
-    # TODO: determine packet loss metric
-    pass
+    controller_ = basic_controller()
+    link = basic_link()
+    controller_.packet_loss[link] = []
+    packet_losses = [None] * 5
+    for _ in packet_losses:
+        controller_.record_packet_loss(link=link)
+    recorded_packet_losses = [record[1] for record in
+                              controller_.packet_loss[link]]
+    assert recorded_packet_losses == packet_losses
 
 
 def controller_record_window_size():
     controller_ = basic_controller()
     flow = basic_flow()
     controller_.window_size[flow] = []
-    window_sizes = list(range(5))
+    window_sizes = range(5)
     for window_size in window_sizes:
         controller_.record_window_size(flow=flow, window_size=window_size)
     recorded_window_sizes = [record[1] for record in
@@ -73,7 +82,7 @@ def controller_record_window_size():
 
 def controller_run_basic():
     controller_ = basic_controller()
-    controller_.run()
+    controller_.run(until=10)
 
 
 def test_controller():
