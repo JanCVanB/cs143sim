@@ -299,8 +299,11 @@ class Controller:
                 else:
                     raise InputFileSyntaxError(line_number=line_number,
                                                message='Unrecognized keyword: ' + keyword)
-        # TODO: Once simulation network is setup, call routers` "initialize routing table" function.
-        pass
+        all_host_ip_addresses = [host.address for host in self.hosts.values()]
+        assert len(all_host_ip_addresses) > 0
+        for router in self.routers:
+            router.initialize_routing_table(all_host_ip_addresses=all_host_ip_addresses)
+
 
     def record(self, recorder, actor, value):
         """Record the time and `value` in the recorder keyed by the `actor`
