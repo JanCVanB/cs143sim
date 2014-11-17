@@ -5,6 +5,12 @@ Simulation
 
 .. currentmodule:: cs143sim.simulation
 
+ControlledEnvironment
+---------------------
+
+.. autoclass:: ControlledEnvironment
+    :members:
+
 Controller
 ----------
 

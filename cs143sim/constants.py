@@ -9,16 +9,23 @@ This file contains all constant definitions
 """
 
 DEBUG = False
+"""Whether to run the simulation in debug mode, with extra print statements"""
+
 PACKET_SIZE = 8192
-GENERATE_ROUTERPACKET_TIME_INTEVAL = 20  #milliseconds
+"""Size of every :class:`.Packet` in the simulation, in bits"""
 
+GENERATE_ROUTERPACKET_TIME_INTEVAL = 20
+"""Time for every :class:`.Router` to wait before generating a new
+:class:`.RouterPacket`, in milliseconds"""
 
-### INPUT FILE UNIT CONVERSIONS:
-# Rate needs to go from Mbps to bits per millisecond (internally)
 INPUT_FILE_RATE_SCALE_FACTOR = 1000000/1000.0
-# Data (flow total data size) needs to go from MBytes to bits
+""" Conversion factor for Mbps to bits per millisecond (for rate)"""
+
 INPUT_FILE_DATA_SCALE_FACTOR = 8000000
-# Start time needs to go from seconds to milliseconds
+"""Conversion factor for MBytes to bits (for flow total data size)"""
+
 INPUT_FILE_TIME_SCALE_FACTOR = 1000
-# Buffer size goes from KB to Bytes
+"""Conversion factor for seconds to milliseconds (for flow start time)"""
+
 INPUT_FILE_BUFFER_SCALE_FACTOR = 1000
+"""Conversion factor for KB to bytes (for buffer size)"""

@@ -5,5 +5,10 @@ Source Code
    :maxdepth: 2
    
    CodeActors
+   CodeConstants
+   CodeErrors
    CodeEvents
+   CodePackets
    CodeSimulation
+   CodeTLA
+   CodeUtilities

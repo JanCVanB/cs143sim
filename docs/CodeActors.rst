@@ -29,12 +29,6 @@ Link
 .. autoclass:: Link
     :members:
 
-Packet
-------
-
-.. autoclass:: Packet
-    :members:
-
 Router
 ------
 
