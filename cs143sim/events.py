@@ -81,7 +81,7 @@ class PacketReceipt(Timeout):
     :class:`~cs143sim.actors.Link`
     
     :param env: SimPy simulation :class:`~simpy.core.Environment`
-    :param float delay: time until Packet begins to arrive at Router
+    :param float delay: time until Packet begins to arrive at Router (in ms)
     :param receiver: :class:`~cs143sim.actors.Host` or
         :class:`~cs143sim.actors.Router` that receives `packet`
     :param link: :class:`~cs143sim.actors.Link` on which `packet` arrives

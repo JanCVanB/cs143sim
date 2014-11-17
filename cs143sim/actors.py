@@ -266,7 +266,6 @@ class Flow(Actor):
         self.tla.react_to_flow_start(event=event)
     
 
-
 class Host(Actor):
     """Representation of an access point
 
@@ -386,8 +385,9 @@ class Link(Actor):
 
     def send(self, packet):
         # TODO: implement sending by scheduling LinkAvailable and PacketReceipt
-        self.busy=True
-        d_trans=(1.0*packet.size)/(self.rate*1024*1024/1000.0)
+        self.busy = True
+        d_trans = (1.0*packet.size)/(self.rate)  # (bits to be tx'ed)/(rate in bits/ms) should give the
+                                                 # transit time in ms
         PacketReceipt(env=self.env, delay=self.delay+d_trans, receiver=self.destination, packet=packet)
         
         LinkAvailable(env=self.env, delay=d_trans, link=self)
