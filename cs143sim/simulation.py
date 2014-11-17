@@ -248,16 +248,16 @@ class Controller:
                                                                 ' is not a valid Host/Router.')
                         self.make_link(name=obj_id + 'a', source=the_src, destination=the_dst,
                                        rate=float(store_in['RATE'])*INPUT_FILE_RATE_SCALE_FACTOR,
-                                       # rate needs to be in Bytes/ms
+                                       # rate needs to be in bits/ms
                                        delay=float(store_in['DELAY']),  # delay is already in ms
                                        buffer_capacity=int(store_in['BUFFER'])*INPUT_FILE_BUFFER_SCALE_FACTOR)
-                                       # in Bytes
+                                       # convert into bits
                         # TODO: THIS IS A TEMPORARY FIX: (making second link for opposite direction)
                         self.make_link(name=obj_id + 'b', source=the_dst, destination=the_src,
                                        rate=float(store_in['RATE'])*INPUT_FILE_RATE_SCALE_FACTOR,
                                        delay=float(store_in['DELAY']),
                                        buffer_capacity=int(store_in['BUFFER'])*INPUT_FILE_BUFFER_SCALE_FACTOR)
-                                       # in Bytes
+                                       # convert into bits
                     elif obj_type == 'HOST':
                         # check the attribute(s) (there's only one for HOSTS so far: IP)
                         for attribute in ['IP']:
@@ -296,7 +296,9 @@ class Controller:
                             self.make_flow(name=obj_id, source=self.hosts[store_in['SRC']],
                                            destination=self.hosts[store_in['DST']],
                                            amount=int(store_in['DATA'])*INPUT_FILE_DATA_SCALE_FACTOR,
+                                           # amount is in bits!
                                            start_time=float(store_in['START'])*INPUT_FILE_TIME_SCALE_FACTOR)
+                                           # start time is stored in ms
                         except KeyError as e:
                             raise InputFileUnknownReference(line_number=line_number,
                                                             message='Input File Formatting Error: ' +

@@ -266,7 +266,6 @@ class Flow(Actor):
         self.tla.react_to_flow_start(event=event)
     
 
-
 class Host(Actor):
     """Representation of an access point
 
