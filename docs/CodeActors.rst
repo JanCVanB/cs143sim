@@ -5,6 +5,12 @@ Actors
 
 .. currentmodule:: cs143sim.actors
 
+Buffer
+------
+
+.. autoclass:: Buffer
+    :members:
+
 Flow
 ----
 
@@ -21,12 +27,6 @@ Link
 ----
 
 .. autoclass:: Link
-    :members:
-
-Packet
-------
-
-.. autoclass:: Packet
     :members:
 
 Router

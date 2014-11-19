@@ -1,0 +1,50 @@
+// Sam's format:
+// define hosts and routers first:
+// IMPORTANT NOTE:This is not actually case 0 in the Project Test Cases..
+// this is just a test case I threw together to make sure this input format works
+//
+// NOTE INPUT FILE UNITS MUST BE SPECIFIED AS FOLLOWS
+// --------------------------------------------------
+// RATE:   Mbps (integer)
+// DELAY:  milliseconds (float)
+// START:  seconds (float)
+// DATA:   MB (MegaBytes) (integer)
+// BUFFER: KB (KiloBytes) (integer)
+
+HOST
+    ID      H1
+    IP      192.168.1.1
+    ID      H2
+    IP      192.168.1.2
+    ID      H3
+    IP      192.168.1.3
+
+ROUTER
+    ID      R1
+    IP      192.168.1.4
+
+LINK
+    ID       L1
+    RATE     10
+    DELAY    10
+    BUFFER   64
+    CONNECTS H1 R1
+    ID       L2
+    CONNECTS H2 R1
+    ID       L3
+    CONNECTS H3 R1
+
+
+FLOW
+    ID      F1
+    SRC     H1
+    DST     H2
+    DATA    20
+    START   1.0
+
+FLOW
+    ID      F2
+    SRC     H1
+    DST     H3
+    DATA    24
+    START   1.3

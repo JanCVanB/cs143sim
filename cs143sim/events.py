@@ -1,5 +1,4 @@
-"""
-This module contains all event definitions.
+"""This module contains all event definitions.
 
 .. autosummary::
 
@@ -10,54 +9,104 @@ This module contains all event definitions.
 
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
-
-
 from simpy.events import Timeout
+
+from cs143sim.constants import DEBUG
+from cs143sim.utilities import print_event
 
 
 class FlowStart(Timeout):
-    """Flow begins generating packets
+    """A :class:`~cs143sim.actors.Flow` begins generating packets
 
-    :param simpy.core.Environment env: SimPy simulation environment
-    :param float delay: time until flow starts
-    :param cs143sim.actors.Flow flow: Flow that starts
+    :param env: SimPy simulation :class:`~simpy.core.Environment`
+    :param float delay: time until :class:`~cs143sim.actors.Flow` starts
+    :param flow: :class:`~cs143sim.actors.Flow` that starts
     """
     def __init__(self, env, delay, flow):
-        super(FlowStart, self).__init__(env, delay, value=flow)
+
+        super(FlowStart, self).__init__(env=env, delay=delay)
+
+        if DEBUG:
+            self.actor = flow
+            self.callbacks.append(print_event)
+            
+        self.callbacks.append(flow.react_to_flow_start)
 
 
 class LinkAvailable(Timeout):
-    """Router finishes sending a packet on Link
+    """A :class:`~cs143sim.actors.Router` finishes sending a
+    :class:`~cs143sim.actors.Packet` on :class:`~cs143sim.actors.Link`
 
-    :param simpy.core.Environment env: SimPy simulation environment
-    :param float delay: time until Router finishes
-    :param cs143sim.actors.Router router: Router that finishes
-    :param cs143sim.actors.Link link: Link on which a packet was sent
+    :param env: SimPy simulation :class:`~simpy.core.Environment`
+    :param float delay: time until :class:`~cs143sim.actors.Router` finishes
+    :param router: :class:`~cs143sim.actors.Router` that finishes
+    :param link: :class:`~cs143sim.actors.Link` on which a
+        :class:`~cs143sim.actors.Packet` was sent
     """
-    def __init__(self, env, delay, router, link):
-        super(LinkAvailable, self).__init__(env, delay, value=(router, link))
+    def __init__(self, env, delay, link):
+        super(LinkAvailable, self).__init__(env=env, delay=delay)
+        if DEBUG:
+            self.actor = link
+            #self.callbacks.append(print_event)
+        self.callbacks.append(link.react_to_link_available)
 
 
 class PacketReceipt(Timeout):
-    """Router receives Packet on Link
+    """A :class:`~cs143sim.actors.Host` or a :class:`~cs143sim.actors.Router`
+    receives a :class:`~cs143sim.actors.Packet` on a
+    :class:`~cs143sim.actors.Link`
     
-    :param simpy.core.Environment env: SimPy simulation environment
-    :param float delay: time until Packet begins to arrive at Router
-    :param cs143sim.actors.Router router: Router that receives
-    :param cs143sim.actors.Link link: Link on which Packet arrives
-    :param cs143sim.actors.Packet packet: Packet that arrives
+    :param env: SimPy simulation :class:`~simpy.core.Environment`
+    :param float delay: time until Packet begins to arrive at Router (in ms)
+    :param receiver: :class:`~cs143sim.actors.Host` or
+        :class:`~cs143sim.actors.Router` that receives `packet`
+    :param link: :class:`~cs143sim.actors.Link` on which `packet` arrives
+    :param packet: :class:`~cs143sim.actors.Packet` that arrives
     """
-    def __init__(self, env, delay, router, link, packet):
-        super(PacketReceipt, self).__init__(env, delay, value=(router, link,
-                                                               packet))
+    def __init__(self, env, delay, receiver, packet):
+
+        super(PacketReceipt, self).__init__(env=env, delay=delay, value=packet)
 
 
-class UpdateRoutingTable(Timeout):
-    """Router updates its routing table
+        if DEBUG:
+#             if hasattr(packet, "acknowledgement"):
+#                 if packet.acknowledgement==False:
+#                     print "    send Data "+str(packet.number)
+#                 else:
+#                     print "    send Ack "+str(packet.number)
+#                 
+            self.actor = receiver
+            self.callbacks.append(print_event)
+        # TODO: 
+        self.callbacks.append(receiver.react_to_packet_receipt)
 
-    :param simpy.core.Environment env: SimPy simulation environment
-    :param float delay: time until Router updates
-    :param cs143sim.actors.Router router: Router that updates
+
+class PacketTimeOut(Timeout):
+    """
+    Time out event for tla
+    """
+    def __init__(self, env, delay, actor, expected_time):
+        super(PacketTimeOut, self).__init__(env, delay, value=expected_time)
+        if DEBUG:
+#             print "    set packet "+str(packet_number)+ " time out: "+str(env.now+delay)
+            pass
+        if DEBUG:
+            self.actor = actor
+            self.callbacks.append(print_event)
+        # TODO: 
+        self.callbacks.append(actor.react_to_time_out)    
+
+
+class RoutingTableOutdated(Timeout):
+    """A :class:`~cs143sim.actors.Router` updates its routing table
+
+    :param env: SimPy simulation :class:`~simpy.core.Environment`
+    :param float delay: time until :class:`~cs143sim.actors.Router` updates
+    :param router: :class:`~cs143sim.actors.Router` that updates
     """
     def __init__(self, env, delay, router):
-        super(UpdateRoutingTable, self).__init__(env, delay, value=router)
+        super(RoutingTableOutdated, self).__init__(env=env, delay=delay)
+        self.callbacks.append(router.react_to_routing_table_outdated)
+        if DEBUG:
+            self.actor = router
+            self.callbacks.append(print_event)
