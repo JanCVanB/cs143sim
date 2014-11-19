@@ -396,6 +396,9 @@ class Router(Actor):
         the key of table is destination (IP_address of hosts)
         the first element in value of table is the distance between current router to final host
         the second element in value of table is where to go for next hop
+
+        If the host destination is not in neighbor links, then set the distance to be inf, the next_hop to be the default_gateway
+        If the host destination is in its neighbor links, then set the distance to be 1( dynamic still inf?), the next_hop to be direct host destination
         """
         self.default_gateway = self.links[0].destination.address
         for host_ip_address in all_host_ip_addresses:
@@ -408,31 +411,35 @@ class Router(Actor):
     
     def update_router_table(self, RouterPacket):
         """
-            This function is to check every item in router table if any update.
-            Implement Bellman Ford algorithm here.
-            mesurement is hop.
-            
+        This function is to check every item in router table if any update.
+        Implement Bellman Ford algorithm here.
+        mesurement is hop if DYNAMICH_ROUTE_DISTANCE_METRIC = False.
+        mesurement is link delay if DYNAMICH_ROUTE_DISTANCE_METRIC = True.
         """
 
         for (destination, val) in RouterPacket.router_table.items():
-            
+            if DYNAMICH_ROUTE_DISTANCE_METRIC:
+                metric = self.env.now - RouterPacket.timestamp
+            else:
+                metric = 1
             if destination in self.table:
-                if val[0] + 1 < self.table[destination][0]:
-                    update_val = val[0] + 1, RouterPacket.source.address
+                if val[0] + metric < self.table[destination][0]:
+                    update_val = val[0] + metric, RouterPacket.source.address
                     self.table[destination] = update_val
             else:
-                update_val = val[0] + 1, RouterPacket.source.address
+                update_val = val[0] + metric, RouterPacket.source.address
                 self.table[destination] = update_val
         
         
     
     def generate_router_packet(self):
         """
-            Design a sepcial packet that send the whole router table of this router to communicate with its neighbor
+            Design RouterPacket(source,timestamp,routertable) that send the whole router table of this router to communicate with its neighbor
         """
         for l in self.links:
-            router_packet = RouterPacket(timestamp=self.env.now, router_table= self.table, source = self)
-            self.send(link = l, packet = router_packet)
+            if isinstance(l.destination, Router):
+                router_packet = RouterPacket(timestamp=self.env.now, router_table= self.table, source = self)
+                self.send(link = l, packet = router_packet)
             
       
     
@@ -461,12 +468,11 @@ class Router(Actor):
         packet = event.value
         if isinstance(packet, DataPacket):
             if DEBUG:
-                print "This is DataPacket"
+                print 'At', event.env.now, str(self.address), 'received DataPacket'  
             self.map_route(packet = packet)
         elif isinstance(packet, RouterPacket):
             if DEBUG:
-                #print "This is RouterPacket"
-                print 'At', event.env.now, str(self.address), 'received RouterPacke from',
+                print 'At', event.env.now, str(self.address), 'received RouterPacket from',
                 print str(packet.source.address)
                 #print full_string(event.actor)
                 
@@ -483,5 +489,8 @@ class Router(Actor):
         link.add(packet = packet)
 
     def react_to_routing_table_outdated(self, event):
+        """
+            Periodically generate RouterPacket to all neighbor links.
+        """
         self.generate_router_packet()
         RoutingTableOutdated(env=self.env, delay=GENERATE_ROUTERPACKET_TIME_INTEVAL, router=self)
