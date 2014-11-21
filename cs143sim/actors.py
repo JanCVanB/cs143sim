@@ -420,15 +420,26 @@ class Router(Actor):
         for (destination, val) in RouterPacket.router_table.items():
             if DYNAMICH_ROUTE_DISTANCE_METRIC:
                 metric = self.env.now - RouterPacket.timestamp
-            else:
-                metric = 1
-            if destination in self.table:
-                if val[0] + metric < self.table[destination][0]:
+                if destination in self.table:
+                    if self.table[destination][1] == RouterPacket.source.address:
+                        update_val = val[0] + metric, RouterPacket.source.address
+                        self.table[destination] = update_val
+                    else:
+                        if val[0] + metric < self.table[destination][0]:
+                            update_val = val[0] + metric, RouterPacket.source.address
+                            self.table[destination] = update_val
+                else:
                     update_val = val[0] + metric, RouterPacket.source.address
                     self.table[destination] = update_val
             else:
-                update_val = val[0] + metric, RouterPacket.source.address
-                self.table[destination] = update_val
+                metric = 1
+                if destination in self.table:
+                    if val[0] + metric < self.table[destination][0]:
+                        update_val = val[0] + metric, RouterPacket.source.address
+                        self.table[destination] = update_val
+                else:
+                    update_val = val[0] + metric, RouterPacket.source.address
+                    self.table[destination] = update_val
         
         
     

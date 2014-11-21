@@ -19,7 +19,6 @@ ACK_PACKET_SIZE = 512
 ROUTER_PACKET_SIZE = 512
 """Size of every :class:`.RouterPacket` in the simulation, in bits"""
 
-
 GENERATE_ROUTERPACKET_TIME_INTEVAL = 20
 """Time for every :class:`.Router` to wait before generating a new
 :class:`.RouterPacket`, in milliseconds"""
