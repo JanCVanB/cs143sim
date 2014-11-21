@@ -16,9 +16,16 @@ PACKET_SIZE = 8192
 ACK_PACKET_SIZE = 512
 """Size of every :class:`.Packet` in the simulation, in bits"""
 
+ROUTER_PACKET_SIZE = 512
+"""Size of every :class:`.RouterPacket` in the simulation, in bits"""
+
 GENERATE_ROUTERPACKET_TIME_INTEVAL = 20
 """Time for every :class:`.Router` to wait before generating a new
 :class:`.RouterPacket`, in milliseconds"""
+
+DYNAMICH_ROUTE_DISTANCE_METRIC = False
+"""Whether to take dynamic link delay as the metric for route distance, 
+otherwise use hops(topology) to be the metric"""
 
 INPUT_FILE_RATE_SCALE_FACTOR = 1000000/1000.0
 """ Conversion factor for Mbps to bits per millisecond (for rate)"""
