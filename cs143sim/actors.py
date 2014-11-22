@@ -449,9 +449,17 @@ class Router(Actor):
         """
         for l in self.links:
             if isinstance(l.destination, Router):
-                router_packet = RouterPacket(timestamp=self.env.now, router_table= self.table, source = self)
+                router_packet = RouterPacket(timestamp=self.env.now, router_table= self.table, source = self, acknowledgement = False)
                 self.send(link = l, packet = router_packet)
-            
+    
+
+    def generate_ack_router_packet(RouterPacket):
+        source_packet = RouterPacket
+        ack_router_packet = RouterPacket(timestamp = source_packet.timestamp,router_table = self.table, source=self, acknowledgement=True) 
+        for l in self.links:
+            if l.destination == RouterPacket.source:
+            self.send(link = l, packet = ack_router_packet)
+            break
       
     
     def map_route(self, packet):
@@ -486,8 +494,10 @@ class Router(Actor):
                 print 'At', event.env.now, str(self.address), 'received RouterPacket from',
                 print str(packet.source.address)
                 #print full_string(event.actor)
-                
-            self.update_router_table(RouterPacket = packet)
+            if packet.acknowledgement == False:
+                self.generate_ack_router_packet(RouterPacket = packet)
+            else:   
+                self.update_router_table(RouterPacket = packet)
         
        
       
