@@ -56,8 +56,9 @@ class RouterPacket(Packet):
     :param source: source :class:`.Host` or :class:`.Router`
     :param str timestamp: time at which the packet was created
     """
-    def __init__(self, source, timestamp, router_table):
+    def __init__(self, source, timestamp, router_table, acknowledgement):
         # TODO: define router_table in docstring
         super(RouterPacket, self).__init__(timestamp=timestamp, source=source,
                                            destination=0)
         self.router_table = router_table
+        self.acknowledgement = acknowledgement
