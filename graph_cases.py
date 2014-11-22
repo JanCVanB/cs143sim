@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from cs143sim.simulation import Controller
 
 
-CASES = [0, 1]
-SIMULATION_DURATION = 10000  # ms
+CASES = [ 1]
+SIMULATION_DURATION = 40000  # ms
 X_STEP = 100  # ms
 
 
