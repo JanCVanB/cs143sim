@@ -3,6 +3,7 @@ from cs143sim.actors import *
 from cs143sim.events import *
 from cs143sim.tla import *
 from cs143sim.constants import *
+from cs143sim.simulation import *
 
 
 

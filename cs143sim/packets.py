@@ -61,4 +61,5 @@ class RouterPacket(Packet):
         super(RouterPacket, self).__init__(timestamp=timestamp, source=source,
                                            destination=0)
         self.router_table = router_table
+        self.number = 0
         self.acknowledgement = acknowledgement

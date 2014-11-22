@@ -19,7 +19,7 @@ from random import randint
 
 from cs143sim.constants import DEBUG, ACK_PACKET_SIZE
 from cs143sim.constants import GENERATE_ROUTERPACKET_TIME_INTEVAL
-from cs143sim.constants import PACKET_SIZE
+from cs143sim.constants import PACKET_SIZE, DYNAMICH_ROUTE_DISTANCE_METRIC
 from cs143sim.events import LinkAvailable
 from cs143sim.events import PacketReceipt
 from cs143sim.events import RoutingTableOutdated
@@ -409,7 +409,7 @@ class Router(Actor):
                 val = 1, link.destination.address
                 self.table[link.destination.address] = val
     
-    def update_router_table(self, RouterPacket):
+    def update_router_table(self, router_packet):
         """
         This function is to check every item in router table if any update.
         Implement Bellman Ford algorithm here.
@@ -417,30 +417,30 @@ class Router(Actor):
         mesurement is link delay if DYNAMICH_ROUTE_DISTANCE_METRIC = True.
         """
 
-        for (destination, val) in RouterPacket.router_table.items():
+        for (destination, val) in router_packet.router_table.items():
             if DYNAMICH_ROUTE_DISTANCE_METRIC:
-                metric = self.env.now - RouterPacket.timestamp
+                metric = self.env.now - router_packet.timestamp
                 if destination in self.table:
-                    if self.table[destination][1] == RouterPacket.source.address:
-                        update_val = val[0] + metric, RouterPacket.source.address
+                    if self.table[destination][1] == router_packet.source.address:
+                        update_val = val[0] + metric, router_packet.source.address
                         self.table[destination] = update_val
                     else:
                         if val[0] + metric < self.table[destination][0]:
-                            update_val = val[0] + metric, RouterPacket.source.address
+                            update_val = val[0] + metric, router_packet.source.address
                             self.table[destination] = update_val
                 else:
-                    update_val = val[0] + metric, RouterPacket.source.address
+                    update_val = val[0] + metric, router_packet.source.address
                     self.table[destination] = update_val
             else:
                 metric = 1
                 if destination in self.table:
                     if val[0] + metric < self.table[destination][0]:
-                        update_val = val[0] + metric, RouterPacket.source.address
+                        update_val = val[0] + metric, router_packet.source.address
                         self.table[destination] = update_val
                 else:
-                    update_val = val[0] + metric, RouterPacket.source.address
+                    update_val = val[0] + metric, router_packet.source.address
                     self.table[destination] = update_val
-        
+#        print self.address, 's new routingtable ', self.table
         
     
     def generate_router_packet(self):
@@ -453,13 +453,13 @@ class Router(Actor):
                 self.send(link = l, packet = router_packet)
     
 
-    def generate_ack_router_packet(RouterPacket):
-        source_packet = RouterPacket
+    def generate_ack_router_packet(self, router_packet):
+        source_packet = router_packet
         ack_router_packet = RouterPacket(timestamp = source_packet.timestamp,router_table = self.table, source=self, acknowledgement=True) 
         for l in self.links:
-            if l.destination == RouterPacket.source:
-            self.send(link = l, packet = ack_router_packet)
-            break
+            if l.destination == router_packet.source:
+                self.send(link = l, packet = ack_router_packet)
+                break
       
     
     def map_route(self, packet):
@@ -495,9 +495,9 @@ class Router(Actor):
                 print str(packet.source.address)
                 #print full_string(event.actor)
             if packet.acknowledgement == False:
-                self.generate_ack_router_packet(RouterPacket = packet)
+                self.generate_ack_router_packet(router_packet = packet)
             else:   
-                self.update_router_table(RouterPacket = packet)
+                self.update_router_table(router_packet = packet)
         
        
       

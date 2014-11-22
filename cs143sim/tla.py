@@ -65,6 +65,7 @@ class TCPTahoe:
         
         self.enable_fast_retransmit=False
         self.enable_fast_recovery=True
+#        self.enable_fast_recovery=False
         
         self.slow_start_flag=True
         self.slow_start_treshold=64
@@ -80,6 +81,8 @@ class TCPTahoe:
         self.time_out_event=None
         
         self.fast_recovery_flag=False
+
+
         
         print self.recorder
     def __str__(self):
@@ -191,8 +194,8 @@ class TCPTahoe:
                     #self.change_W(self.W+1)
                     
                
-                if DEBUG:
-                    print "            Old "+str(self.snd_sending)   
+#                if DEBUG:
+#                    print "            Old "+str(self.snd_sending)   
                 
                 del_list=list()
                          
@@ -206,8 +209,8 @@ class TCPTahoe:
                 for x in del_list:            
                     self.snd_sending.remove(x)
                         
-                if DEBUG:
-                    print "            New "+str(self.snd_sending) 
+#                if DEBUG:
+#                    print "            New "+str(self.snd_sending) 
                 
                 n=ack_packet.number
                 self.snd_acked=max([self.snd_acked,n-1])

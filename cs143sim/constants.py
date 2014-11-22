@@ -7,6 +7,7 @@
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
 """
 
+#DEBUG = True
 DEBUG = False
 """Whether to run the simulation in debug mode, with extra print statements"""
 
@@ -19,11 +20,11 @@ ACK_PACKET_SIZE = 512
 ROUTER_PACKET_SIZE = 512
 """Size of every :class:`.RouterPacket` in the simulation, in bits"""
 
-GENERATE_ROUTERPACKET_TIME_INTEVAL = 20
+GENERATE_ROUTERPACKET_TIME_INTEVAL = 1000
 """Time for every :class:`.Router` to wait before generating a new
 :class:`.RouterPacket`, in milliseconds"""
 
-DYNAMICH_ROUTE_DISTANCE_METRIC = False
+DYNAMICH_ROUTE_DISTANCE_METRIC = True
 """Whether to take dynamic link delay as the metric for route distance, 
 otherwise use hops(topology) to be the metric"""
 
