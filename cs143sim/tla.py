@@ -68,7 +68,7 @@ class TCPTahoe:
 #        self.enable_fast_recovery=False
         
         self.slow_start_flag=True
-        self.slow_start_treshold=64
+        self.slow_start_treshold=240
         
         
         
@@ -185,13 +185,6 @@ class TCPTahoe:
                     """
                     
                     
-                if self.slow_start_flag:
-                    self.change_W(self.W+self.ks*1.0)
-                    if self.W>self.slow_start_treshold:
-                        self.slow_start_flag=False
-                else:
-                    self.change_W(self.W+self.ka*1.0/self.W)
-                    #self.change_W(self.W+1)
                     
                
 #                if DEBUG:
@@ -203,7 +196,7 @@ class TCPTahoe:
                     if x<n:
                         del_list.append(x)
                         
-                if len(del_list)>0:
+                if self.snd_sending[0] in del_list:
                     self.reset_timer()
                     
                 for x in del_list:            
@@ -217,7 +210,21 @@ class TCPTahoe:
                 
                 """
                 Process sending
-                """             
+                """
+                    
+                """
+                    Note: you can not start sending a lot of packets now. 
+                    See send_new_packets: limit the packets send for each ack
+                    (Data Burst: RFC3782)
+                """ 
+                if self.W-len(self.snd_sending)<2:        
+                    if self.slow_start_flag:
+                        self.change_W(self.W+self.ks*1.0)
+                        if self.W>self.slow_start_treshold:
+                            self.slow_start_flag=False
+                    else:
+                        self.change_W(self.W+self.ka*1.0/self.W)
+                        
                 self.send_new_packets()
 
     def react_to_time_out(self, event):
@@ -247,7 +254,7 @@ class TCPTahoe:
     def send_new_packets(self):
 
         send_flag=False
-        Cnt=10
+        Cnt=2
         while len(self.snd_sending)<self.W and Cnt>0:
             Cnt-=1
             send_flag=True
