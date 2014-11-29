@@ -549,7 +549,6 @@ class TCPVegas:
     def change_W(self, W):
         self.W=W
         self.env.controller.record_window_size(flow=self.flow, window_size=self.W)
-        
         if DEBUG:
                 print "        W="+str(self.W) 
      

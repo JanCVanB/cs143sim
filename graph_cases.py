@@ -11,9 +11,10 @@ X_STEP = 100  # ms
 for case in CASES:
     c = Controller(case='cs143sim/cases/case' + str(case) + '.txt')
     c.run(SIMULATION_DURATION)
-    categories = ['Buffer Occupancy', 'Flow Rate', 'Link Rate', 'Packet Loss',
-                  'Packet Delay', 'Window Size']
-    for category in categories:
+    categories1 = ['Buffer Occupancy', 'Flow Rate', 'Link Rate', 'Packet Loss',
+                  'Packet Delay']
+    categories2 = ['Window Size']
+    for category in categories1:
         print category
         fig = plt.figure()
         ax = plt.axes()
@@ -36,6 +37,29 @@ for case in CASES:
                 y[-1] += value if value != None else 1
             x = [time / 1000.0 for time in x]
             y = [value / X_STEP for value in y]
+            #ax.plot(x, y, '.', label=actor_name)
+            ax.plot(x, y, label=actor_name)
+        ax.legend()
+        
+    for category in categories2:
+        print category
+        fig = plt.figure()
+        ax = plt.axes()
+        ax.set_title('Case ' + str(case) + ' ' + category)
+        ax.set_xlabel('Time (s)')
+        record_name = '_'.join(category.lower().split(' '))
+        record = c.__dict__[record_name]
+        for actor in record:
+            x = [0]
+            y = [0]
+            actor_name = [key for actor_dict in (c.flows, c.links)
+                          for key in actor_dict
+                          if actor_dict[key] == actor][0]
+            print '  ', actor_name
+            for time, value in record[actor]:
+                # print '    ', time, value
+                x.append(time)
+                y.append(value)
             #ax.plot(x, y, '.', label=actor_name)
             ax.plot(x, y, label=actor_name)
         ax.legend()
