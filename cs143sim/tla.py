@@ -348,6 +348,8 @@ class TCPVegas:
         self.vegas_alpha=4
         self.vegas_beta=8
         self.vegas_gamma=6
+        self.fast_alpha=4
+        self.enable_fast=True
         
         self.ka=1
         self.ks=1
@@ -489,10 +491,13 @@ class TCPVegas:
                     self.send_new_packets(2)
 
     def react_to_vegas_time_out(self, event):
-        if self.W/self.vegas_rtt_base-self.W/self.vegas_rtt < self.vegas_alpha/self.vegas_rtt_base:
-            self.change_W(W=self.W+1)
-        if self.W/self.vegas_rtt_base-self.W/self.vegas_rtt > self.vegas_beta/self.vegas_rtt_base:
-            self.change_W(W=self.W-1)
+        if not self.enable_fast:
+            if self.W/self.vegas_rtt_base-self.W/self.vegas_rtt < self.vegas_alpha/self.vegas_rtt_base:
+                self.change_W(W=self.W+1)
+            if self.W/self.vegas_rtt_base-self.W/self.vegas_rtt > self.vegas_beta/self.vegas_rtt_base:
+                self.change_W(W=self.W-1)
+        else:
+            self.change_W(W=self.W*self.vegas_rtt_base/self.vegas_rtt+self.fast_alpha)
         self.vegas_time_out_event=VegasTimeOut(env=self.env, delay= self.vegas_rtt, actor=self)
                 
 

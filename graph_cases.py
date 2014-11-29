@@ -35,6 +35,7 @@ for case in CASES:
                     y.append(0)
                 y[-1] += value if value != None else 1
             x = [time / 1000.0 for time in x]
+            y = [value / X_STEP for value in y]
             #ax.plot(x, y, '.', label=actor_name)
             ax.plot(x, y, label=actor_name)
         ax.legend()

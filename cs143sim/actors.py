@@ -225,6 +225,7 @@ class Flow(Actor):
         
         self.env.controller.record_flow_rate(flow=self, packet_size=packet.size)
         packet_delay = self.env.now - packet.timestamp
+
         self.env.controller.record_packet_delay(flow=self, packet_delay=packet_delay)
         """
         If the packet is a ack packet, call tla.rcv_ack()
