@@ -95,7 +95,18 @@ class PacketTimeOut(Timeout):
             self.callbacks.append(print_event)
         # TODO: 
         self.callbacks.append(actor.react_to_time_out)    
-
+        
+class VegasTimeOut(Timeout):
+    """
+    Time out event for tla
+    """
+    def __init__(self, env, delay, actor):
+        super(VegasTimeOut, self).__init__(env, delay)
+        if DEBUG:
+            self.actor = actor
+            self.callbacks.append(print_event)
+        # TODO: 
+        self.callbacks.append(actor.react_to_vegas_time_out)    
 
 class RoutingTableOutdated(Timeout):
     """A :class:`~cs143sim.actors.Router` updates its routing table

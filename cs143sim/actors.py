@@ -26,6 +26,7 @@ from cs143sim.events import RoutingTableOutdated
 from cs143sim.packets import DataPacket
 from cs143sim.packets import RouterPacket
 from cs143sim.tla import TCPTahoe
+from cs143sim.tla import TCPVegas
 from cs143sim.utilities import full_string
 
 
@@ -108,14 +109,14 @@ class Flow(Actor):
     :ivar rcv_expect_to_receive: next packet expect to receive
     :ivar rcv_received_packets:  list of packets that have been received, but not what we need now.
     """
-    def __init__(self, env, source, destination, amount):
+    def __init__(self, env, source, destination, amount, algorithm=0):
         super(Flow, self).__init__(env=env)
         self.source = source
         self.destination = destination
         self.amount = amount
         
 
-        self.tla=TCPTahoe(env=self.env, flow=self)
+        self.tla=TCPVegas(env=self.env, flow=self)
         
         self.rcv_expect_to_receive=0;
         self.rcv_received_packets=list();
@@ -314,7 +315,7 @@ class Link(Actor):
         if self.busy:
             flag=self.buffer.add(packet)
             
-            if flag==True and hasattr(packet, "acknowledgement"):   
+            if flag==True and not isinstance(packet, RouterPacket):   
                 if DEBUG:
                     if packet.acknowledgement==False:
                         print ("    --buff Data "+str(packet.number)
@@ -325,7 +326,7 @@ class Link(Actor):
                         +" buffer="+str(self.buffer.packets.qsize())
                         +" at "+full_string(self))
             
-            if flag==False and hasattr(packet, "acknowledgement"):   
+            if flag==False and not isinstance(packet, RouterPacket):   
                 if DEBUG:
                     if packet.acknowledgement==False:
                         print ("    --drop Data "+str(packet.number)
@@ -336,7 +337,7 @@ class Link(Actor):
                         +" buffer="+str(self.buffer.packets.qsize())
                         +" at "+full_string(self))
         else:
-            if hasattr(packet, "acknowledgement"):
+            if not isinstance(packet, RouterPacket):
                 if DEBUG:
                     if packet.acknowledgement==False:
                         print ("    --send Data "+str(packet.number)

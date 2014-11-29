@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 from cs143sim.simulation import Controller
 
 
-CASES = [ 0]
+CASES = [ 1]
 SIMULATION_DURATION = 40000  # ms
-X_STEP = 100  # ms
+X_STEP = 10  # ms
 
 
 for case in CASES:
@@ -35,6 +35,6 @@ for case in CASES:
                     y.append(0)
                 y[-1] += value if value != None else 1
             x = [time / 1000.0 for time in x]
-            ax.plot(x, y, label=actor_name)
+            ax.plot(x, y, '.', label=actor_name)
         ax.legend()
     plt.show()
