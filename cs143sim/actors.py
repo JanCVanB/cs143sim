@@ -26,6 +26,7 @@ from cs143sim.events import RoutingTableOutdated
 from cs143sim.packets import DataPacket
 from cs143sim.packets import RouterPacket
 from cs143sim.tla import TCPTahoe
+from cs143sim.tla import TCPVegas
 from cs143sim.utilities import full_string
 
 
@@ -70,7 +71,7 @@ class Buffer(Actor):
             self.packets.put(packet)
             self.current_level=self.current_level+packet.size
             self.env.controller.record_buffer_occupancy(link=self.link,
-                                                        buffer_occupancy=self.current_level)
+                                                        buffer_occupancy=self.current_level/PACKET_SIZE)
             return True
         else:
             # The packet cannot be stored, so the packet is dropped
@@ -87,7 +88,7 @@ class Buffer(Actor):
         packet=self.packets.get(timeout=timeout)
         self.current_level=self.current_level-packet.size
         self.env.controller.record_buffer_occupancy(link=self.link,
-                                                    buffer_occupancy=self.current_level)
+                                                    buffer_occupancy=self.current_level/PACKET_SIZE)
         return packet
 
 
@@ -108,14 +109,14 @@ class Flow(Actor):
     :ivar rcv_expect_to_receive: next packet expect to receive
     :ivar rcv_received_packets:  list of packets that have been received, but not what we need now.
     """
-    def __init__(self, env, source, destination, amount):
+    def __init__(self, env, source, destination, amount, algorithm=0):
         super(Flow, self).__init__(env=env)
         self.source = source
         self.destination = destination
         self.amount = amount
         
 
-        self.tla=TCPTahoe(env=self.env, flow=self)
+        self.tla=TCPVegas(env=self.env, flow=self)
         
         self.rcv_expect_to_receive=0;
         self.rcv_received_packets=list();
@@ -209,20 +210,23 @@ class Flow(Actor):
             self.destination.send(packet)
         
     def react_to_packet_receipt(self, event):
+
         packet=event.value
-        self.env.controller.record_flow_rate(flow=self, packet_size=packet.size)
-        packet_delay = self.env.now - packet.timestamp
-        self.env.controller.record_packet_delay(flow=self, packet_delay=packet_delay)
         """
         If the packet is a data packet, generate an ack packet
         """        
-        
-        
+     
         if packet.acknowledgement==False:
             if DEBUG:
                 print "    Data "+str(packet.number)+" Received"
             ack_packet=self.make_ack_packet(packet)
             self.send_packet(ack_packet)
+            
+        
+        self.env.controller.record_flow_rate(flow=self, packet_size=packet.size)
+        packet_delay = self.env.now - packet.timestamp
+
+        self.env.controller.record_packet_delay(flow=self, packet_delay=packet_delay)
         """
         If the packet is a ack packet, call tla.rcv_ack()
         """
@@ -314,7 +318,7 @@ class Link(Actor):
         if self.busy:
             flag=self.buffer.add(packet)
             
-            if flag==True and hasattr(packet, "acknowledgement"):   
+            if flag==True and not isinstance(packet, RouterPacket):   
                 if DEBUG:
                     if packet.acknowledgement==False:
                         print ("    --buff Data "+str(packet.number)
@@ -325,7 +329,7 @@ class Link(Actor):
                         +" buffer="+str(self.buffer.packets.qsize())
                         +" at "+full_string(self))
             
-            if flag==False and hasattr(packet, "acknowledgement"):   
+            if flag==False and not isinstance(packet, RouterPacket):   
                 if DEBUG:
                     if packet.acknowledgement==False:
                         print ("    --drop Data "+str(packet.number)
@@ -336,7 +340,7 @@ class Link(Actor):
                         +" buffer="+str(self.buffer.packets.qsize())
                         +" at "+full_string(self))
         else:
-            if hasattr(packet, "acknowledgement"):
+            if not isinstance(packet, RouterPacket):
                 if DEBUG:
                     if packet.acknowledgement==False:
                         print ("    --send Data "+str(packet.number)
@@ -365,6 +369,7 @@ class Link(Actor):
                                                  # transit time in ms
         PacketReceipt(env=self.env, delay=self.delay+d_trans, receiver=self.destination, packet=packet)
         LinkAvailable(env=self.env, delay=d_trans, link=self)
+        
         self.env.controller.record_link_rate(link=self, send_duration=d_trans)
 
 

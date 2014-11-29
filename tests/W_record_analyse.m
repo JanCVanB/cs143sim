@@ -7,7 +7,7 @@ subplot(1,1,1);
 name='W_record.txt'
 W=load(name);
 
-title(name);
+
 hold on
 W(1,4)=0;
 plot(W(:,1),W(:,2),'-');
@@ -19,8 +19,11 @@ plot(W(index,1),W(index,2),'or');
 index=~index;
 plot(W(index,1),W(index,2),'ob');
 
+xlabel('t')
+ylabel('W')
 % plot(W(:,1),W(:,4),'x');
 
+a(2)=25000
 axis(a);
 
 %subplot(1,2,2);
