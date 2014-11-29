@@ -19,6 +19,7 @@ from cs143sim.constants import INPUT_FILE_RATE_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_BUFFER_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_DATA_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_TIME_SCALE_FACTOR
+from cs143sim.constants import GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL
 from cs143sim.errors import InputFileSyntaxError
 from cs143sim.errors import InputFileUnknownReference
 from cs143sim.errors import MissingAttribute
@@ -73,10 +74,11 @@ class Controller:
         self.packet_delay = {}
         self.packet_loss = {}
         self.window_size = {}
+        self.algorithm = 0  # default algorithm is specified by
 
         self.read_case(case)
 
-    def make_flow(self, name, source, destination, amount, start_time):
+    def make_flow(self, name, source, destination, amount, start_time, algorithm):
         """Make a new :class:`.Flow` and add it to `self.flows`
 
         :param str name: new :class:`.Flow` name
@@ -86,13 +88,14 @@ class Controller:
         :param float start_time: time the new :class:`.Flow` starts
         """
         new_flow = Flow(env=self.env, source=source, destination=destination,
-                        amount=amount)
+                        amount=amount, algorithm=algorithm)
         source.flows.append(new_flow)
         destination.flows.append(new_flow)
         self.flows[name] = new_flow
         self.flow_rate[new_flow] = [(0, 0)]
         self.packet_delay[new_flow] = [(0, 0)]
         self.window_size[new_flow] = [(0, 0)]
+        self.algorithm = algorithm
         FlowStart(env=self.env, delay=start_time, flow=new_flow)
 
     def make_host(self, name, ip_address):
@@ -116,9 +119,9 @@ class Controller:
         """
         new_link = Link(env=self.env, source=source, destination=destination,
                         delay=delay, rate=rate, buffer_capacity=buffer_capacity)
-        # TODO: THIS IS A TEMPORARY FIX. Need to implement two buffers per link (if full-duplex) or shared link/buffer
-        # NOTE: This temporary fix also affects read_case (below)
-        actor = source  # OLD: for actor in (source, destination):
+        # NOTE: Each link is split into two links (one for each direction) in the read_case function
+        #       and appended with 'a' or 'b' on its ID. (e.g. 'L1' becomes 'L1a' and 'L1b')
+        actor = source
         if isinstance(actor, Host):
             actor.link = new_link
         elif isinstance(actor, Router):
@@ -130,19 +133,18 @@ class Controller:
         self.link_rate[new_link] = [(0, 0)]
         self.packet_loss[new_link] = [(0, 0)]
 
-    def make_router(self, name, ip_address):
+    def make_router(self, name, ip_address, update_time):
         """Make a new :class:`.Router` and add it to `self.routers`
 
         :param str name: new :class:`.Router` name
         :param str ip_address: new :class:`.Router`'s IP Address
         """
-        new_router = Router(env=self.env, address=ip_address)
+        new_router = Router(env=self.env, address=ip_address, update_time=int(update_time))
         self.routers[name] = new_router
         RoutingTableOutdated(env=self.env, delay=0, router=new_router)
 
     def read_case(self, case):
-        """Read input file at path `case` and create actors (and events?)
-        accordingly
+        """Read input file at path `case` and create actors accordingly
 
         :param str case: path to simulation input file
         """
@@ -156,7 +158,7 @@ class Controller:
             # These are "simple" attributes that have only 1 argument.
             # Not included in this list is the CONNECTS attribute, which has 2 arguments,
             #   and ID, which requires special processing.
-            attributes = ('RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START', 'IP')
+            attributes = ('RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START', 'IP', 'ALGORITHM','UPDATE')
             store_in = {attribute: '' for attribute in attributes}  # initialize all attributes to ''
             line_number = 0
             for case_line in case_file:
@@ -227,7 +229,7 @@ class Controller:
                                        delay=float(store_in['DELAY']),  # delay is already in ms
                                        buffer_capacity=int(store_in['BUFFER'])*INPUT_FILE_BUFFER_SCALE_FACTOR)
                                        # convert into bits
-                        # TODO: THIS IS A TEMPORARY FIX: (making second link for opposite direction)
+                        # Links are split into two, one for each direction (so that they are full-duplex).
                         self.make_link(name=obj_id + 'b', source=the_dst, destination=the_src,
                                        rate=float(store_in['RATE'])*INPUT_FILE_RATE_SCALE_FACTOR,
                                        delay=float(store_in['DELAY']),
@@ -245,22 +247,31 @@ class Controller:
                         self.make_host(name=obj_id, ip_address=store_in['IP'])
 
                     elif obj_type == 'ROUTER':
-                        # check the attribute(s) (only one so far: IP)
-                        # TODO: Add router update-routing-tables value to attributes
-                        for attribute in ['IP']:
+                        # check the attribute(s) (only one so far: IP), UPDATE is not mandatory.
+                        for attribute in ['IP', 'UPDATE']:
                             if store_in[attribute] in ['', []]:
-                                raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
-                                                       missing_attr=attribute)
+                                if attribute == 'UPDATE':
+                                    # Just set update to a default value
+                                    if DEBUG:
+                                        print 'Note: Setting routing table update time to default for ' + obj_id
+                                    store_in[attribute] = GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL
+                                else:
+                                    raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
+                                                           missing_attr=attribute)
                         if DEBUG:
                             print 'Making Router: ' + obj_id
-                        self.make_router(name=obj_id, ip_address=store_in['IP'])
+                        self.make_router(name=obj_id, ip_address=store_in['IP'], update_time=store_in['UPDATE'])
 
-                    elif obj_type == 'FLOW':                        
-                        # TODO: Specify congestion control algorithm as attribute
-                        for attribute in ['SRC', 'DST', 'START', 'DATA']:
+                    elif obj_type == 'FLOW':
+                        for attribute in ['SRC', 'DST', 'START', 'DATA', 'ALGORITHM']:
                             if store_in[attribute] in ['', []]:
-                                raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
-                                                       missing_attr=attribute)
+                                if attribute == 'ALGORITHM':
+                                    if DEBUG:
+                                        print 'Note: Setting algorithm to default 0 for ' + obj_id
+                                    store_in[attribute] = 0
+                                else:
+                                    raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
+                                                           missing_attr=attribute)
                         # if all the attributes are there, lets go ahead and create the flow
                         # BUT FIRST, we need to make sure the SRC/DST hosts actually exist..
                         # if they don't, warn the user that "No, i'm sorry, you have to specify
@@ -272,8 +283,10 @@ class Controller:
                                            destination=self.hosts[store_in['DST']],
                                            amount=int(store_in['DATA'])*INPUT_FILE_DATA_SCALE_FACTOR,
                                            # amount is in bits!
-                                           start_time=float(store_in['START'])*INPUT_FILE_TIME_SCALE_FACTOR)
+                                           start_time=float(store_in['START'])*INPUT_FILE_TIME_SCALE_FACTOR,
                                            # start time is stored in ms
+                                           algorithm=int(store_in['ALGORITHM']))
+
                         except KeyError as e:
                             raise InputFileUnknownReference(line_number=line_number,
                                                             message='Input File Formatting Error: ' +

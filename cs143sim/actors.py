@@ -18,7 +18,7 @@ from Queue import Queue
 from random import randint
 
 from cs143sim.constants import DEBUG, ACK_PACKET_SIZE
-from cs143sim.constants import GENERATE_ROUTERPACKET_TIME_INTEVAL
+from cs143sim.constants import GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL
 from cs143sim.constants import PACKET_SIZE, DYNAMICH_ROUTE_DISTANCE_METRIC
 from cs143sim.events import LinkAvailable
 from cs143sim.events import PacketReceipt
@@ -386,12 +386,13 @@ class Router(Actor):
     :ivar dict table: routing table
     :ivar default_gateway: default out port if can not decide route
     """
-    def __init__(self, env, address):
+    def __init__(self, env, address, update_time=GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL):
         super(Router, self).__init__(env=env)
         self.address = address
         self.links = []
         self.table = {}
         self.default_gateway = None
+        self.update_time = update_time
 
     def __str__(self):
         return self.address
@@ -519,4 +520,4 @@ class Router(Actor):
             Periodically generate RouterPacket to all neighbor links.
         """
         self.generate_router_packet()
-        RoutingTableOutdated(env=self.env, delay=GENERATE_ROUTERPACKET_TIME_INTEVAL, router=self)
+        RoutingTableOutdated(env=self.env, delay=self.update_time, router=self)
