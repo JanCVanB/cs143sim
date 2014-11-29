@@ -71,7 +71,7 @@ class Buffer(Actor):
             self.packets.put(packet)
             self.current_level=self.current_level+packet.size
             self.env.controller.record_buffer_occupancy(link=self.link,
-                                                        buffer_occupancy=self.current_level)
+                                                        buffer_occupancy=self.current_level/PACKET_SIZE)
             return True
         else:
             # The packet cannot be stored, so the packet is dropped
@@ -88,7 +88,7 @@ class Buffer(Actor):
         packet=self.packets.get(timeout=timeout)
         self.current_level=self.current_level-packet.size
         self.env.controller.record_buffer_occupancy(link=self.link,
-                                                    buffer_occupancy=self.current_level)
+                                                    buffer_occupancy=self.current_level/PACKET_SIZE)
         return packet
 
 
@@ -369,6 +369,7 @@ class Link(Actor):
                                                  # transit time in ms
         PacketReceipt(env=self.env, delay=self.delay+d_trans, receiver=self.destination, packet=packet)
         LinkAvailable(env=self.env, delay=d_trans, link=self)
+        
         self.env.controller.record_link_rate(link=self, send_duration=d_trans)
 
 
