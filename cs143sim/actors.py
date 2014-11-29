@@ -71,11 +71,13 @@ class Buffer(Actor):
             self.packets.put(packet)
             self.current_level=self.current_level+packet.size
             self.env.controller.record_buffer_occupancy(link=self.link,
-                                                        buffer_occupancy=self.current_level/PACKET_SIZE)
+                                                        buffer_occupancy=self.current_level)
             return True
         else:
             # The packet cannot be stored, so the packet is dropped
             self.env.controller.record_packet_loss(link=self.link)
+            
+#             if DEBUG:
             if DEBUG:
                 if packet.acknowledgement==False:
                     print "    ---packet "+str(packet.number)+' (loss)'
@@ -88,7 +90,7 @@ class Buffer(Actor):
         packet=self.packets.get(timeout=timeout)
         self.current_level=self.current_level-packet.size
         self.env.controller.record_buffer_occupancy(link=self.link,
-                                                    buffer_occupancy=self.current_level/PACKET_SIZE)
+                                                    buffer_occupancy=self.current_level)
         return packet
 
 
@@ -480,6 +482,9 @@ class Router(Actor):
             print '     ---WARNING: Default Gateway'
             next_hop = self.default_gateway # can be delete
             self.send(link = self.links[0], packet = packet)
+#         if 20010<self.env.now<20015:
+#             print self.__str__()
+#             print self.table
 
         
     

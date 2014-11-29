@@ -505,6 +505,7 @@ class TCPVegas:
         if event==self.time_out_event:
             if DEBUG:
                 print "    "+full_string(self.flow)+" Timeout"
+            print "    "+full_string(self.flow)+" Timeout"
             self.react_to_time_out_base()
 
             
