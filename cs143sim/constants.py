@@ -45,3 +45,8 @@ INPUT_FILE_TIME_SCALE_FACTOR = 1000
 
 INPUT_FILE_BUFFER_SCALE_FACTOR = 8000
 """Conversion factor for KB to bits (for buffer size)"""
+
+OUTPUT_BUFFER_OCCUPANCY_SCALE_FACTOR = 1.0 / PACKET_SIZE
+"""Conversion factor for bits to packets"""
+OUTPUT_FLOW_RATE_SCALE_FACTOR = 1000.0/1000000
+""" Conversion factor for bits per millisecond (for rate) to Mbps"""
