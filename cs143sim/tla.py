@@ -18,26 +18,50 @@ from cs143sim.utilities import full_string
 
 class TCPTahoe:
     """
+    Constants:
+    :ivar enable_fast_retransmit
+    :ivar enable_fast_recovery
+    :ivar ka: k of additive
+    :ivar ks: k of slow start
+    :ivar rtt_alpha: change rate of rtt_avg
+    :ivar rtt_beta: change rate of rtt_div    
+    
     :ivar W: window size
     :ivar packet_number: number of packets to be sent
-    :ivar TimeOut: timer's waiting time
+    :ivar time_out: timer's waiting time
 
-    """
-
-    """
-    :ivar snd_not_sent: packet that has not been sent
-    :ivar snd_sending: list of packet that are being sent
-    """
-    """
-    :ivar enable_fast_retransmit
-    """
-    """
+    Transmitter:
+    :ivar transmitter_not_sent: packets that have not been sent
+    :ivar transmitter_sending: list of packets that are being sent
+    :ivar transmitter_acked: packets  that have been acked
+    
+    Ack management:
+    :ivar duplicate_ack_number: record last acked packet number
+    :ivar duplicate_ack_times: record how many times the packet has been continuous acked
+    
+    Timeout Management:
+    :ivar last_reset: last effective timeout time
+    :ivar time_out_event: current time out event
+    
+    Slow Start:
+    :ivar slow_start_treshold: treshold of slow start
+    
+    RTT caculator:
+    :ivar rtt_avg
+    :ivar rtt_div
+    
+    Flags:    
     :ivar slow_start_flag
+    :ivar fast_recovery_flag
     """
     # TODO: define class in docstring and fix triplicate docstring
-    def __init__(self, env, flow, recorder=None):
-        
-
+    def __init__(self, env, flow):
+        self.enable_fast_retransmit=False
+        self.enable_fast_recovery=True
+        self.ka=1
+        self.ks=1
+        self.rtt_alpha=0.125
+        self.rtt_beta=0.25
         
         self.flow=flow
         self.env=env
@@ -45,38 +69,30 @@ class TCPTahoe:
         self.packet_number=self.flow.amount/PACKET_SIZE
         if self.packet_number*PACKET_SIZE<self.flow.amount:
             self.packet_number+=1
-          
-        
-        
+      
         self.time_out=1000
         self.first_ack_flag=True
         #self.rtt_avg
         #self.rtt_div
         
-        self.snd_not_sent=0
-        self.snd_sending=list()
-        self.snd_acked=-1
+        self.transmitter_not_sent=0
+        self.transmitter_sending=list()
+        self.transmitter_acked=-1
         
         self.duplicate_ack_number=-1
         self.duplicate_ack_times=0
         
-        self.enable_fast_retransmit=False
-        self.enable_fast_recovery=True
-#        self.enable_fast_recovery=False
         
-        self.slow_start_flag=True
         self.slow_start_treshold=240
         
-        
+      
         
         self.change_W(W=1)
-        #slew rate of AIMD:AI
-        self.ka=1
-        self.ks=1
         
         self.last_reset=0
         self.time_out_event=None
         
+        self.slow_start_flag=True
         self.fast_recovery_flag=False
 
 
@@ -94,8 +110,7 @@ class TCPTahoe:
         Updating Time out (according to 7.4.4 Timers)
         """
         #RFC 6298
-        alpha=0.125
-        beta=0.25
+
         
         if self.first_ack_flag:
             t=self.env.now-ack_packet.timestamp
@@ -106,8 +121,8 @@ class TCPTahoe:
         else:
             t=self.env.now-ack_packet.timestamp
             
-            self.rtt_div=(1-beta)*self.rtt_div+beta*abs(t-self.rtt_avg)
-            self.rtt_avg=(1-alpha)*self.rtt_avg+alpha*t
+            self.rtt_div=(1-self.rtt_beta)*self.rtt_div+self.rtt_beta*abs(t-self.rtt_avg)
+            self.rtt_avg=(1-self.rtt_alpha)*self.rtt_avg+self.rtt_alpha*t
             
             self.time_out=int(1+(self.rtt_avg+4*self.rtt_div))
             if self.time_out<1000:
@@ -123,7 +138,7 @@ class TCPTahoe:
          
         """
         n=ack_packet.number
-        if n>self.snd_acked:
+        if n>self.transmitter_acked:
             if n==self.duplicate_ack_number:
                 self.duplicate_ack_times+=1
             else:
@@ -145,11 +160,11 @@ class TCPTahoe:
                 self.slow_start_treshold=self.W/2    
                 #self.change_W(self.W/2+3)
                 """
-                Acturally, W is not windows size at that means. 
+                Actually, W is not windows size at that means. 
                 W is number of packets between the first and the last unacked packets
                 """
-                while len(self.snd_sending)>=self.W:
-                    self.snd_sending.pop()
+                while len(self.transmitter_sending)>=self.W:
+                    self.transmitter_sending.pop()
                          
                 n=self.duplicate_ack_number
                 packet=self.flow.make_packet(packet_number=n)  
@@ -189,21 +204,21 @@ class TCPTahoe:
                 
                 del_list=list()
                          
-                for x in self.snd_sending:            
+                for x in self.transmitter_sending:            
                     if x<n:
                         del_list.append(x)
                         
-                if self.snd_sending[0] in del_list:
+                if self.transmitter_sending[0] in del_list:
                     self.reset_timer()
                     
                 for x in del_list:            
-                    self.snd_sending.remove(x)
+                    self.transmitter_sending.remove(x)
                         
 #                if DEBUG:
 #                    print "            New "+str(self.snd_sending) 
                 
                 n=ack_packet.number
-                self.snd_acked=max([self.snd_acked,n-1])
+                self.transmitter_acked=max([self.transmitter_acked,n-1])
                 
                 """
                 Process sending
@@ -214,7 +229,7 @@ class TCPTahoe:
                     See send_new_packets: limit the packets send for each ack
                     (Data Burst: RFC3782)
                 """ 
-                if self.W-len(self.snd_sending)<2:        
+                if self.W-len(self.transmitter_sending)<2:        
                     if self.slow_start_flag:
                         self.change_W(self.W+self.ks*1.0)
                         if self.W>self.slow_start_treshold:
@@ -233,7 +248,7 @@ class TCPTahoe:
             
     
     def react_to_time_out_base(self):
-        if len(self.snd_sending)>0:
+        if len(self.transmitter_sending)>0:
 
             
             self.time_out=2*self.time_out
@@ -243,7 +258,7 @@ class TCPTahoe:
             self.slow_start_flag=True
             
             self.change_W(W=1)
-            self.snd_sending=[]
+            self.transmitter_sending=[]
             self.send_new_packets()
             
             self.last_reset=self.env.now
@@ -252,22 +267,22 @@ class TCPTahoe:
 
         send_flag=False
         Cnt=2
-        while len(self.snd_sending)<self.W and Cnt>0:
+        while len(self.transmitter_sending)<self.W and Cnt>0:
             Cnt-=1
             send_flag=True
             
-            l=len(self.snd_sending)
+            l=len(self.transmitter_sending)
             if l==0:
-                n=self.snd_acked+1
+                n=self.transmitter_acked+1
             else:
-                n=self.snd_sending[l-1]+1
+                n=self.transmitter_sending[l-1]+1
             
             if n>self.packet_number:
                 break
             
             packet=self.flow.make_packet(packet_number=n)            
             self.flow.send_packet(packet)            
-            self.snd_sending.append(n)
+            self.transmitter_sending.append(n)
         
         if send_flag==True and self.time_out_event==None:
             self.reset_timer()
@@ -281,9 +296,7 @@ class TCPTahoe:
         
         if DEBUG:
                 print "        W="+str(self.W) 
-                
-
-        
+     
     pass
 
     def reset_timer(self):
