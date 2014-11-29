@@ -31,6 +31,12 @@ otherwise use hops(topology) to be the metric"""
 INPUT_FILE_RATE_SCALE_FACTOR = 1000000/1000.0
 """ Conversion factor for Mbps to bits per millisecond (for rate)"""
 
+INPUT_FILE_DELAY_SCALE_FACTOR = 1
+""" Conversion factor for ms to ms (for delay)"""
+
+INPUT_FILE_UPDATE_SCALE_FACTOR = 1
+""" Conversion factor for ms to ms (for update)"""
+
 INPUT_FILE_DATA_SCALE_FACTOR = 8000000
 """Conversion factor for MBytes to bits (for flow total data size)"""
 

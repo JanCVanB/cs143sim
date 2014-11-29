@@ -19,6 +19,8 @@ from cs143sim.constants import INPUT_FILE_RATE_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_BUFFER_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_DATA_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_TIME_SCALE_FACTOR
+from cs143sim.constants import INPUT_FILE_DELAY_SCALE_FACTOR
+from cs143sim.constants import INPUT_FILE_UPDATE_SCALE_FACTOR
 from cs143sim.constants import GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL
 from cs143sim.errors import InputFileSyntaxError
 from cs143sim.errors import InputFileUnknownReference
@@ -240,14 +242,13 @@ class Controller:
                                                                 ' is not a valid Host/Router.')
                         self.make_link(name=obj_id + 'a', source=the_src, destination=the_dst,
                                        rate=float(store_in['RATE'])*INPUT_FILE_RATE_SCALE_FACTOR,
-                                       # rate needs to be in bits/ms
-                                       delay=float(store_in['DELAY']),  # delay is already in ms
+                                       delay=float(store_in['DELAY'])*INPUT_FILE_DELAY_SCALE_FACTOR,
                                        buffer_capacity=int(store_in['BUFFER'])*INPUT_FILE_BUFFER_SCALE_FACTOR)
-                                       # convert into bits
+
                         # Links are split into two, one for each direction (so that they are full-duplex).
                         self.make_link(name=obj_id + 'b', source=the_dst, destination=the_src,
                                        rate=float(store_in['RATE'])*INPUT_FILE_RATE_SCALE_FACTOR,
-                                       delay=float(store_in['DELAY']),
+                                       delay=float(store_in['DELAY'])*INPUT_FILE_DELAY_SCALE_FACTOR,
                                        buffer_capacity=int(store_in['BUFFER'])*INPUT_FILE_BUFFER_SCALE_FACTOR)
                                        # convert into bits
                     elif obj_type == 'HOST':
@@ -275,7 +276,8 @@ class Controller:
                                                            missing_attr=attribute)
                         if DEBUG:
                             print 'Making Router: ' + obj_id
-                        self.make_router(name=obj_id, ip_address=store_in['IP'], update_time=store_in['UPDATE'])
+                        self.make_router(name=obj_id, ip_address=store_in['IP'],
+                                         update_time=store_in['UPDATE']*INPUT_FILE_UPDATE_SCALE_FACTOR)
 
                     elif obj_type == 'FLOW':
                         for attribute in ['SRC', 'DST', 'START', 'DATA', 'ALGORITHM']:
@@ -297,9 +299,7 @@ class Controller:
                             self.make_flow(name=obj_id, source=self.hosts[store_in['SRC']],
                                            destination=self.hosts[store_in['DST']],
                                            amount=int(store_in['DATA'])*INPUT_FILE_DATA_SCALE_FACTOR,
-                                           # amount is in bits!
                                            start_time=float(store_in['START'])*INPUT_FILE_TIME_SCALE_FACTOR,
-                                           # start time is stored in ms
                                            algorithm=int(store_in['ALGORITHM']))
 
                         except KeyError as e:
