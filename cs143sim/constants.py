@@ -7,8 +7,8 @@
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
 """
 
-#DEBUG = True
 DEBUG = False
+#DEBUG = False
 """Whether to run the simulation in debug mode, with extra print statements"""
 
 PACKET_SIZE = 8192

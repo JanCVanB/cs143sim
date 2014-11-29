@@ -210,20 +210,22 @@ class Flow(Actor):
             self.destination.send(packet)
         
     def react_to_packet_receipt(self, event):
+
         packet=event.value
-        self.env.controller.record_flow_rate(flow=self, packet_size=packet.size)
-        packet_delay = self.env.now - packet.timestamp
-        self.env.controller.record_packet_delay(flow=self, packet_delay=packet_delay)
         """
         If the packet is a data packet, generate an ack packet
         """        
-        
-        
+     
         if packet.acknowledgement==False:
             if DEBUG:
                 print "    Data "+str(packet.number)+" Received"
             ack_packet=self.make_ack_packet(packet)
             self.send_packet(ack_packet)
+            
+        
+        self.env.controller.record_flow_rate(flow=self, packet_size=packet.size)
+        packet_delay = self.env.now - packet.timestamp
+        self.env.controller.record_packet_delay(flow=self, packet_delay=packet_delay)
         """
         If the packet is a ack packet, call tla.rcv_ack()
         """
