@@ -37,10 +37,7 @@ class TCPTahoe:
     # TODO: define class in docstring and fix triplicate docstring
     def __init__(self, env, flow, recorder=None):
         
-        if recorder==None:
-            self.recorder=open("W_record.txt","w")
-        else:
-            self.recorder=open(recorder,"w")
+
         
         self.flow=flow
         self.env=env
@@ -84,7 +81,7 @@ class TCPTahoe:
 
 
         
-        print self.recorder
+
     def __str__(self):
         return self.flow.__str__()
     
@@ -285,7 +282,7 @@ class TCPTahoe:
         if DEBUG:
                 print "        W="+str(self.W) 
                 
-        self.recorder.write("{0},{1},{2},{3}\r\n".format(str(self.env.now),str(self.W),str(int(self.slow_start_flag)),str(self.slow_start_treshold)))
+
         
     pass
 
