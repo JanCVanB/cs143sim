@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 
 from cs143sim.simulation import Controller
+from cs143sim.constants import DEBUG
 
 
 CASES = [ 2]
@@ -10,6 +11,8 @@ X_STEP = 100  # ms
 
 for case in CASES:
     c = Controller(case='cs143sim/cases/case' + str(case) + '.txt')
+    
+    
     c.run(SIMULATION_DURATION)
     categories1 = ['Buffer Occupancy', 'Flow Rate', 'Link Rate', 'Packet Loss',
                   'Packet Delay']
@@ -58,7 +61,7 @@ for case in CASES:
             print '  ', actor_name
             for time, value in record[actor]:
                 # print '    ', time, value
-                x.append(time)
+                x.append(time/1000)
                 y.append(value)
             #ax.plot(x, y, '.', label=actor_name)
             ax.plot(x, y, label=actor_name)

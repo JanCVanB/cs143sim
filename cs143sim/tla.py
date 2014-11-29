@@ -515,7 +515,7 @@ class TCPVegas:
             self.time_out=2*self.time_out
             self.reset_timer()
     
-            self.change_W(W=self.W/2+1)
+            self.change_W(W=1)
             self.transmitter_sending=[]
             self.send_new_packets()
             
