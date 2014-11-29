@@ -158,7 +158,22 @@ class Controller:
             # These are "simple" attributes that have only 1 argument.
             # Not included in this list is the CONNECTS attribute, which has 2 arguments,
             #   and ID, which requires special processing.
-            attributes = ('RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START', 'IP', 'ALGORITHM','UPDATE')
+            attributes = ('RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START', 'IP', 'ALGORITHM', 'UPDATE')
+            """Input File Attributes:
+             RATE - belongs to a :class:`.Link`, specifies link rate in Mbps (float)
+             DELAY - belongs to a :class:`.Link`, specifies link delay in ms (int)
+             DATA - belongs to a :class:`.Flow`, specifies amount of data to be transmitted in MegaBytes (int)
+             BUFFER - belongs to a :class:`.Link`, specifies buffer size in KiloBytes (int)
+             DST - belongs to a :class:`.Link` or :class:`.Flow`, specifies a destination (ID of destination)
+             SRC - belongs to a :class:`.Link` or :class:`.Flow`, specifies a source (ID of source)
+             START - belongs to a :class:`.Flow`, specifies starting time for that flow in seconds (float)
+             IP - belongs to a :class:`.Router` or :class:`.Host`, specifies the IP address of the HOST or ROUTER (str)
+             ALGORITHM - belongs to a :class:`.Flow`, specifies the congestion control algorithm for that flow (int)
+             UPDATE - belongs to a :class:`.Router`, specifies the time between router table updates in ms (int)
+             CONNECTS - belongs to a :class:`.Link`, specifies two Hosts/Routers that are connected by that link (ID ID)
+
+             Note: most of the units above will be converted internally and apply only to the input file.
+            """
             store_in = {attribute: '' for attribute in attributes}  # initialize all attributes to ''
             line_number = 0
             for case_line in case_file:
