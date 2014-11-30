@@ -15,7 +15,7 @@ from cs143sim.actors import Host
 from cs143sim.actors import Link
 from cs143sim.actors import Router
 from cs143sim.constants import DEBUG, OUTPUT_BUFFER_OCCUPANCY_SCALE_FACTOR,\
-    OUTPUT_FLOW_RATE_SCALE_FACTOR
+    OUTPUT_FLOW_RATE_SCALE_FACTOR, OUTPUT_LINK_RATE_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_RATE_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_BUFFER_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_DATA_SCALE_FACTOR
@@ -353,6 +353,7 @@ class Controller:
         """
         self.record(recorder=self.buffer_occupancy, actor=link,
                     value=buffer_occupancy * OUTPUT_BUFFER_OCCUPANCY_SCALE_FACTOR)
+        print buffer_occupancy * OUTPUT_BUFFER_OCCUPANCY_SCALE_FACTOR
 
     def record_flow_rate(self, flow, packet_size):
         """Record the size of a delivered packet
@@ -361,7 +362,7 @@ class Controller:
         :param float packet_size: size of the delivered packet (bits)
         """
         self.record(recorder=self.flow_rate, actor=flow,
-                    value=packet_size*OUTPUT_FLOW_RATE_SCALE_FACTOR)
+                    value=packet_size * OUTPUT_FLOW_RATE_SCALE_FACTOR)
 
     def record_link_rate(self, link, send_duration):
         """Record the duration a link sends a packet
@@ -369,7 +370,8 @@ class Controller:
         :param link: :class:`.Link` sending the packet
         :param float send_duration: duration required to send the packet (ms)
         """
-        self.record(recorder=self.link_rate, actor=link, value=send_duration)
+        self.record(recorder=self.link_rate, actor=link,
+                    value=send_duration * OUTPUT_LINK_RATE_SCALE_FACTOR)
 
     def record_packet_delay(self, flow, packet_delay):
         """Record the delay of a delivered packet

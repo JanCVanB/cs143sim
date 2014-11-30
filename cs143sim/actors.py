@@ -83,6 +83,8 @@ class Buffer(Actor):
                     print "    ---packet "+str(packet.number)+' (loss)'
                 else:
                     print "    ---ack "+str(packet.number)+' (loss)'
+            self.env.controller.record_buffer_occupancy(link=self.link,
+                                                        buffer_occupancy=self.current_level)
             return False
                     
     def get(self, timeout=None):
@@ -117,8 +119,24 @@ class Flow(Actor):
         self.destination = destination
         self.amount = amount
         
-
-        self.tla=TCPVegas(env=self.env, flow=self)
+        if algorithm==0:
+            self.tla=TCPTahoe(env=self.env, flow=self)
+            self.tla.enable_fast_recovery=False
+            self.tla.enable_fast_retransmit=False
+        elif algorithm==1:
+            self.tla=TCPTahoe(env=self.env, flow=self)
+            self.tla.enable_fast_recovery=False
+            self.tla.enable_fast_retransmit=True
+        elif algorithm==2:
+            self.tla=TCPTahoe(env=self.env, flow=self)
+            self.tla.enable_fast_recovery=True
+            self.tla.enable_fast_retransmit=False
+        elif algorithm==3:
+            self.tla=TCPVegas(env=self.env, flow=self)
+            self.tla.enable_fast=False
+        else:
+            self.tla=TCPVegas(env=self.env, flow=self)
+            self.tla.enable_fast=True
         
         self.rcv_expect_to_receive=0;
         self.rcv_received_packets=list();
