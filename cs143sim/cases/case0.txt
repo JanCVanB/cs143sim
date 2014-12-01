@@ -13,6 +13,7 @@ FLOW
     DST     H2
     DATA    20
     START   1.0
+    ALGORITHM 0
 
 LINK
     ID       L1
