@@ -13,6 +13,7 @@ FLOW
     DST     H2
     DATA    20
     START   0.5
+    ALGORITHM 0
 
 ROUTER
     ID      R1
