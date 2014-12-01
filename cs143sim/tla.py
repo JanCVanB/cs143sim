@@ -15,6 +15,7 @@ from cs143sim.constants import PACKET_SIZE
 from cs143sim.events import PacketTimeOut
 from cs143sim.events import VegasTimeOut
 from cs143sim.utilities import full_string
+from math import floor
 
 
 class TCPTahoe:
@@ -84,7 +85,7 @@ class TCPTahoe:
         self.duplicate_ack_times=0
         
         
-        self.slow_start_treshold=240
+        self.slow_start_treshold=100
         
       
         
@@ -147,7 +148,7 @@ class TCPTahoe:
                 self.duplicate_ack_times=0
                 
                 
-            if self.enable_fast_retransmit and self.duplicate_ack_times==4:
+            if self.enable_fast_retransmit and self.duplicate_ack_times==4 and self.env.now-self.last_reset>self.time_out:
                 if DEBUG:
                     print "    Duplicate Ack "+str(n)
                     print "    Fast retransmit"
@@ -178,7 +179,7 @@ class TCPTahoe:
                     print "    More Fast recovery" 
                 self.change_W(self.W+1)
                 self.send_new_packets()
-            elif ack_packet.timestamp>=self.last_reset:
+            else:
 #             else:
                 """
                 Process Ack
@@ -187,7 +188,9 @@ class TCPTahoe:
                     """
                     Just leave fast recovery
                     """
-                    self.change_W(self.slow_start_treshold-1)
+                    if self.env.now-self.last_reset>self.rtt_avg:
+                        self.change_W(floor(self.slow_start_treshold))
+                        self.last_reset=self.env.now
                     self.fast_recovery_flag=False
                     self.slow_start_flag=False
                     
@@ -234,9 +237,9 @@ class TCPTahoe:
                         if self.W>self.slow_start_treshold:
                             self.slow_start_flag=False
                     else:
-                        self.change_W(self.W+self.ka*1.0/self.W)
-                        
+                        self.change_W(self.W+self.ka*1.0/max(self.W,1))      
                 self.send_new_packets()
+
 
     def react_to_time_out(self, event):
         if event==self.time_out_event:
@@ -385,6 +388,7 @@ class TCPVegas:
         self.change_W(W=1)
         
         self.last_reset=0
+        self.last_half=0
         self.time_out_event=None
         
         self.slow_start_flag=True
