@@ -20,7 +20,7 @@ ACK_PACKET_SIZE = 512
 ROUTER_PACKET_SIZE = 512
 """Size of every :class:`.RouterPacket` in the simulation, in bits"""
 
-GENERATE_ROUTERPACKET_TIME_INTEVAL = 1000
+GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL = 1000
 """Time for every :class:`.Router` to wait before generating a new
 :class:`.RouterPacket`, in milliseconds"""
 
@@ -31,6 +31,12 @@ otherwise use hops(topology) to be the metric"""
 INPUT_FILE_RATE_SCALE_FACTOR = 1000000/1000.0
 """ Conversion factor for Mbps to bits per millisecond (for rate)"""
 
+INPUT_FILE_DELAY_SCALE_FACTOR = 1
+""" Conversion factor for ms to ms (for delay)"""
+
+INPUT_FILE_UPDATE_SCALE_FACTOR = 1
+""" Conversion factor for ms to ms (for update)"""
+
 INPUT_FILE_DATA_SCALE_FACTOR = 8000000
 """Conversion factor for MBytes to bits (for flow total data size)"""
 
@@ -39,3 +45,12 @@ INPUT_FILE_TIME_SCALE_FACTOR = 1000
 
 INPUT_FILE_BUFFER_SCALE_FACTOR = 8000
 """Conversion factor for KB to bits (for buffer size)"""
+
+OUTPUT_LINK_RATE_SCALE_FACTOR = 1000.0/1000000
+""" Conversion factor for bits per millisecond (for rate) to Mbps"""
+
+OUTPUT_BUFFER_OCCUPANCY_SCALE_FACTOR = 1.0 / PACKET_SIZE
+"""Conversion factor for bits to packets"""
+
+OUTPUT_FLOW_RATE_SCALE_FACTOR = 1000.0/1000000
+""" Conversion factor for bits per millisecond (for rate) to Mbps"""

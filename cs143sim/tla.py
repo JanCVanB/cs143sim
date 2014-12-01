@@ -349,7 +349,9 @@ class TCPVegas:
         self.vegas_beta=8
         self.vegas_gamma=6
         self.fast_alpha=4
-        self.enable_fast=True
+        self.vegas_virtual_rtt=0
+        
+        self.enable_fast=False
         
         self.ka=1
         self.ks=1
@@ -491,10 +493,15 @@ class TCPVegas:
                     self.send_new_packets(2)
 
     def react_to_vegas_time_out(self, event):
+        if self.vegas_virtual_rtt==0:
+            vrtt=self.vegas_rtt_base
+        else:
+            vrtt=self.vegas_virtual_rtt
+            
         if not self.enable_fast:
-            if self.W/self.vegas_rtt_base-self.W/self.vegas_rtt < self.vegas_alpha/self.vegas_rtt_base:
+            if self.W/self.vegas_rtt_base-self.W/self.vegas_rtt < self.vegas_alpha/vrtt:
                 self.change_W(W=self.W+1)
-            if self.W/self.vegas_rtt_base-self.W/self.vegas_rtt > self.vegas_beta/self.vegas_rtt_base:
+            if self.W/self.vegas_rtt_base-self.W/self.vegas_rtt > self.vegas_beta/vrtt:
                 self.change_W(W=self.W-1)
         else:
             self.change_W(W=self.W*self.vegas_rtt_base/self.vegas_rtt+self.fast_alpha)
@@ -505,6 +512,7 @@ class TCPVegas:
         if event==self.time_out_event:
             if DEBUG:
                 print "    "+full_string(self.flow)+" Timeout"
+            print "    "+full_string(self.flow)+" Timeout"
             self.react_to_time_out_base()
 
             

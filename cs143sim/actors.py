@@ -18,7 +18,7 @@ from Queue import Queue
 from random import randint
 
 from cs143sim.constants import DEBUG, ACK_PACKET_SIZE
-from cs143sim.constants import GENERATE_ROUTERPACKET_TIME_INTEVAL
+from cs143sim.constants import GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL
 from cs143sim.constants import PACKET_SIZE, DYNAMICH_ROUTE_DISTANCE_METRIC
 from cs143sim.events import LinkAvailable
 from cs143sim.events import PacketReceipt
@@ -71,16 +71,20 @@ class Buffer(Actor):
             self.packets.put(packet)
             self.current_level=self.current_level+packet.size
             self.env.controller.record_buffer_occupancy(link=self.link,
-                                                        buffer_occupancy=self.current_level/PACKET_SIZE)
+                                                        buffer_occupancy=self.current_level)
             return True
         else:
             # The packet cannot be stored, so the packet is dropped
             self.env.controller.record_packet_loss(link=self.link)
+            
+#             if DEBUG:
             if DEBUG:
                 if packet.acknowledgement==False:
                     print "    ---packet "+str(packet.number)+' (loss)'
                 else:
                     print "    ---ack "+str(packet.number)+' (loss)'
+            self.env.controller.record_buffer_occupancy(link=self.link,
+                                                        buffer_occupancy=self.current_level)
             return False
                     
     def get(self, timeout=None):
@@ -88,7 +92,7 @@ class Buffer(Actor):
         packet=self.packets.get(timeout=timeout)
         self.current_level=self.current_level-packet.size
         self.env.controller.record_buffer_occupancy(link=self.link,
-                                                    buffer_occupancy=self.current_level/PACKET_SIZE)
+                                                    buffer_occupancy=self.current_level)
         return packet
 
 
@@ -115,8 +119,24 @@ class Flow(Actor):
         self.destination = destination
         self.amount = amount
         
-
-        self.tla=TCPVegas(env=self.env, flow=self)
+        if algorithm==0:
+            self.tla=TCPTahoe(env=self.env, flow=self)
+            self.tla.enable_fast_recovery=False
+            self.tla.enable_fast_retransmit=False
+        elif algorithm==1:
+            self.tla=TCPTahoe(env=self.env, flow=self)
+            self.tla.enable_fast_recovery=False
+            self.tla.enable_fast_retransmit=True
+        elif algorithm==2:
+            self.tla=TCPTahoe(env=self.env, flow=self)
+            self.tla.enable_fast_recovery=True
+            self.tla.enable_fast_retransmit=False
+        elif algorithm==3:
+            self.tla=TCPVegas(env=self.env, flow=self)
+            self.tla.enable_fast=False
+        else:
+            self.tla=TCPVegas(env=self.env, flow=self)
+            self.tla.enable_fast=True
         
         self.rcv_expect_to_receive=0;
         self.rcv_received_packets=list();
@@ -386,12 +406,13 @@ class Router(Actor):
     :ivar dict table: routing table
     :ivar default_gateway: default out port if can not decide route
     """
-    def __init__(self, env, address):
+    def __init__(self, env, address, update_time=GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL):
         super(Router, self).__init__(env=env)
         self.address = address
         self.links = []
         self.table = {}
         self.default_gateway = None
+        self.update_time = update_time
 
     def __str__(self):
         return self.address
@@ -480,6 +501,9 @@ class Router(Actor):
             print '     ---WARNING: Default Gateway'
             next_hop = self.default_gateway # can be delete
             self.send(link = self.links[0], packet = packet)
+#         if 20010<self.env.now<20015:
+#             print self.__str__()
+#             print self.table
 
         
     
@@ -519,4 +543,4 @@ class Router(Actor):
             Periodically generate RouterPacket to all neighbor links.
         """
         self.generate_router_packet()
-        RoutingTableOutdated(env=self.env, delay=GENERATE_ROUTERPACKET_TIME_INTEVAL, router=self)
+        RoutingTableOutdated(env=self.env, delay=self.update_time, router=self)
