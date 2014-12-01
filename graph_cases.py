@@ -14,8 +14,8 @@ for case in CASES:
    
     c.run(SIMULATION_DURATION)
     print c.packet_loss
-    categories1 = ['Flow Rate', 'Packet Delay']
-    categories2 = ['Buffer Occupancy','Window Size']
+    categories1 = ['Flow Rate']
+    categories2 = ['Buffer Occupancy','Window Size', 'Packet Delay']
     categories3 = ['Link Rate']
     categories4 = ['Packet Loss']
     
