@@ -434,6 +434,7 @@ class Router(Actor):
             if isinstance(link.destination, Host):
                 val = 1, link.destination.address
                 self.table[link.destination.address] = val
+        self.generate_router_packet()
     
     def update_router_table(self, router_packet):
         """
