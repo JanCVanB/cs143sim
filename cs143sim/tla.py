@@ -59,7 +59,7 @@ class TCPTahoe:
     # TODO: define class in docstring and fix triplicate docstring
     def __init__(self, env, flow):
         self.enable_fast_retransmit=False
-        self.enable_fast_recovery=True
+        self.enable_fast_recovery=False
         self.ka=1
         self.ks=1
         self.divide_factor=2;
@@ -86,7 +86,7 @@ class TCPTahoe:
         self.duplicate_ack_times=0
         
         
-        self.slow_start_treshold=100
+        self.slow_start_treshold=240
         
       
         
@@ -181,8 +181,8 @@ class TCPTahoe:
                     print "    More Fast recovery" 
                 self.change_W(self.W+1)
                 self.send_new_packets()
-            elif ack_packet.timestamp>self.last_reset:
-#             else:
+#             elif ack_packet.timestamp>self.last_reset:
+            else:
                 """
                 Process Ack
                 """

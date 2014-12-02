@@ -19,7 +19,6 @@ for case in CASES:
     categories1 = ['Flow Rate','Packet Loss']
     categories2 = ['Buffer Occupancy','Window Size', 'Packet Delay']
     categories3 = ['Link Rate']
-    categories4 = []
     
     for category in categories1:
         print category
