@@ -353,7 +353,7 @@ class Controller:
         """
         self.record(recorder=self.buffer_occupancy, actor=link,
                     value=buffer_occupancy * OUTPUT_BUFFER_OCCUPANCY_SCALE_FACTOR)
-        print buffer_occupancy * OUTPUT_BUFFER_OCCUPANCY_SCALE_FACTOR
+
 
     def record_flow_rate(self, flow, packet_size):
         """Record the size of a delivered packet

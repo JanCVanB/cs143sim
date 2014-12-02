@@ -15,6 +15,7 @@ from cs143sim.constants import PACKET_SIZE
 from cs143sim.events import PacketTimeOut
 from cs143sim.events import VegasTimeOut
 from cs143sim.utilities import full_string
+from math import floor
 
 
 class TCPTahoe:
@@ -61,6 +62,7 @@ class TCPTahoe:
         self.enable_fast_recovery=True
         self.ka=1
         self.ks=1
+        self.divide_factor=2;
         self.rtt_alpha=0.125
         self.rtt_beta=0.25
         
@@ -84,13 +86,14 @@ class TCPTahoe:
         self.duplicate_ack_times=0
         
         
-        self.slow_start_treshold=240
+        self.slow_start_treshold=100
         
       
         
         self.change_W(W=1)
         
         self.last_reset=0
+        self.last_half=0
         self.time_out_event=None
         
         self.slow_start_flag=True
@@ -147,7 +150,7 @@ class TCPTahoe:
                 self.duplicate_ack_times=0
                 
                 
-            if self.enable_fast_retransmit and self.duplicate_ack_times==4:
+            if self.enable_fast_retransmit and self.duplicate_ack_times==4 and self.env.now-self.last_reset>self.time_out:
                 if DEBUG:
                     print "    Duplicate Ack "+str(n)
                     print "    Fast retransmit"
@@ -158,7 +161,7 @@ class TCPTahoe:
                     print "    Enter Fast recovery"
                     
                 self.fast_recovery_flag=True
-                self.slow_start_treshold=self.W/2    
+                self.slow_start_treshold=self.W/self.divide_factor    
                 #self.change_W(self.W/2+3)
                 """
                 Actually, W is not windows size at that means. 
@@ -178,7 +181,7 @@ class TCPTahoe:
                     print "    More Fast recovery" 
                 self.change_W(self.W+1)
                 self.send_new_packets()
-            elif ack_packet.timestamp>=self.last_reset:
+            elif ack_packet.timestamp>self.last_reset:
 #             else:
                 """
                 Process Ack
@@ -187,7 +190,9 @@ class TCPTahoe:
                     """
                     Just leave fast recovery
                     """
-                    self.change_W(self.slow_start_treshold-1)
+                    if self.env.now-self.last_half>self.rtt_avg:
+                        self.change_W(floor(self.slow_start_treshold))
+                        self.last_half=self.env.now
                     self.fast_recovery_flag=False
                     self.slow_start_flag=False
                     
@@ -234,9 +239,9 @@ class TCPTahoe:
                         if self.W>self.slow_start_treshold:
                             self.slow_start_flag=False
                     else:
-                        self.change_W(self.W+self.ka*1.0/self.W)
-                        
+                        self.change_W(self.W+self.ka*1.0/max(self.W,1))      
                 self.send_new_packets()
+
 
     def react_to_time_out(self, event):
         if event==self.time_out_event:
@@ -253,7 +258,7 @@ class TCPTahoe:
             self.time_out=2*self.time_out
             self.reset_timer()
     
-            self.slow_start_treshold=self.W/2
+            self.slow_start_treshold=self.W/self.divide_factor
             self.slow_start_flag=True
             
             self.change_W(W=1)
@@ -385,6 +390,7 @@ class TCPVegas:
         self.change_W(W=1)
         
         self.last_reset=0
+        self.last_half=0
         self.time_out_event=None
         
         self.slow_start_flag=True
@@ -505,7 +511,8 @@ class TCPVegas:
                 self.change_W(W=self.W-1)
         else:
             self.change_W(W=self.W*self.vegas_rtt_base/self.vegas_rtt+self.fast_alpha)
-        self.vegas_time_out_event=VegasTimeOut(env=self.env, delay= self.vegas_rtt, actor=self)
+        if self.transmitter_acked<self.packet_number-1:
+            self.vegas_time_out_event=VegasTimeOut(env=self.env, delay= self.vegas_rtt, actor=self)
                 
 
     def react_to_time_out(self, event):
