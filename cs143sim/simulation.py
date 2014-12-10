@@ -95,9 +95,6 @@ class Controller:
         source.flows.append(new_flow)
         destination.flows.append(new_flow)
         self.flows[name] = new_flow
-        self.flow_rate[new_flow] = [(0, 0)]
-        self.packet_delay[new_flow] = [(0, 0)]
-        self.window_size[new_flow] = [(0, 0)]
         self.algorithm = algorithm
         FlowStart(env=self.env, delay=start_time, flow=new_flow)
 
@@ -132,9 +129,6 @@ class Controller:
         else:
             raise Exception('Unknown Source/Destination: ' + actor)
         self.links[name] = new_link
-        self.buffer_occupancy[new_link] = [(0, 0)]
-        self.link_rate[new_link] = [(0, 0)]
-        self.packet_loss[new_link] = [(0, 0)]
 
     def make_router(self, name, ip_address, update_time):
         """Make a new :class:`.Router` and add it to `self.routers`
@@ -353,7 +347,6 @@ class Controller:
         """
         self.record(recorder=self.buffer_occupancy, actor=link,
                     value=buffer_occupancy * OUTPUT_BUFFER_OCCUPANCY_SCALE_FACTOR)
-
 
     def record_flow_rate(self, flow, packet_size):
         """Record the size of a delivered packet
