@@ -4,4 +4,4 @@ The cs143sim Package
 
 __all__ = []
 __name__ = 'cs143sim'
-__version__ = '0.0.1'
+__version__ = '0.1.0'

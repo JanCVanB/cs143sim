@@ -11,9 +11,6 @@
 """
 from simpy.events import Timeout
 
-from cs143sim.constants import DEBUG
-from cs143sim.utilities import print_event
-
 
 class FlowStart(Timeout):
     """A :class:`~cs143sim.actors.Flow` begins generating packets
@@ -25,11 +22,6 @@ class FlowStart(Timeout):
     def __init__(self, env, delay, flow):
 
         super(FlowStart, self).__init__(env=env, delay=delay)
-
-        if DEBUG:
-            self.actor = flow
-            self.callbacks.append(print_event)
-            
         self.callbacks.append(flow.react_to_flow_start)
 
 
@@ -45,9 +37,6 @@ class LinkAvailable(Timeout):
     """
     def __init__(self, env, delay, link):
         super(LinkAvailable, self).__init__(env=env, delay=delay)
-        if DEBUG:
-            self.actor = link
-            #self.callbacks.append(print_event)
         self.callbacks.append(link.react_to_link_available)
 
 
@@ -66,18 +55,6 @@ class PacketReceipt(Timeout):
     def __init__(self, env, delay, receiver, packet):
 
         super(PacketReceipt, self).__init__(env=env, delay=delay, value=packet)
-
-
-        if DEBUG:
-#             if hasattr(packet, "acknowledgement"):
-#                 if packet.acknowledgement==False:
-#                     print "    send Data "+str(packet.number)
-#                 else:
-#                     print "    send Ack "+str(packet.number)
-#                 
-            self.actor = receiver
-            self.callbacks.append(print_event)
-        # TODO: 
         self.callbacks.append(receiver.react_to_packet_receipt)
 
 
@@ -87,26 +64,17 @@ class PacketTimeOut(Timeout):
     """
     def __init__(self, env, delay, actor, expected_time):
         super(PacketTimeOut, self).__init__(env, delay, value=expected_time)
-        if DEBUG:
-#             print "    set packet "+str(packet_number)+ " time out: "+str(env.now+delay)
-            pass
-        if DEBUG:
-            self.actor = actor
-            self.callbacks.append(print_event)
-        # TODO: 
         self.callbacks.append(actor.react_to_time_out)    
-        
+
+
 class VegasTimeOut(Timeout):
     """
     Time out event for tla
     """
     def __init__(self, env, delay, actor):
         super(VegasTimeOut, self).__init__(env, delay)
-        if DEBUG:
-            self.actor = actor
-            self.callbacks.append(print_event)
-        # TODO: 
         self.callbacks.append(actor.react_to_vegas_time_out)    
+
 
 class RoutingTableOutdated(Timeout):
     """A :class:`~cs143sim.actors.Router` updates its routing table
@@ -118,6 +86,3 @@ class RoutingTableOutdated(Timeout):
     def __init__(self, env, delay, router):
         super(RoutingTableOutdated, self).__init__(env=env, delay=delay)
         self.callbacks.append(router.react_to_routing_table_outdated)
-        if DEBUG:
-            self.actor = router
-            self.callbacks.append(print_event)

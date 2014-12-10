@@ -20,7 +20,8 @@ class InputFileSyntaxError(Exception):
         self.message = message
 
     def __str__(self):
-        return 'Input File Syntax Error: (Line ' + str(self.line_number) + ') ' + self.message
+        return ('Input File Syntax Error: (Line ' + str(self.line_number) +
+                ') ' + self.message)
 
 
 class InputFileUnknownReference(Exception):
@@ -32,7 +33,8 @@ class InputFileUnknownReference(Exception):
         self.message = message
 
     def __str__(self):
-        return 'InputFileUnknownReference (Line ' + str(self.line_number) + '): ' + self.message
+        return ('InputFileUnknownReference (Line ' + str(self.line_number) +
+                '): ' + self.message)
 
 
 class MissingAttribute(Exception):
@@ -45,5 +47,5 @@ class MissingAttribute(Exception):
         self.missing_attr = missing_attr
 
     def __str__(self):
-        return 'I/O Error: Type ' + self.obj_type + ' (ID: ' + self.obj_id + \
-               ') is missing attribute ' + self.missing_attr
+        return ('I/O Error: Type ' + self.obj_type + ' (ID: ' + self.obj_id +
+                ') is missing attribute ' + self.missing_attr)

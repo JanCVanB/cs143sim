@@ -8,7 +8,6 @@
 """
 
 DEBUG = False
-#DEBUG = False
 """Whether to run the simulation in debug mode, with extra print statements"""
 
 PACKET_SIZE = 8192
@@ -24,7 +23,7 @@ GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL = 1000
 """Time for every :class:`.Router` to wait before generating a new
 :class:`.RouterPacket`, in milliseconds"""
 
-DYNAMICH_ROUTE_DISTANCE_METRIC = True
+DYNAMIC_ROUTE_DISTANCE_METRIC = True
 """Whether to take dynamic link delay as the metric for route distance, 
 otherwise use hops(topology) to be the metric"""
 

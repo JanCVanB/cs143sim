@@ -14,8 +14,9 @@ from cs143sim.actors import Flow
 from cs143sim.actors import Host
 from cs143sim.actors import Link
 from cs143sim.actors import Router
-from cs143sim.constants import DEBUG, OUTPUT_BUFFER_OCCUPANCY_SCALE_FACTOR,\
-    OUTPUT_FLOW_RATE_SCALE_FACTOR, OUTPUT_LINK_RATE_SCALE_FACTOR
+from cs143sim.constants import OUTPUT_BUFFER_OCCUPANCY_SCALE_FACTOR
+from cs143sim.constants import OUTPUT_FLOW_RATE_SCALE_FACTOR
+from cs143sim.constants import OUTPUT_LINK_RATE_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_RATE_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_BUFFER_SCALE_FACTOR
 from cs143sim.constants import INPUT_FILE_DATA_SCALE_FACTOR
@@ -63,14 +64,12 @@ class Controller:
     :ivar dict window_size: window size records for each flow;
         :class:`Flows <.Flow>` key to lists of (time, value) tuples
     """
-
     def __init__(self, case='cs143sim/cases/case0.txt'):
         self.env = ControlledEnvironment(controller=self)
         self.flows = {}
         self.hosts = {}
         self.links = {}
         self.routers = {}
-
         self.buffer_occupancy = {}
         self.flow_rate = {}
         self.link_rate = {}
@@ -78,7 +77,6 @@ class Controller:
         self.packet_loss = {}
         self.window_size = {}
         self.algorithm = 0  # default algorithm is specified by
-
         self.read_case(case)
 
     def make_flow(self, name, source, destination, amount, start_time, algorithm):
@@ -145,8 +143,6 @@ class Controller:
 
         :param str case: path to simulation input file
         """
-        if DEBUG:
-            print 'Reading test case from file "' + case
         with open(case, 'rb') as case_file:
             # Open the file for line-by-line consumption
             obj_type = ''  # obj_type holds the current object type (LINK/HOST/Etc)
@@ -156,21 +152,19 @@ class Controller:
             # Not included in this list is the CONNECTS attribute, which has 2 arguments,
             #   and ID, which requires special processing.
             attributes = ('RATE', 'DELAY', 'DATA', 'BUFFER', 'DST', 'SRC', 'START', 'IP', 'ALGORITHM', 'UPDATE')
-            """Input File Attributes:
-             RATE - belongs to a :class:`.Link`, specifies link rate in Mbps (float)
-             DELAY - belongs to a :class:`.Link`, specifies link delay in ms (int)
-             DATA - belongs to a :class:`.Flow`, specifies amount of data to be transmitted in MegaBytes (int)
-             BUFFER - belongs to a :class:`.Link`, specifies buffer size in KiloBytes (int)
-             DST - belongs to a :class:`.Link` or :class:`.Flow`, specifies a destination (ID of destination)
-             SRC - belongs to a :class:`.Link` or :class:`.Flow`, specifies a source (ID of source)
-             START - belongs to a :class:`.Flow`, specifies starting time for that flow in seconds (float)
-             IP - belongs to a :class:`.Router` or :class:`.Host`, specifies the IP address of the HOST or ROUTER (str)
-             ALGORITHM - belongs to a :class:`.Flow`, specifies the congestion control algorithm for that flow (int)
-             UPDATE - belongs to a :class:`.Router`, specifies the time between router table updates in ms (int)
-             CONNECTS - belongs to a :class:`.Link`, specifies two Hosts/Routers that are connected by that link (ID ID)
-
-             Note: most of the units above will be converted internally and apply only to the input file.
-            """
+            # Input File Attributes:
+            # RATE - belongs to a :class:`.Link`, specifies link rate in Mbps (float)
+            # DELAY - belongs to a :class:`.Link`, specifies link delay in ms (int)
+            # DATA - belongs to a :class:`.Flow`, specifies amount of data to be transmitted in MegaBytes (int)
+            # BUFFER - belongs to a :class:`.Link`, specifies buffer size in KiloBytes (int)
+            # DST - belongs to a :class:`.Link` or :class:`.Flow`, specifies a destination (ID of destination)
+            # SRC - belongs to a :class:`.Link` or :class:`.Flow`, specifies a source (ID of source)
+            # START - belongs to a :class:`.Flow`, specifies starting time for that flow in seconds (float)
+            # IP - belongs to a :class:`.Router` or :class:`.Host`, specifies the IP address of the HOST or ROUTER (str)
+            # ALGORITHM - belongs to a :class:`.Flow`, specifies the congestion control algorithm for that flow (int)
+            # UPDATE - belongs to a :class:`.Router`, specifies the time between router table updates in ms (int)
+            # CONNECTS - belongs to a :class:`.Link`, specifies two Hosts/Routers that are connected by that link (ID ID)
+            # Note: most of the units above will be converted internally and apply only to the input file.
             store_in = {attribute: '' for attribute in attributes}  # initialize all attributes to ''
             line_number = 0
             for case_line in case_file:
@@ -214,8 +208,6 @@ class Controller:
                                 raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
                                                        missing_attr=attribute)
                         # If all the attributes are present, create the object
-                        if DEBUG:
-                            print 'Making Link: ' + obj_id + 'a & b'
                         the_src = ''  # temp variables that will point to src/dst instances
                         the_dst = ''
                         # Enforce referential integrity (aka check that the specified
@@ -236,15 +228,15 @@ class Controller:
                                 raise InputFileUnknownReference(line_number, target +
                                                                 ' is not a valid Host/Router.')
                         self.make_link(name=obj_id + 'a', source=the_src, destination=the_dst,
-                                       rate=float(store_in['RATE'])*INPUT_FILE_RATE_SCALE_FACTOR,
-                                       delay=float(store_in['DELAY'])*INPUT_FILE_DELAY_SCALE_FACTOR,
-                                       buffer_capacity=int(store_in['BUFFER'])*INPUT_FILE_BUFFER_SCALE_FACTOR)
+                                       rate=float(store_in['RATE']) * INPUT_FILE_RATE_SCALE_FACTOR,
+                                       delay=float(store_in['DELAY']) * INPUT_FILE_DELAY_SCALE_FACTOR,
+                                       buffer_capacity=int(store_in['BUFFER']) * INPUT_FILE_BUFFER_SCALE_FACTOR)
 
                         # Links are split into two, one for each direction (so that they are full-duplex).
                         self.make_link(name=obj_id + 'b', source=the_dst, destination=the_src,
-                                       rate=float(store_in['RATE'])*INPUT_FILE_RATE_SCALE_FACTOR,
-                                       delay=float(store_in['DELAY'])*INPUT_FILE_DELAY_SCALE_FACTOR,
-                                       buffer_capacity=int(store_in['BUFFER'])*INPUT_FILE_BUFFER_SCALE_FACTOR)
+                                       rate=float(store_in['RATE']) * INPUT_FILE_RATE_SCALE_FACTOR,
+                                       delay=float(store_in['DELAY']) * INPUT_FILE_DELAY_SCALE_FACTOR,
+                                       buffer_capacity=int(store_in['BUFFER']) * INPUT_FILE_BUFFER_SCALE_FACTOR)
                                        # convert into bits
                     elif obj_type == 'HOST':
                         # check the attribute(s) (there's only one for HOSTS so far: IP)
@@ -253,8 +245,6 @@ class Controller:
                                 # Make sure all the attributes are not empty
                                 raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
                                                        missing_attr=attribute)
-                        if DEBUG:
-                            print 'Making Host: ' + obj_id
                         self.make_host(name=obj_id, ip_address=store_in['IP'])
 
                     elif obj_type == 'ROUTER':
@@ -263,23 +253,17 @@ class Controller:
                             if store_in[attribute] in ['', []]:
                                 if attribute == 'UPDATE':
                                     # Just set update to a default value
-                                    if DEBUG:
-                                        print 'Note: Setting routing table update time to default for ' + obj_id
                                     store_in[attribute] = GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL
                                 else:
                                     raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
                                                            missing_attr=attribute)
-                        if DEBUG:
-                            print 'Making Router: ' + obj_id
                         self.make_router(name=obj_id, ip_address=store_in['IP'],
-                                         update_time=store_in['UPDATE']*INPUT_FILE_UPDATE_SCALE_FACTOR)
+                                         update_time=store_in['UPDATE'] * INPUT_FILE_UPDATE_SCALE_FACTOR)
 
                     elif obj_type == 'FLOW':
                         for attribute in ['SRC', 'DST', 'START', 'DATA', 'ALGORITHM']:
                             if store_in[attribute] in ['', []]:
                                 if attribute == 'ALGORITHM':
-                                    if DEBUG:
-                                        print 'Note: Setting algorithm to default 0 for ' + obj_id
                                     store_in[attribute] = 0
                                 else:
                                     raise MissingAttribute(obj_type=obj_type, obj_id=obj_id,
@@ -288,13 +272,11 @@ class Controller:
                         # BUT FIRST, we need to make sure the SRC/DST hosts actually exist..
                         # if they don't, warn the user that "No, i'm sorry, you have to specify
                         # hosts that actually exist."
-                        if DEBUG:
-                            print 'Making Flow: ' + obj_id
                         try:
                             self.make_flow(name=obj_id, source=self.hosts[store_in['SRC']],
                                            destination=self.hosts[store_in['DST']],
-                                           amount=int(store_in['DATA'])*INPUT_FILE_DATA_SCALE_FACTOR,
-                                           start_time=float(store_in['START'])*INPUT_FILE_TIME_SCALE_FACTOR,
+                                           amount=int(store_in['DATA']) * INPUT_FILE_DATA_SCALE_FACTOR,
+                                           start_time=float(store_in['START']) * INPUT_FILE_TIME_SCALE_FACTOR,
                                            algorithm=int(store_in['ALGORITHM']))
 
                         except KeyError as e:
@@ -316,8 +298,9 @@ class Controller:
                         store_in['DST'] = line_comp[2].upper()
                     else:
                         raise InputFileSyntaxError(line_number=line_number,
-                                                   message='Input File Formatting Error: CONNECTS attr' +
-                                                   'ibute formatted incorrectly.\nExpects: CONNECTS A B')
+                                                   message='Input File Formatting Error: ' +
+                                                           'CONNECTS attribute formatted incorrectly.\n' +
+                                                           'Expects: CONNECTS A B')
                 else:
                     raise InputFileSyntaxError(line_number=line_number,
                                                message='Unrecognized keyword: ' + keyword)
