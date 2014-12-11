@@ -34,7 +34,6 @@ class LinkAvailable(Timeout):
 
     :param env: SimPy simulation :class:`~simpy.core.Environment`
     :param float delay: time until :class:`~cs143sim.actors.Router` finishes
-    :param router: :class:`~cs143sim.actors.Router` that finishes
     :param link: :class:`~cs143sim.actors.Link` on which a
         :class:`~cs143sim.actors.Packet` was sent
     """
@@ -52,7 +51,6 @@ class PacketReceipt(Timeout):
     :param float delay: time until Packet begins to arrive at Router (in ms)
     :param receiver: :class:`~cs143sim.actors.Host` or
         :class:`~cs143sim.actors.Router` that receives `packet`
-    :param link: :class:`~cs143sim.actors.Link` on which `packet` arrives
     :param packet: :class:`~cs143sim.actors.Packet` that arrives
     """
     def __init__(self, env, delay, receiver, packet):

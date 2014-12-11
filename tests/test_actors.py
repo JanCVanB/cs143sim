@@ -18,17 +18,18 @@ def basic_buffer():
 
 def basic_flow():
     return Flow(env=ControlledEnvironment(controller=Controller()),
-                source=basic_host(), destination=basic_host(),
+                name='', source=basic_host(), destination=basic_host(),
                 amount=1.0)
 
 
 def basic_host():
-    return Host(env=ControlledEnvironment(controller=Controller()), address='')
+    return Host(env=ControlledEnvironment(controller=Controller()),
+                name='', address='')
 
 
 def basic_link():
     return Link(env=ControlledEnvironment(controller=Controller()),
-                source=basic_host(), destination=basic_host(),
+                name='', source=basic_host(), destination=basic_host(),
                 delay=1.0, rate=1.0, buffer_capacity=1)
 
 
@@ -40,14 +41,13 @@ def basic_packet():
 
 
 def basic_router_packet():
-    #return Packet(source=basic_host(), destination=basic_host(), number=1,
-    #              acknowledgement=object())
-    return RouterPacket(source=basic_host(), timestamp=0, router_table={})
+    return RouterPacket(source=basic_host(), timestamp=0, router_table={},
+                        acknowledgement=False)
 
 
 def basic_router():
     return Router(env=ControlledEnvironment(controller=Controller()),
-                  address='')
+                  name='', address='')
 
 
 def buffer_overflow():
