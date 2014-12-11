@@ -16,42 +16,27 @@ from cs143sim.events import VegasTimeOut
 
 
 class TCPTahoe:
-    """
-    Constants:
-    :ivar enable_fast_retransmit
-    :ivar enable_fast_recovery
-    :ivar ka: k of additive
-    :ivar ks: k of slow start
-    :ivar rtt_alpha: change rate of rtt_avg
-    :ivar rtt_beta: change rate of rtt_div    
-    
+    """This is the class that implements TCP Tahoe, TCP Tahoe with fast retransmit, TCP Vegas.
+
+    :param enable_fast_retransmit: enable fast retransmit
+    :param enable_fast_recovery: enable fast recovery or not
+    :param rtt_alpha: change rate of rtt_avg
+    :param rtt_beta: change rate of rtt_div    
     :ivar W: window size
     :ivar packet_number: number of packets to be sent
     :ivar time_out: timer's waiting time
-
-    Transmitter:
     :ivar transmitter_not_sent: packets that have not been sent
     :ivar transmitter_sending: list of packets that are being sent
     :ivar transmitter_acked: packets  that have been acked
-    
-    Ack management:
     :ivar duplicate_ack_number: record last acked packet number
     :ivar duplicate_ack_times: record how many times the packet has been continuous acked
-    
-    Timeout Management:
     :ivar last_reset: last effective timeout time
     :ivar time_out_event: current time out event
-    
-    Slow Start:
-    :ivar slow_start_threshold: threshold of slow start
-    
-    RTT calculator:
-    :ivar rtt_avg
-    :ivar rtt_div
-    
-    Flags:    
-    :ivar slow_start_flag
-    :ivar fast_recovery_flag
+    :ivar slow_start_treshold: treshold of slow start
+    :ivar rtt_avg: the average value of rtt
+    :ivar rtt_div: the divergence of rtt
+    :ivar slow_start_flag:
+    :ivar fast_recovery_flag:
     """
     def __init__(self, env, flow):
         self.enable_fast_retransmit = False
@@ -89,9 +74,6 @@ class TCPTahoe:
         self.send_new_packets()
     
     def react_to_ack(self, ack_packet):
-        """
-        Updating Time out (according to 7.4.4 Timers)
-        """
         #RFC 6298
         if self.first_ack_flag:
             t = self.env.now - ack_packet.timestamp
@@ -209,54 +191,32 @@ class TCPTahoe:
 
 
 class TCPVegas:
-    """
-    Constants:
+    """This is the class that implements TCP Vegas and FAST TCP.
 
-    :ivar vegas_alpha
-    :ivar vegas_beta
-    :ivar ka: k of additive
-    :ivar ks: k of slow start
-    :ivar rtt_alpha: change rate of rtt_avg
-    :ivar rtt_beta: change rate of rtt_div
+    :param enable_fast:
+    :param vegas_alpha:
+    :param vegas_beta:
+    :param vegas_gamma:
+    :param fast_alpha:
+    :param rtt_alpha: change rate of rtt_avg
+    :param rtt_beta: change rate of rtt_div       
     :ivar W: window size
     :ivar packet_number: number of packets to be sent
     :ivar time_out: timer's waiting time
-
-    Transmitter:
-
     :ivar transmitter_not_sent: packets that have not been sent
     :ivar transmitter_sending: list of packets that are being sent
     :ivar transmitter_acked: packets  that have been acked
-    
-    Ack management:
-
     :ivar duplicate_ack_number: record last acked packet number
     :ivar duplicate_ack_times: record how many times the packet has been continuous acked
-    
-    Timeout Management:
-
     :ivar last_reset: last effective timeout time
     :ivar time_out_event: current time out event
-    
-    Slow Start:
-
-    :ivar slow_start_threshold: threshold of slow start
-    
-    RTT calculator:
-
-    :ivar rtt_avg
-    :ivar rtt_div
-    
-    Flags:
-
-    :ivar slow_start_flag
-    :ivar fast_recovery_flag
-    
-    Vegas:
-
-    :ivar vegas_rtt
-    :ivar vegas_rtt_base
-    :ivar vegas_time_out_event
+    :ivar slow_start_treshold: treshold of slow start
+    :ivar rtt_avg: the average value of rtt
+    :ivar rtt_div: the divergence of rtt
+    :ivar slow_start_flag: flag for slow start
+    :ivar vegas_rtt : last rtt
+    :ivar vegas_rtt_base : the minimum of rtt
+    :ivar vegas_time_out_event : the time out event used by vegas
     """
     def __init__(self, env, flow):
         self.vegas_alpha = 4
@@ -296,10 +256,6 @@ class TCPVegas:
         self.send_new_packets()
     
     def react_to_ack(self, ack_packet):
-        """
-        Updating Time out (according to 7.4.4 Timers)
-        Updating vegas_rtt
-        """
         #RFC 6298
         if self.first_ack_flag:
             t = self.env.now - ack_packet.timestamp

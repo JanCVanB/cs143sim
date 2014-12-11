@@ -1,0 +1,40 @@
+// Case 2
+// for simulations
+HOST
+    ID      H1
+    IP      192.168.1.1
+    ID      H2
+    IP      192.168.1.2
+    ID      H3
+    IP      192.168.1.3
+
+ROUTER
+    ID      R1
+    IP      192.168.1.4
+
+LINK
+    ID       L1
+    RATE     12.5
+    DELAY    10
+    BUFFER   64
+    CONNECTS H1 R1
+    ID       L2
+    CONNECTS H2 R1
+    ID       L3
+    RATE     10.0
+    CONNECTS R1 H3
+
+FLOW
+    ID      Tahoe
+    SRC     H1
+    DST     H3
+    DATA    20
+    START   1
+    ALGORITHM 1
+    ID      FAST
+    SRC     H2
+    DST     H3
+    DATA    20
+    START   1
+    ALGORITHM 4
+
