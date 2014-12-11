@@ -17,6 +17,7 @@ from cs143sim.events import VegasTimeOut
 
 class TCPTahoe:
     """This is the class that implements TCP Tahoe, TCP Tahoe with fast retransmit, TCP Vegas.
+
     :param enable_fast_retransmit
     :param enable_fast_recovery
     :param rtt_alpha: change rate of rtt_avg
@@ -193,7 +194,8 @@ class TCPTahoe:
 
 
 class TCPVegas:
-    """This is the class that implements TCP Vegas and FAST TCP.    
+    """This is the class that implements TCP Vegas and FAST TCP.
+
     :param enable_fast
     :param vegas_alpha
     :param vegas_beta
