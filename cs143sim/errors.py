@@ -14,6 +14,9 @@
 class InputFileSyntaxError(Exception):
     """InputFileSyntaxError is an `Exception` thrown when an unrecognized syntax
     is used in the input file.
+
+    :param int line_number: erroneous line of input file
+    :param str message: error message
     """
     def __init__(self, line_number, message):
         self.line_number = line_number
@@ -27,6 +30,9 @@ class InputFileSyntaxError(Exception):
 class InputFileUnknownReference(Exception):
     """InputFileUnknownReference is an `Exception` thrown when a link or host makes reference
     to an unknown object (Host/Router/Link)
+
+    :param int line_number: erroneous line of input file
+    :param str message: error message
     """
     def __init__(self, line_number, message):
         self.line_number = line_number
@@ -40,6 +46,10 @@ class InputFileUnknownReference(Exception):
 class MissingAttribute(Exception):
     """MissingAttribute is an `Exception` designed to notify the user that the
     input file is missing information
+
+    :param obj_type:
+    :param obj_id:
+    :param missing_attr:
     """
     def __init__(self, obj_type, obj_id, missing_attr):
         self.obj_type = obj_type

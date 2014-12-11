@@ -107,9 +107,6 @@ class Flow(Actor):
     :ivar destination: destination :class:`.Host`
     :ivar float amount: amount of data to transmit
     :ivar int algorithm: indicate which tla this flow is using
-    
-    
-    Receiver
     :ivar rcv_expect_to_receive: next packet expect to receive
     :ivar rcv_received_packets:  list of packets that have been received, but not what we need now.
     """
