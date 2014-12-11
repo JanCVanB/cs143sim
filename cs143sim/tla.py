@@ -16,15 +16,11 @@ from cs143sim.events import VegasTimeOut
 
 
 class TCPTahoe:
-    """
-    This is the class that implements TCP Tahoe, TCP Tahoe with fast retransmit, TCP Vegas.
-    
-    :ivar enable_fast_retransmit
-    :ivar enable_fast_recovery
-    :ivar ka: k of additive
-    :ivar ks: k of slow start
-    :ivar rtt_alpha: change rate of rtt_avg
-    :ivar rtt_beta: change rate of rtt_div    
+    """This is the class that implements TCP Tahoe, TCP Tahoe with fast retransmit, TCP Vegas.
+    :param enable_fast_retransmit
+    :param enable_fast_recovery
+    :param rtt_alpha: change rate of rtt_avg
+    :param rtt_beta: change rate of rtt_div    
     :ivar W: window size
     :ivar packet_number: number of packets to be sent
     :ivar time_out: timer's waiting time
@@ -197,18 +193,14 @@ class TCPTahoe:
 
 
 class TCPVegas:
-    """
-    This is the class that implements TCP Vegas and FAST TCP.
-    
-    :ivar enable_fast
-    :ivar vegas_alpha
-    :ivar vegas_beta
-    :ivar vegas_gamma
-    :ivar fast_alpha
-    :ivar ka: k of additive
-    :ivar ks: k of slow start
-    :ivar rtt_alpha: change rate of rtt_avg
-    :ivar rtt_beta: change rate of rtt_div       
+    """This is the class that implements TCP Vegas and FAST TCP.    
+    :param enable_fast
+    :param vegas_alpha
+    :param vegas_beta
+    :param vegas_gamma
+    :param fast_alpha
+    :param rtt_alpha: change rate of rtt_avg
+    :param rtt_beta: change rate of rtt_div       
     :ivar W: window size
     :ivar packet_number: number of packets to be sent
     :ivar time_out: timer's waiting time
