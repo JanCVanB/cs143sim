@@ -150,8 +150,8 @@ def run():
     parser.add_argument('-c', '--case', dest='case', help='simulation case number')
     parser.add_argument('-d', '--duration', dest='duration', help='simulation duration in seconds')
     arguments = parser.parse_args()
-    case = arguments.case if arguments.case else 0
-    duration = arguments.duration if arguments.duration else 10
+    case = int(arguments.case) if arguments.case else 0
+    duration = float(arguments.duration) if arguments.duration else 10
     duration *= 1000
     controller = Controller(case='cs143sim/cases/case' + str(case) + '.txt')
     controller.run(until=duration)
