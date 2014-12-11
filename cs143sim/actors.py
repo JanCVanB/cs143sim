@@ -35,8 +35,9 @@ class Actor(object):
     :param env: SimPy simulation :class:`~simpy.core.Environment`
     :ivar env: SimPy simulation :class:`~simpy.core.Environment`
     """
-    def __init__(self, env):
+    def __init__(self, env, name=None):
         self.env = env
+        self.name = name
 
 
 class Buffer(Actor):
@@ -102,8 +103,8 @@ class Flow(Actor):
     :ivar rcv_expect_to_receive: next packet expect to receive
     :ivar rcv_received_packets:  list of packets that have been received, but not what we need now.
     """
-    def __init__(self, env, source, destination, amount, algorithm=0):
-        super(Flow, self).__init__(env=env)
+    def __init__(self, env, name, source, destination, amount, algorithm=0):
+        super(Flow, self).__init__(env=env, name=name)
         self.source = source
         self.destination = destination
         self.amount = amount
@@ -217,8 +218,8 @@ class Host(Actor):
     :ivar list flows: :class:`Flows <.Flow>` on this :class:`.Host`
     :ivar link: :class:`Link` connected to this :class:`.Host`
     """
-    def __init__(self, env, address):
-        super(Host, self).__init__(env=env)
+    def __init__(self, env, name, address):
+        super(Host, self).__init__(env=env, name=name)
         self.address = address
         self.flows = []
         self.link = None
@@ -259,8 +260,8 @@ class Link(Actor):
     :ivar bool busy: whether currently removing data from source
     :ivar float utilization: fraction of capacity in use
     """
-    def __init__(self, env, source, destination, delay, rate, buffer_capacity):
-        super(Link, self).__init__(env=env)
+    def __init__(self, env, name, source, destination, delay, rate, buffer_capacity):
+        super(Link, self).__init__(env=env, name=name)
         self.source = source
         self.destination = destination
         self.delay = delay
@@ -312,8 +313,8 @@ class Router(Actor):
     :ivar dict table: routing table
     :ivar default_gateway: default out port if can not decide route
     """
-    def __init__(self, env, address, update_time=GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL):
-        super(Router, self).__init__(env=env)
+    def __init__(self, env, name, address, update_time=GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL):
+        super(Router, self).__init__(env=env, name=name)
         self.address = address
         self.links = []
         self.table = {}

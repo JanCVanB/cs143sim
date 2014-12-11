@@ -20,7 +20,7 @@ setuptools.setup(
     url='https://github.com/jvanbrug/cs143sim',
     version=cs143sim.__version__,
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Education',
         'Intended Audience :: End Users/Desktop',
         'Intended Audience :: Science/Research',
@@ -34,7 +34,7 @@ setuptools.setup(
         'Topic :: Scientific/Engineering',
     ],
     install_requires=['simpy==3.0.5'],
-    keywords='caltech cs143 abstract network architecture protocol simulator simulation simpy',
+    keywords='Caltech cs143 abstract network architecture protocol simulation simulator simpy',
     license='MIT',
     long_description=README,
     packages=setuptools.find_packages(exclude=['docs', 'tests']),

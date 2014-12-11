@@ -9,7 +9,6 @@ Contents:
    Architecture
    Code
    CourseMaterials
-   reSTHelp
 
 
 Indices and tables

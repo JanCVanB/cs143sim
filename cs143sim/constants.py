@@ -7,9 +7,6 @@
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
 """
 
-DEBUG = False
-"""Whether to run the simulation in debug mode, with extra print statements"""
-
 PACKET_SIZE = 8192
 """Size of every :class:`.Packet` in the simulation, in bits"""
 
@@ -27,7 +24,7 @@ DYNAMIC_ROUTE_DISTANCE_METRIC = True
 """Whether to take dynamic link delay as the metric for route distance, 
 otherwise use hops(topology) to be the metric"""
 
-INPUT_FILE_RATE_SCALE_FACTOR = 1000000/1000.0
+INPUT_FILE_RATE_SCALE_FACTOR = 1000000 / 1000.0
 """ Conversion factor for Mbps to bits per millisecond (for rate)"""
 
 INPUT_FILE_DELAY_SCALE_FACTOR = 1
@@ -45,11 +42,11 @@ INPUT_FILE_TIME_SCALE_FACTOR = 1000
 INPUT_FILE_BUFFER_SCALE_FACTOR = 8000
 """Conversion factor for KB to bits (for buffer size)"""
 
-OUTPUT_LINK_RATE_SCALE_FACTOR = 1000.0/1000000
+OUTPUT_LINK_RATE_SCALE_FACTOR = 1000.0 / 1000000
 """ Conversion factor for bits per millisecond (for rate) to Mbps"""
 
 OUTPUT_BUFFER_OCCUPANCY_SCALE_FACTOR = 1.0 / PACKET_SIZE
 """Conversion factor for bits to packets"""
 
-OUTPUT_FLOW_RATE_SCALE_FACTOR = 1000.0/1000000
+OUTPUT_FLOW_RATE_SCALE_FACTOR = 1000.0 / 1000000
 """ Conversion factor for bits per millisecond (for rate) to Mbps"""

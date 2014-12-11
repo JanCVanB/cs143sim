@@ -11,4 +11,3 @@ Source Code
    CodePackets
    CodeSimulation
    CodeTLA
-   CodeUtilities

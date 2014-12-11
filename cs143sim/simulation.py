@@ -88,7 +88,7 @@ class Controller:
         :param int amount: amount of data to transfer, in bits
         :param float start_time: time the new :class:`.Flow` starts
         """
-        new_flow = Flow(env=self.env, source=source, destination=destination,
+        new_flow = Flow(env=self.env, name=name, source=source, destination=destination,
                         amount=amount, algorithm=algorithm)
         source.flows.append(new_flow)
         destination.flows.append(new_flow)
@@ -102,7 +102,7 @@ class Controller:
         :param str name: new :class:`.Host` name
         :param str ip_address: new :class:`.Host`'s IP address
         """
-        new_host = Host(env=self.env, address=ip_address)
+        new_host = Host(env=self.env, name=name, address=ip_address)
         self.hosts[name] = new_host
 
     def make_link(self, name, source, destination, rate, delay, buffer_capacity):
@@ -115,7 +115,7 @@ class Controller:
         :param float delay: delay for data transfer, in ms
         :param int buffer_capacity: size of receiver :class:`.Buffer`, in KB
         """
-        new_link = Link(env=self.env, source=source, destination=destination,
+        new_link = Link(env=self.env, name=name, source=source, destination=destination,
                         delay=delay, rate=rate, buffer_capacity=buffer_capacity)
         # NOTE: Each link is split into two links (one for each direction) in the read_case function
         #       and appended with 'a' or 'b' on its ID. (e.g. 'L1' becomes 'L1a' and 'L1b')
@@ -134,7 +134,7 @@ class Controller:
         :param str name: new :class:`.Router` name
         :param str ip_address: new :class:`.Router`'s IP Address
         """
-        new_router = Router(env=self.env, address=ip_address, update_time=int(update_time))
+        new_router = Router(env=self.env, name=name, address=ip_address, update_time=int(update_time))
         self.routers[name] = new_router
         RoutingTableOutdated(env=self.env, delay=0, router=new_router)
 
@@ -213,7 +213,6 @@ class Controller:
                         # Enforce referential integrity (aka check that the specified
                         # hosts/routers actually exist in the simulation)
                         for target in [store_in['SRC'], store_in['DST']]:
-                            print 'Checking: ' + target
                             if target in self.hosts:
                                 if the_src == '':
                                     the_src = self.hosts[target]
