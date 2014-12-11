@@ -136,7 +136,7 @@ def graph_link_rate(case, category, controller, x_step):
                 y.append(0)
             y[-1] += value if value else 1
         x = [time / 1000.0 for time in x]
-        y = [value * 1.0 * controller.links[actor.name].rate / x_step for value in y]
+        y = [value * 1.0 / x_step for value in y]
         if 'a' in actor.name:
             line_color = next(line_colors)
         line_style = '-' if 'a' in actor.name else ':'
@@ -152,6 +152,7 @@ def run():
     arguments = parser.parse_args()
     case = arguments.case if arguments.case else 0
     duration = arguments.duration if arguments.duration else 10
+    duration *= 1000
     controller = Controller(case='cs143sim/cases/case' + str(case) + '.txt')
     controller.run(until=duration)
     x_step = duration / NUMBER_X_STEPS

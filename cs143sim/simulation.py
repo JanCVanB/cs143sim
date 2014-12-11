@@ -339,14 +339,14 @@ class Controller:
         self.record(recorder=self.flow_rate, actor=flow,
                     value=packet_size * OUTPUT_FLOW_RATE_SCALE_FACTOR)
 
-    def record_link_rate(self, link, send_duration):
+    def record_link_rate(self, link, packet_size):
         """Record the duration a link sends a packet
 
         :param link: :class:`.Link` sending the packet
-        :param float send_duration: duration required to send the packet (ms)
+        :param float packet_size: size of the delivered packet (bits)
         """
         self.record(recorder=self.link_rate, actor=link,
-                    value=send_duration * OUTPUT_LINK_RATE_SCALE_FACTOR)
+                    value=packet_size * OUTPUT_LINK_RATE_SCALE_FACTOR)
 
     def record_packet_delay(self, flow, packet_delay):
         """Record the delay of a delivered packet

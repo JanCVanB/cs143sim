@@ -190,7 +190,7 @@ class Flow(Actor):
         if not packet.acknowledgement:
             ack_packet = self.make_ack_packet(packet)
             self.send_packet(ack_packet)
-        self.env.controller.record_flow_rate(flow=self, packet_size=packet.size)
+            self.env.controller.record_flow_rate(flow=self, packet_size=packet.size)
         packet_delay = self.env.now - packet.timestamp
         self.env.controller.record_packet_delay(flow=self, packet_delay=packet_delay)
         if packet.acknowledgement:
@@ -298,7 +298,7 @@ class Link(Actor):
                                                  # transit time in ms
         PacketReceipt(env=self.env, delay=self.delay + d_trans, receiver=self.destination, packet=packet)
         LinkAvailable(env=self.env, delay=d_trans, link=self)
-        self.env.controller.record_link_rate(link=self, send_duration=d_trans)
+        self.env.controller.record_link_rate(link=self, packet_size=packet.size)
 
 
 class Router(Actor):
