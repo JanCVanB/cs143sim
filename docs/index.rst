@@ -13,64 +13,30 @@ Our Team
 ========
 
 .. image:: images/HongjianLan.jpg
-   :align: left
-   :width: 10em
-
-Hongjian Lan
-
-`lanhongjianlr@gmail.com <mailto:lanhongjianlr@gmail.com>`_
-
-.. container:: clearer
-
-    .. image :: images/spacer.png
-
+   :width: 10%
 .. image:: images/YameiOu.jpg
-   :align: left
-   :width: 10em
-
-Yamei Ou
-
-`oym111@gmail.com <mailto:oym111@gmail.com>`_
-
-.. container:: clearer
-
-    .. image :: images/spacer.png
-
+   :width: 10%
 .. image:: images/SamuelRicherd.jpg
-   :align: left
-   :width: 10em
-
-Samuel Richerd
-
-`dondiego152@gmail.com <mailto:dondiego152@gmail.com>`_
-
-.. container:: clearer
-
-    .. image :: images/spacer.png
-
+   :width: 10%
 .. image:: images/JanVanBruggen.jpg
-   :align: left
-   :width: 10em
-
-Jan Van Bruggen
-
-`jancvanbruggen@gmail.com <mailto:jancvanbruggen@gmail.com>`_
-
-.. container:: clearer
-
-    .. image :: images/spacer.png
-
+   :width: 10%
 .. image:: images/JunlinZhang.jpg
-   :align: left
-   :width: 10em
-
-Junlin Zhang
-
-`neicullyn@gmail.com <mailto:neicullyn@gmail.com>`_
+   :width: 10%
 
 .. container:: clearer
 
-    .. image :: images/spacer.png
+    .. image:: images/spacer.png
+
+.. image:: images/HongjianLanName.png
+   :width: 10%
+.. image:: images/YameiOuName.png
+   :width: 10%
+.. image:: images/SamuelRicherdName.png
+   :width: 10%
+.. image:: images/JanVanBruggenName.png
+   :width: 10%
+.. image:: images/JunlinZhangName.png
+   :width: 10%
 
 Site Contents
 =============
