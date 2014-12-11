@@ -18,8 +18,8 @@ from cs143sim.events import VegasTimeOut
 class TCPTahoe:
     """This is the class that implements TCP Tahoe, TCP Tahoe with fast retransmit, TCP Vegas.
 
-    :param enable_fast_retransmit
-    :param enable_fast_recovery
+    :param enable_fast_retransmit: enable fast retransmit
+    :param enable_fast_recovery: enable fast recovery or not
     :param rtt_alpha: change rate of rtt_avg
     :param rtt_beta: change rate of rtt_div    
     :ivar W: window size
@@ -33,10 +33,10 @@ class TCPTahoe:
     :ivar last_reset: last effective timeout time
     :ivar time_out_event: current time out event
     :ivar slow_start_treshold: treshold of slow start
-    :ivar rtt_avg : the average value of rtt
-    :ivar rtt_div : the divergence of rtt
-    :ivar slow_start_flag
-    :ivar fast_recovery_flag
+    :ivar rtt_avg: the average value of rtt
+    :ivar rtt_div: the divergence of rtt
+    :ivar slow_start_flag:
+    :ivar fast_recovery_flag:
     """
     def __init__(self, env, flow):
         self.enable_fast_retransmit = False
@@ -196,11 +196,11 @@ class TCPTahoe:
 class TCPVegas:
     """This is the class that implements TCP Vegas and FAST TCP.
 
-    :param enable_fast
-    :param vegas_alpha
-    :param vegas_beta
-    :param vegas_gamma
-    :param fast_alpha
+    :param enable_fast:
+    :param vegas_alpha:
+    :param vegas_beta:
+    :param vegas_gamma:
+    :param fast_alpha:
     :param rtt_alpha: change rate of rtt_avg
     :param rtt_beta: change rate of rtt_div       
     :ivar W: window size
@@ -214,8 +214,8 @@ class TCPVegas:
     :ivar last_reset: last effective timeout time
     :ivar time_out_event: current time out event
     :ivar slow_start_treshold: treshold of slow start
-    :ivar rtt_avg : the average value of rtt
-    :ivar rtt_div : the divergence of rtt
+    :ivar rtt_avg: the average value of rtt
+    :ivar rtt_div: the divergence of rtt
     :ivar slow_start_flag: flag for slow start
     :ivar vegas_rtt : last rtt
     :ivar vegas_rtt_base : the minimum of rtt
