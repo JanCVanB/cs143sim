@@ -311,10 +311,10 @@ class Router(Actor):
 
     Routers route packets through the network to their destination Hosts.
 
-    :param str address:IP address for router
+    :param str address: IP address for router
     :param list links: all connected Links
     :param float update_time: the time interval of updating routing tables
-    :ivar str address:IP address for router
+    :ivar str address: IP address for router
     :ivar list links: all connected Links
     :ivar dict table: routing table
     :ivar default_gateway: default out port if can not decide route
