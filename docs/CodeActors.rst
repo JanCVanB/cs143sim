@@ -5,6 +5,12 @@ Actors
 
 .. currentmodule:: cs143sim.actors
 
+Actor
+-----
+
+.. autoclass:: Actor
+    :members:
+
 Buffer
 ------
 

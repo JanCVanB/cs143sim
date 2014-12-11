@@ -2,18 +2,17 @@
 
 .. autosummary::
 
-    GoBackN
-    FastRetransmit
-    StopAndWait
     TCPTahoe
+    TCPVegas
 
-.. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
+.. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 """
+from math import floor
+
 from cs143sim.constants import PACKET_SIZE
 from cs143sim.events import PacketTimeOut
 from cs143sim.events import VegasTimeOut
-from math import floor
 
 
 class TCPTahoe:

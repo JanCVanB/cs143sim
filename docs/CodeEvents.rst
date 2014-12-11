@@ -34,3 +34,9 @@ RoutingTableOutdated
 
 .. autoclass:: RoutingTableOutdated
     :members:
+
+VegasTimeOut
+------------
+
+.. autoclass:: VegasTimeOut
+    :members:

@@ -9,11 +9,11 @@
     Link
     Router
 
-.. moduleauthor:: Lan Hongjian <lanhongjianlr@gmail.com>
-.. moduleauthor:: Yamei Ou <oym111@gmail.com>
-.. moduleauthor:: Samuel Richerd <dondiego152@gmail.com>
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
 .. moduleauthor:: Junlin Zhang <neicullyn@gmail.com>
+.. moduleauthor:: Yamei Ou <oym111@gmail.com>
+.. moduleauthor:: Lan Hongjian <lanhongjianlr@gmail.com>
+.. moduleauthor:: Samuel Richerd <dondiego152@gmail.com>
 """
 from Queue import Queue
 
@@ -33,7 +33,9 @@ class Actor(object):
     """Representation of an actor
 
     :param env: SimPy simulation :class:`~simpy.core.Environment`
+    :param str name: name from input file
     :ivar env: SimPy simulation :class:`~simpy.core.Environment`
+    :ivar name: name from input file
     """
     def __init__(self, env, name=None):
         self.env = env

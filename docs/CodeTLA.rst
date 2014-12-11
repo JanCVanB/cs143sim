@@ -5,25 +5,13 @@ Transport Layer Algorithms
 
 .. currentmodule:: cs143sim.tla
 
-GoBackN
--------
-
-.. autoclass:: GoBackN
-    :members:
-
-FastRetransmit
---------------
-
-.. autoclass:: FastRetransmit
-    :members:
-
-StopAndWait
------------
-
-.. autoclass:: StopAndWait
-    :members:
-
 TCPTahoe
+--------
+
+.. autoclass:: TCPTahoe
+    :members:
+
+TCPVegas
 --------
 
 .. autoclass:: TCPTahoe

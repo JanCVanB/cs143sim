@@ -5,9 +5,12 @@
     FlowStart
     LinkAvailable
     PacketReceipt
-    UpdateRoutingTable
+    PacketTimeOut
+    RoutingTableOutdated
+    VegasTimeOut
 
 .. moduleauthor:: Jan Van Bruggen <jancvanbruggen@gmail.com>
+.. moduleauthor:: Junlin Zhang <jancvanbruggen@gmail.com>
 """
 from simpy.events import Timeout
 
@@ -67,15 +70,6 @@ class PacketTimeOut(Timeout):
         self.callbacks.append(actor.react_to_time_out)    
 
 
-class VegasTimeOut(Timeout):
-    """
-    Time out event for tla
-    """
-    def __init__(self, env, delay, actor):
-        super(VegasTimeOut, self).__init__(env, delay)
-        self.callbacks.append(actor.react_to_vegas_time_out)    
-
-
 class RoutingTableOutdated(Timeout):
     """A :class:`~cs143sim.actors.Router` updates its routing table
 
@@ -86,3 +80,12 @@ class RoutingTableOutdated(Timeout):
     def __init__(self, env, delay, router):
         super(RoutingTableOutdated, self).__init__(env=env, delay=delay)
         self.callbacks.append(router.react_to_routing_table_outdated)
+
+
+class VegasTimeOut(Timeout):
+    """
+    Time out event for tla
+    """
+    def __init__(self, env, delay, actor):
+        super(VegasTimeOut, self).__init__(env, delay)
+        self.callbacks.append(actor.react_to_vegas_time_out)
