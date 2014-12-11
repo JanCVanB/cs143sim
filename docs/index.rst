@@ -13,30 +13,30 @@ Our Team
 ========
 
 .. image:: images/HongjianLan.jpg
-   :width: 20%
+   :width: 15%
 .. image:: images/YameiOu.jpg
-   :width: 20%
+   :width: 15%
 .. image:: images/SamuelRicherd.jpg
-   :width: 20%
+   :width: 15%
 .. image:: images/JanVanBruggen.jpg
-   :width: 20%
+   :width: 15%
 .. image:: images/JunlinZhang.jpg
-   :width: 20%
+   :width: 15%
 
 .. container:: clearer
 
     .. image:: images/spacer.png
 
 .. image:: images/HongjianLanName.png
-   :width: 20%
+   :width: 15%
 .. image:: images/YameiOuName.png
-   :width: 20%
+   :width: 15%
 .. image:: images/SamuelRicherdName.png
-   :width: 20%
+   :width: 15%
 .. image:: images/JanVanBruggenName.png
-   :width: 20%
+   :width: 15%
 .. image:: images/JunlinZhangName.png
-   :width: 20%
+   :width: 15%
 
 Site Contents
 =============
