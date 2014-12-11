@@ -74,9 +74,6 @@ class TCPTahoe:
         self.send_new_packets()
     
     def react_to_ack(self, ack_packet):
-        """
-        Updating Time out (according to 7.4.4 Timers)
-        """
         #RFC 6298
         if self.first_ack_flag:
             t = self.env.now - ack_packet.timestamp
@@ -259,10 +256,6 @@ class TCPVegas:
         self.send_new_packets()
     
     def react_to_ack(self, ack_packet):
-        """
-        Updating Time out (according to 7.4.4 Timers)
-        Updating vegas_rtt
-        """
         #RFC 6298
         if self.first_ack_flag:
             t = self.env.now - ack_packet.timestamp
