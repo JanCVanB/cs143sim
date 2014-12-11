@@ -155,7 +155,7 @@ def run():
     duration *= 1000
     controller = Controller(case='cs143sim/cases/case' + str(case) + '.txt')
     controller.run(until=duration)
-    x_step = duration / NUMBER_X_STEPS
+    x_step = int(duration / NUMBER_X_STEPS)
     graph_buffer_occupancy(case, 'Buffer Occupancy', controller, x_step)
     graph_flow_rate_or_packet_loss(case, 'Flow Rate', controller, duration, x_step)
     graph_link_rate(case, 'Link Rate', controller, x_step)
