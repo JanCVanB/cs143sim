@@ -60,8 +60,11 @@ class PacketReceipt(Timeout):
 
 
 class PacketTimeOut(Timeout):
-    """
-    Time out event for tla
+    """A TLA checks if a packet time out happens
+    
+    :param env: SimPy simulation :class:`~simpy.core.Environment`
+    :param float delay: time until packet timeout.
+    :param actor: the responsing TLA
     """
     def __init__(self, env, delay, actor, expected_time):
         super(PacketTimeOut, self).__init__(env, delay, value=expected_time)
@@ -69,11 +72,11 @@ class PacketTimeOut(Timeout):
 
 
 class RoutingTableOutdated(Timeout):
-    """A :class:`~cs143sim.actors.Router` updates its routing table
+    """A TCP Vegas updates its window size
 
     :param env: SimPy simulation :class:`~simpy.core.Environment`
-    :param float delay: time until :class:`~cs143sim.actors.Router` updates
-    :param router: :class:`~cs143sim.actors.Router` that updates
+    :param float delay: time until window size updates
+    :param actor: the responsing TLA
     """
     def __init__(self, env, delay, router):
         super(RoutingTableOutdated, self).__init__(env=env, delay=delay)
