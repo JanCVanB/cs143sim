@@ -31,11 +31,13 @@ from cs143sim.tla import TCPVegas
 
 class Actor(object):
     """Representation of an actor
+    
+    The superclass of all actors defining environment variables.
 
     :param env: SimPy simulation :class:`~simpy.core.Environment`
     :param str name: name from input file
     :ivar env: SimPy simulation :class:`~simpy.core.Environment`
-    :ivar name: name from input file
+    :ivar str name: name from input file
     """
     def __init__(self, env, name=None):
         self.env = env
@@ -52,6 +54,7 @@ class Buffer(Actor):
     :ivar int capacity: maximum number of bits that can be stored
     :ivar link: :class:`.Link` containing this buffer
     :ivar list packets: :class:`Packets <.Packet>` currently in storage
+    :ivar int current_level: the current occupancy of the buffer
     """
     def __init__(self, env, capacity, link):
         super(Buffer, self).__init__(env=env)
@@ -80,7 +83,10 @@ class Buffer(Actor):
             return False
                     
     def get(self, timeout=None):
-        # TODO: add docstring
+        """Link get a packet from its buffer.
+        
+        :param timeout
+        """
         packet = self.packets.get(timeout=timeout)
         self.current_level = self.current_level - packet.size
         self.env.controller.record_buffer_occupancy(link=self.link,
@@ -96,9 +102,11 @@ class Flow(Actor):
     :param source: source :class:`.Host`
     :param destination: destination :class:`.Host`
     :param float amount: amount of data to transmit
+    :param int algorithm: indicate which tla this flow is using
     :ivar source: source :class:`.Host`
     :ivar destination: destination :class:`.Host`
     :ivar float amount: amount of data to transmit
+    :ivar int algorithm: indicate which tla this flow is using
     
     
     Receiver
@@ -258,6 +266,7 @@ class Link(Actor):
     :ivar source: source :class:`.Host` or :class:`.Router`
     :ivar destination: destination :class:`.Host` or :class:`.Router`
     :ivar float delay: amount of time required to transmit a :class:`.Packet`
+    :ivar float rate: speed of removing data from source
     :ivar list buffer: :class:`Packets <.Packet>` currently in transmission
     :ivar bool busy: whether currently removing data from source
     :ivar float utilization: fraction of capacity in use
@@ -284,17 +293,11 @@ class Link(Actor):
             self.send(packet)
 
     def react_to_link_available(self, event):
-        # TODO: implement the pseudo-code below
-        # self.busy = False
-        # if packets in buffer:
-        #     self.busy = True
-        #     self.send(self.buffer.get_first_packet())
         self.busy = False
         if not self.buffer.packets.empty():
             self.send(self.buffer.get())
 
     def send(self, packet):
-        # TODO: implement sending by scheduling LinkAvailable and PacketReceipt
         self.busy = True
         d_trans = 1.0 * packet.size / self.rate  # (bits to be tx'ed)/(rate in bits/ms) should give the
                                                  # transit time in ms
@@ -308,12 +311,14 @@ class Router(Actor):
 
     Routers route packets through the network to their destination Hosts.
 
-    :param address:IP address for router
+    :param str address:IP address for router
     :param list links: all connected Links
-    :param Link default_gateway: default route
+    :param float update_time: the time interval of updating routing tables
+    :ivar str address:IP address for router
     :ivar list links: all connected Links
     :ivar dict table: routing table
     :ivar default_gateway: default out port if can not decide route
+    :ivar float update_time: the time interval of updating routing tables
     """
     def __init__(self, env, name, address, update_time=GENERATE_ROUTER_PACKET_DEFAULT_INTERVAL):
         super(Router, self).__init__(env=env, name=name)
@@ -348,8 +353,8 @@ class Router(Actor):
     def update_router_table(self, router_packet):
         """Check every item in router table if any update
 
-        Implement Bellman Ford algorithm here.
-        Measurement is hop if DYNAMIC_ROUTE_DISTANCE_METRIC = False.
+        Implement Bellman-Ford algorithm here.
+        Measurement is number of hops if DYNAMIC_ROUTE_DISTANCE_METRIC = False.
         Measurement is link delay if DYNAMIC_ROUTE_DISTANCE_METRIC = True.
         """
         for (destination, val) in router_packet.router_table.items():
