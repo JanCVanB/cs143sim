@@ -307,7 +307,7 @@ class Link(Actor):
 
 
 class Router(Actor):
-    """Representation of a router...
+    """Representation of a router
 
     Routers route packets through the network to their destination Hosts.
 
