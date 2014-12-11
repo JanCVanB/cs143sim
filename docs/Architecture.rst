@@ -1,5 +1,5 @@
-Architecture
-============
+Initial Architecture Plan
+=========================
 
 .. toctree::
    :maxdepth: 2
