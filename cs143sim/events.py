@@ -60,8 +60,11 @@ class PacketReceipt(Timeout):
 
 
 class PacketTimeOut(Timeout):
-    """
-    Time out event for tla
+    """A TLA Check if a packet time out happens
+    
+    :param env: SimPy simulation :class:`~simpy.core.Environment`
+    :param float delay: time until packet timeout.
+    :param actor: the responsing TLA
     """
     def __init__(self, env, delay, actor, expected_time):
         super(PacketTimeOut, self).__init__(env, delay, value=expected_time)
@@ -81,8 +84,11 @@ class RoutingTableOutdated(Timeout):
 
 
 class VegasTimeOut(Timeout):
-    """
-    Time out event for tla
+    """A TCP Vegas updates its window size
+        
+    :param env: SimPy simulation :class:`~simpy.core.Environment`
+    :param float delay: time until updating.
+    :param actor: the responsing TCP Vegas
     """
     def __init__(self, env, delay, actor):
         super(VegasTimeOut, self).__init__(env, delay)
